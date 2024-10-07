@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/admin/purchaseSubscription")
@@ -27,4 +28,20 @@ public class PurchaseSubscriptionController {
         List<PurchaseSubscriptionDTO> purchaseSubscription = purchaseSubscriptionService.getAllPurchaseSubscriptions();
         return ResponseEntity.ok(purchaseSubscription);
     }
+
+    @GetMapping("/{uuid}")
+    public Optional<PurchaseSubscriptionDTO> getPurchaseSubscriptionByUuid(@PathVariable String uuid) {
+        return purchaseSubscriptionService.getPurchaseSubscriptionByUuid(uuid);
+    }
+
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<String> deletePurchaseSubscriptionByUuid(@PathVariable String uuid) {
+        boolean deactivated = purchaseSubscriptionService.deletePurchaseSubscription(uuid);
+        if (deactivated) {
+            return ResponseEntity.ok("Purchase Subscription is deleted");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
