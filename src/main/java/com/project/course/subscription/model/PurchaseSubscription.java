@@ -28,7 +28,7 @@ public class PurchaseSubscription {
     private String uuid = UUID.randomUUID().toString();
 
     @ManyToOne
-    @JoinColumn(name = "subscription_id", referencedColumnName = "id")
+    @JoinColumn(name = "subscription_id", referencedColumnName = "id",updatable = false)
     private Subscription subscription;
 
     private boolean recurring;
@@ -37,7 +37,7 @@ public class PurchaseSubscription {
     private boolean paid;
 
     @ManyToOne
-    @JoinColumn(name = "pax_user_id",referencedColumnName = "id")
+    @JoinColumn(name = "pax_user_id",referencedColumnName = "id",updatable = false)
     private PaxUser paxUser;
 
     private LocalDateTime purchaseDate;

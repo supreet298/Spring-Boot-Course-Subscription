@@ -63,7 +63,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         return Optional.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid)
                 .filter(PurchaseSubscription::isActive)
                 .map(this::convertToDTO)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, " Purchase Subscription not found with UUID: " + uuid)));
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid)));
     }
 
     @Override
@@ -75,7 +75,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
             purchaseSubscriptionRepository.save(purchaseSubscription);
             return true;
         } else {
-            throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
+            throw new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid);
         }
     }
 
