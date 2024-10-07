@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -47,7 +46,20 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         // Set expiryDate based on SubscriptionType directly from subscription service
         LocalDateTime expiryDate = calculateExpiryDate(now, subscription.getSubscriptionType());
         purchaseSubscription.setExpiryDate(expiryDate);
+
+        // Check if the user has an active subscription for the same plan
+        if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
+            throw new IllegalArgumentException("PaxUser cannot purchase the same subscription until the previous one expires.");
+        }
         return purchaseSubscriptionRepository.save(purchaseSubscription);
+    }
+
+    private boolean hasActiveSubscriptionForSamePlan(PaxUser paxUser, Subscription subscription) {
+        List<PurchaseSubscription> activeSubscriptions = purchaseSubscriptionRepository.findActiveSubscriptionsByUserId(paxUser.getId());
+
+        // Check if any active subscription matches the subscription being purchased
+        return activeSubscriptions.stream()
+                .anyMatch(ps -> ps.getSubscription().getId().equals(subscription.getId()));
     }
 
     @Override

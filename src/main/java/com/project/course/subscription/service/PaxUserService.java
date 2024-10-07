@@ -4,7 +4,6 @@ import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.PaxMemberDTO;
 import com.project.course.subscription.model.PaxUser;
 import jakarta.validation.Valid;
-
 import java.util.List;
 
 public interface PaxUserService {
