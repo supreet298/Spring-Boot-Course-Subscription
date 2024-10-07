@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
@@ -16,4 +17,6 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
 
     @Query("SELECT u FROM PaxUser u WHERE u.type = 'MEMBER'")
     List<PaxUser> findAllMembers();
+    
+    Optional<PaxUser> findByUuid(String uuid);
 }

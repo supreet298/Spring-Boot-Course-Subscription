@@ -7,6 +7,7 @@ import com.project.course.subscription.service.PaxUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -15,30 +16,41 @@ import java.util.List;
 @RequestMapping("api/admin/pax")
 public class PaxUserController {
 
-    @Autowired
-    private PaxUserService paxUserService;
+	@Autowired
+	private PaxUserService paxUserService;
 
-    @PostMapping("/addHead")
-    public ResponseEntity<PaxUser> addPaxHead(@Valid @RequestBody PaxUser paxUser) {
-        PaxUser createdUser = paxUserService.addPaxHead(paxUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-    }
+	@PostMapping("/addHead")
+	public ResponseEntity<PaxUser> addPaxHead(@Valid @RequestBody PaxUser paxUser) {
+		PaxUser createdUser = paxUserService.addPaxHead(paxUser);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+	}
 
-    @PostMapping("/addMember")
-    public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxUser paxUser) {
-        PaxUser createdUser = paxUserService.addPaxMember(paxUser);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-    }
+	@PostMapping("/addMember")
+	public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxUser paxUser) {
+		PaxUser createdUser = paxUserService.addPaxMember(paxUser);
+		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+	}
 
-    @GetMapping("/head")
-    public ResponseEntity<List<PaxHeadDTO>> getAllPaxHeads() {
-        List<PaxHeadDTO> head = paxUserService.getAllHead();
-        return ResponseEntity.ok(head);
-    }
+	@GetMapping("/head")
+	public ResponseEntity<List<PaxHeadDTO>> getAllPaxHeads() {
+		List<PaxHeadDTO> head = paxUserService.getAllHead();
+		return ResponseEntity.ok(head);
+	}
 
-    @GetMapping("/member")
-    public ResponseEntity<List<PaxMemberDTO>> getAllPaxMembers() {
-        List<PaxMemberDTO> member = paxUserService.getAllMember();
-        return ResponseEntity.ok(member);
-    }
+	@GetMapping("/member")
+	public ResponseEntity<List<PaxMemberDTO>> getAllPaxMembers() {
+		List<PaxMemberDTO> member = paxUserService.getAllMember();
+		return ResponseEntity.ok(member);
+	}
+
+	@PutMapping("/updateHead/{uuid}")
+	public ResponseEntity<?> updateHead(@PathVariable String uuid, @RequestBody PaxUser request) {
+		try {
+			PaxUser updatedPaxUser = paxUserService.updatePaxHead(uuid, request);
+			return new ResponseEntity<>(updatedPaxUser, HttpStatus.OK);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+
 }

@@ -8,11 +8,13 @@ import com.project.course.subscription.service.PaxUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +31,17 @@ public class PaxUserServiceImpl implements PaxUserService {
         head.setPhoneNumber(paxUser.getPhoneNumber());
         head.setType(PaxUser.Type.HEAD);
         return paxUserRepository.save(head);
+    }
+    
+    public PaxUser updatePaxHead(String uuid, PaxUser request) {
+        PaxUser existingUser = paxUserRepository.findByUuid(uuid)
+                .orElseThrow(() -> new UsernameNotFoundException("No user found for UUID: " + uuid));
+
+        existingUser.setUserName(request.getUserName());
+        existingUser.setEmail(request.getEmail());
+        existingUser.setPhoneNumber(request.getPhoneNumber());
+        existingUser.setType(PaxUser.Type.HEAD);  
+        return paxUserRepository.save(existingUser);
     }
 
     @Override
@@ -107,4 +120,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 
         return dto;
     }
+    
+    
+    
 }
