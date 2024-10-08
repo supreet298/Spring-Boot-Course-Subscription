@@ -20,5 +20,9 @@ public interface PaxUserService {
     
     PaxUser updatePaxHead(String uuid,PaxUser request);
     
+    PaxUser updatepaxMember(String uuid, PaxUser paxUserMember);
+    
+    PaxUser dropPaxUser(String uuid);
+    
     
 }

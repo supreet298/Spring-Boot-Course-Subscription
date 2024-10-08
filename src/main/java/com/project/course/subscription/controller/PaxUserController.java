@@ -46,8 +46,28 @@ public class PaxUserController {
 	@PutMapping("/updateHead/{uuid}")
 	public ResponseEntity<?> updateHead(@PathVariable String uuid, @RequestBody PaxUser request) {
 		try {
-			PaxUser updatedPaxUser = paxUserService.updatePaxHead(uuid, request);
-			return new ResponseEntity<>(updatedPaxUser, HttpStatus.OK);
+			PaxUser updatedPaxHead = paxUserService.updatePaxHead(uuid, request);
+			return new ResponseEntity<>(updatedPaxHead, HttpStatus.OK);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+
+	@PutMapping("/UpdateMember/{uuid}")
+	public ResponseEntity<?> updateMember(@PathVariable String uuid, @RequestBody PaxUser request) {
+		try {
+			PaxUser updatedPaxMember = paxUserService.updatepaxMember(uuid, request);
+			return new ResponseEntity<>(updatedPaxMember, HttpStatus.OK);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+
+	@DeleteMapping("/dropPaxuser/{uuid}")
+	public ResponseEntity<?> dropPaxuser(@PathVariable String uuid) {
+		try {
+			PaxUser dropPaxHead = paxUserService.dropPaxUser(uuid);
+			return new ResponseEntity<>(dropPaxHead.getUserName()+" Deleted Sucessfully", HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}

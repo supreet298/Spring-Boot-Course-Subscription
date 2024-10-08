@@ -19,4 +19,8 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
     List<PaxUser> findAllMembers();
     
     Optional<PaxUser> findByUuid(String uuid);
+    
+    Optional<PaxUser> findByUuidAndType(String uuid, PaxUser.Type type);
+
+
 }
