@@ -7,7 +7,6 @@ import com.project.course.subscription.service.PaxUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -63,11 +62,11 @@ public class PaxUserController {
 		}
 	}
 
-	@DeleteMapping("/dropPaxuser/{uuid}")
-	public ResponseEntity<?> dropPaxuser(@PathVariable String uuid) {
+	@DeleteMapping("/dropPaxUser/{uuid}")
+	public ResponseEntity<?> dropPaxUser(@PathVariable String uuid) {
 		try {
 			PaxUser dropPaxHead = paxUserService.dropPaxUser(uuid);
-			return new ResponseEntity<>(dropPaxHead.getUserName()+" Deleted Sucessfully", HttpStatus.OK);
+			return new ResponseEntity<>(dropPaxHead.getUserName()+" Deleted Successfully", HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
