@@ -1,19 +1,23 @@
 package com.project.course.subscription.service.Impl;
 
-import com.project.course.subscription.dto.PaxHeadDTO;
-import com.project.course.subscription.dto.PaxMemberDTO;
-import com.project.course.subscription.model.PaxUser;
-import com.project.course.subscription.repository.PaxUserRepository;
-import com.project.course.subscription.service.PaxUserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+import com.project.course.subscription.dto.PaxHeadDTO;
+import com.project.course.subscription.dto.PaxMemberDTO;
+import com.project.course.subscription.model.PaxUser;
+import com.project.course.subscription.model.PaxUser.Type;
+import com.project.course.subscription.repository.PaxUserRepository;
+import com.project.course.subscription.service.PaxUserService;
 
 @Service
 public class PaxUserServiceImpl implements PaxUserService {
@@ -30,7 +34,18 @@ public class PaxUserServiceImpl implements PaxUserService {
         head.setType(PaxUser.Type.HEAD);
         return paxUserRepository.save(head);
     }
+    
+    public PaxUser updatePaxHead(String uuid, PaxUser request) {
+        PaxUser existingHead = paxUserRepository.findByUuid(uuid)
+                .orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
 
+        existingHead.setUserName(request.getUserName());
+        existingHead.setEmail(request.getEmail());
+        existingHead.setPhoneNumber(request.getPhoneNumber());
+        existingHead.setType(PaxUser.Type.HEAD);  
+        return paxUserRepository.save(existingHead);
+    }
+   
     @Override
     public PaxUser addPaxMember(PaxUser paxUser) {
 
@@ -50,7 +65,21 @@ public class PaxUserServiceImpl implements PaxUserService {
         member.setRelation(paxUser.getRelation()); // Set relation
         return paxUserRepository.save(member);
     }
-
+    
+    @Override
+    public PaxUser updatepaxMember(String uuid, PaxUser paxMember)
+    {
+    	 PaxUser existingMember = paxUserRepository.findByUuidAndType(uuid, Type.MEMBER)
+                 .orElseThrow(() -> new UsernameNotFoundException("No Member found for UUID: " + uuid));
+    	 existingMember.setUserName(paxMember.getUserName());
+    	 existingMember.setEmail(paxMember.getEmail());
+    	 existingMember.setPhoneNumber(paxMember.getPhoneNumber());
+    	 existingMember.setType(PaxUser.Type.MEMBER);
+    	 existingMember.setRelation(paxMember.getRelation());
+    	 return paxUserRepository.save(existingMember);
+    	
+    }
+    
     @Override
     public List<PaxHeadDTO> getAllHead() {
         List<PaxUser> heads = paxUserRepository.findAllHeads();
@@ -107,4 +136,21 @@ public class PaxUserServiceImpl implements PaxUserService {
 
         return dto;
     }
+
+	@Override
+	public PaxUser dropPaxUser(String uuid) {
+		PaxUser existingHead = paxUserRepository.findByUuid(uuid)
+                .orElseThrow(() -> new UsernameNotFoundException("No PaxUser found for this UUID: " + uuid));
+   	 if(existingHead.isActive())
+   	 {
+   		 existingHead.setActive(false);
+   		 paxUserRepository.save(existingHead);
+   	    }
+  
+		return existingHead;
+   	
+	}
+    
+    
+    
 }
