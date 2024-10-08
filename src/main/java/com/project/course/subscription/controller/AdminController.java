@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("api/admin/")
-public class adminController {
+public class AdminController {
 
     @GetMapping("home")
     public String home(){

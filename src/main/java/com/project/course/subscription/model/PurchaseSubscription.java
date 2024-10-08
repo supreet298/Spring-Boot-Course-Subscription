@@ -28,6 +28,10 @@ public class PurchaseSubscription {
     private String uuid = UUID.randomUUID().toString();
 
     @ManyToOne
+    @JoinColumn(name = "pax_user_id",referencedColumnName = "id",updatable = false)
+    private PaxUser paxUser;
+
+    @ManyToOne
     @JoinColumn(name = "subscription_id", referencedColumnName = "id",updatable = false)
     private Subscription subscription;
 
@@ -35,10 +39,6 @@ public class PurchaseSubscription {
 
     @Column(nullable = false)
     private boolean paid;
-
-    @ManyToOne
-    @JoinColumn(name = "pax_user_id",referencedColumnName = "id",updatable = false)
-    private PaxUser paxUser;
 
     private LocalDateTime purchaseDate;
 

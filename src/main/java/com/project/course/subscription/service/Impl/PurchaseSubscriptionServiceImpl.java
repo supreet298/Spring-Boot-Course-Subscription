@@ -105,7 +105,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
     private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
         return switch (subscriptionType) {
-            case MONTHLY -> startDate.plusMonths(1);
+            case MONTHLY -> startDate.plusMinutes(5);
             case QUARTERLY -> startDate.plusMonths(3);
             case HALF_YEARLY -> startDate.plusMonths(6);
             case YEARLY -> startDate.plusYears(1);
