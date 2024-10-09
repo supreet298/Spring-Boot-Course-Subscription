@@ -16,13 +16,11 @@ public interface PaxUserService {
 
     List<PaxMemberDTO> getAllMember();
 
-    PaxUser getHeadUserById(Long id);
-    
     PaxUser updatePaxHead(String uuid,PaxUser request);
     
-    PaxUser updatepaxMember(String uuid, PaxUser paxUserMember);
+    PaxUser updatePaxMember(String uuid, PaxUser paxUserMember);
     
     PaxUser dropPaxUser(String uuid);
-    
-    
+
+    PaxUser getHeadUserById(Long id);
 }

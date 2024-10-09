@@ -2,10 +2,12 @@ package com.project.course.subscription.service.Impl;
 
 import com.project.course.subscription.dto.PurchaseSubscriptionDTO;
 import com.project.course.subscription.model.PaxUser;
+import com.project.course.subscription.model.PurchaseHistory;
 import com.project.course.subscription.model.PurchaseSubscription;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.repository.PurchaseSubscriptionRepository;
 import com.project.course.subscription.service.PaxUserService;
+import com.project.course.subscription.service.PurchaseHistoryService;
 import com.project.course.subscription.service.PurchaseSubscriptionService;
 import com.project.course.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +31,12 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
     @Autowired
     private SubscriptionService subscriptionService;
 
+    @Autowired
+    private PurchaseHistoryService purchaseHistoryService;
+
     @Override
     public PurchaseSubscription createPurchaseSubscription(PurchaseSubscription purchaseSubscription) {
+
         // Fetch the PaxUser and check if it's of type HEAD in one step
         PaxUser paxUser = paxUserService.getHeadUserById(purchaseSubscription.getPaxUser().getId());
         purchaseSubscription.setPaxUser(paxUser);
@@ -51,7 +57,22 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
             throw new IllegalArgumentException("PaxUser cannot purchase the same subscription until the previous one expires.");
         }
-        return purchaseSubscriptionRepository.save(purchaseSubscription);
+        // Save the PurchaseSubscription
+        PurchaseSubscription savedSubscription = purchaseSubscriptionRepository.save(purchaseSubscription);
+
+        // Create PurchaseHistory with the same details
+        PurchaseHistory purchaseHistory = new PurchaseHistory();
+        purchaseHistory.setPaxUserHead(paxUser);
+        purchaseHistory.setSubscription(subscription);
+        purchaseHistory.setPlanName(subscription.getPlanName());
+        purchaseHistory.setRenewalCount(0);  // Set renewal count as needed
+        purchaseHistory.setPurchaseDate(now); // Use the same purchaseDate
+        purchaseHistory.setExpiryDate(expiryDate); // Use the same expiryDate
+
+        // Save the PurchaseHistory
+        purchaseHistoryService.createPurchaseHistory(purchaseHistory);
+
+        return savedSubscription;
     }
 
     private boolean hasActiveSubscriptionForSamePlan(PaxUser paxUser, Subscription subscription) {
@@ -60,6 +81,16 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         // Check if any active subscription matches the subscription being purchased
         return activeSubscriptions.stream()
                 .anyMatch(ps -> ps.getSubscription().getId().equals(subscription.getId()));
+    }
+
+    private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
+        return switch (subscriptionType) {
+            case MONTHLY -> startDate.plusMonths(1);
+            case QUARTERLY -> startDate.plusMonths(3);
+            case HALF_YEARLY -> startDate.plusMonths(6);
+            case YEARLY -> startDate.plusYears(1);
+            default -> throw new IllegalArgumentException("Unknown SubscriptionType: " + subscriptionType);
+        };
     }
 
     @Override
@@ -103,13 +134,4 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         return dto;
     }
 
-    private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
-        return switch (subscriptionType) {
-            case MONTHLY -> startDate.plusMinutes(5);
-            case QUARTERLY -> startDate.plusMonths(3);
-            case HALF_YEARLY -> startDate.plusMonths(6);
-            case YEARLY -> startDate.plusYears(1);
-            default -> throw new IllegalArgumentException("Unknown SubscriptionType: " + subscriptionType);
-        };
-    }
 }

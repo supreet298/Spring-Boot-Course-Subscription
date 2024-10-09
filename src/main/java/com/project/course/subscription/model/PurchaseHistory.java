@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,13 +18,20 @@ public class PurchaseHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "purchase_subscription_id", referencedColumnName = "id", nullable = false)
-    private PurchaseSubscription purchaseSubscription;
+    @JoinColumn(name = "pax_user_head_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private PaxUser paxUserHead;
 
-    @Column(name = "plan_renewal_count", nullable = false)
-    private int planRenewalCount;
+    @ManyToOne
+    @JoinColumn(name = "subscription_id", referencedColumnName = "id", nullable = false, updatable = false)
+    private Subscription subscription;
 
-    @Column(name = "purchase_date", nullable = false)
+    @Column(name = "plan_name", nullable = false)
+    private String planName;
+
+    @Column(name = "renewal_count", nullable = false)
+    private int renewalCount;
+
+    @Column(name = "purchase_date", nullable = false,updatable = false)
     private LocalDateTime purchaseDate;
 
     @Column(name = "expiry_date", nullable = false)

@@ -55,7 +55,7 @@ public class PaxUserController {
 	@PutMapping("/UpdateMember/{uuid}")
 	public ResponseEntity<?> updateMember(@PathVariable String uuid, @RequestBody PaxUser request) {
 		try {
-			PaxUser updatedPaxMember = paxUserService.updatepaxMember(uuid, request);
+			PaxUser updatedPaxMember = paxUserService.updatePaxMember(uuid, request);
 			return new ResponseEntity<>(updatedPaxMember, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

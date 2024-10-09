@@ -69,7 +69,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     public Subscription getSubscriptionById(Long id){
         return subscriptionRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SubscriptionType not found"));
+                .orElseThrow(() -> new IllegalArgumentException("SubscriptionType not found"));
     }
 
     private SubscriptionDTO convertToDTO(Subscription subscription) {

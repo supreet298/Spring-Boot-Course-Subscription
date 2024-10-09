@@ -4,14 +4,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.PaxMemberDTO;
 import com.project.course.subscription.model.PaxUser;
@@ -34,18 +32,7 @@ public class PaxUserServiceImpl implements PaxUserService {
         head.setType(PaxUser.Type.HEAD);
         return paxUserRepository.save(head);
     }
-    
-    public PaxUser updatePaxHead(String uuid, PaxUser request) {
-        PaxUser existingHead = paxUserRepository.findByUuid(uuid)
-                .orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
 
-        existingHead.setUserName(request.getUserName());
-        existingHead.setEmail(request.getEmail());
-        existingHead.setPhoneNumber(request.getPhoneNumber());
-        existingHead.setType(PaxUser.Type.HEAD);  
-        return paxUserRepository.save(existingHead);
-    }
-   
     @Override
     public PaxUser addPaxMember(PaxUser paxUser) {
 
@@ -65,9 +52,21 @@ public class PaxUserServiceImpl implements PaxUserService {
         member.setRelation(paxUser.getRelation()); // Set relation
         return paxUserRepository.save(member);
     }
-    
+
     @Override
-    public PaxUser updatepaxMember(String uuid, PaxUser paxMember)
+    public PaxUser updatePaxHead(String uuid, PaxUser request) {
+        PaxUser existingHead = paxUserRepository.findByUuid(uuid)
+                .orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
+
+        existingHead.setUserName(request.getUserName());
+        existingHead.setEmail(request.getEmail());
+        existingHead.setPhoneNumber(request.getPhoneNumber());
+        existingHead.setType(PaxUser.Type.HEAD);  
+        return paxUserRepository.save(existingHead);
+    }
+
+    @Override
+    public PaxUser updatePaxMember(String uuid, PaxUser paxMember)
     {
     	 PaxUser existingMember = paxUserRepository.findByUuidAndType(uuid, Type.MEMBER)
                  .orElseThrow(() -> new UsernameNotFoundException("No Member found for UUID: " + uuid));
@@ -102,14 +101,13 @@ public class PaxUserServiceImpl implements PaxUserService {
                 .collect(Collectors.toList());
     }
 
-    @Override
     public PaxUser getHeadUserById(Long id) {
         PaxUser paxUser = paxUserRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PaxUser not found"));
 
         // Check if the PaxUser's type is HEAD
         if (!paxUser.getType().equals(PaxUser.Type.HEAD)) {
-            throw new BadCredentialsException("Only PaxUser of type HEAD can purchase subscription.");
+            throw new IllegalArgumentException("Only PaxUser of type HEAD can purchase subscription.");
         }
 
         return paxUser; // Return the PaxUser if the check passes
@@ -150,7 +148,4 @@ public class PaxUserServiceImpl implements PaxUserService {
 		return existingHead;
    	
 	}
-    
-    
-    
 }
