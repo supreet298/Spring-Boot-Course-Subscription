@@ -11,6 +11,7 @@ import com.project.course.subscription.service.PurchaseHistoryService;
 import com.project.course.subscription.service.PurchaseSubscriptionService;
 import com.project.course.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
@@ -60,19 +61,25 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         // Save the PurchaseSubscription
         PurchaseSubscription savedSubscription = purchaseSubscriptionRepository.save(purchaseSubscription);
 
-        // Create PurchaseHistory with the same details
-        PurchaseHistory purchaseHistory = new PurchaseHistory();
-        purchaseHistory.setPaxUserHead(paxUser);
-        purchaseHistory.setSubscription(subscription);
-        purchaseHistory.setPlanName(subscription.getPlanName());
-        purchaseHistory.setRenewalCount(0);  // Set renewal count as needed
-        purchaseHistory.setPurchaseDate(now); // Use the same purchaseDate
-        purchaseHistory.setExpiryDate(expiryDate); // Use the same expiryDate
-
-        // Save the PurchaseHistory
-        purchaseHistoryService.createPurchaseHistory(purchaseHistory);
+        // Create PurchaseHistory with initial details
+        createPurchaseHistory(paxUser, subscription, now, expiryDate,0);
 
         return savedSubscription;
+    }
+
+    @Scheduled(cron = "0 0 12 * * ?")
+    public void renewExpiredRecurringSubscriptions() {
+        List<PurchaseSubscription> expiredSubscriptions = purchaseSubscriptionRepository.findExpiredRecurringSubscriptions(LocalDateTime.now());
+
+        for (PurchaseSubscription subscription : expiredSubscriptions) {
+            if (subscription.isRecurring()) {
+
+                LocalDateTime newExpiryDate = calculateExpiryDate(subscription.getExpiryDate(), subscription.getSubscription().getSubscriptionType());
+
+                int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
+                createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(), newExpiryDate, newRenewalCount);
+            }
+        }
     }
 
     private boolean hasActiveSubscriptionForSamePlan(PaxUser paxUser, Subscription subscription) {
@@ -91,6 +98,23 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
             case YEARLY -> startDate.plusYears(1);
             default -> throw new IllegalArgumentException("Unknown SubscriptionType: " + subscriptionType);
         };
+    }
+
+    private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate,int renewalCount) {
+        PurchaseHistory purchaseHistory = new PurchaseHistory();
+        purchaseHistory.setPaxUserHead(paxUser);
+        purchaseHistory.setSubscription(subscription);
+        purchaseHistory.setPlanName(subscription.getPlanName());
+        purchaseHistory.setRenewalCount(renewalCount);
+        purchaseHistory.setPurchaseDate(purchaseDate);
+        purchaseHistory.setExpiryDate(expiryDate);
+
+        purchaseHistoryService.createPurchaseHistory(purchaseHistory);  // Save purchase history
+    }
+
+    private int getRenewalCount(PaxUser paxUser, Subscription subscription) {
+        List<PurchaseHistory> historyList = purchaseHistoryService.findPurchaseHistoryByUserAndSubscription(paxUser.getId(), subscription.getId());
+        return historyList.size();
     }
 
     @Override

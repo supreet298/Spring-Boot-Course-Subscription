@@ -5,7 +5,6 @@ import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.repository.SubscriptionRepository;
 import com.project.course.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.List;

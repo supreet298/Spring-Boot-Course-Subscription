@@ -8,4 +8,6 @@ public interface PurchaseHistoryService {
     List<PurchaseHistory> getAllPurchaseSubscriptionHistory();
 
     void createPurchaseHistory(PurchaseHistory purchaseHistory);
+
+    List<PurchaseHistory> findPurchaseHistoryByUserAndSubscription(Long userId, Long subscriptionId);
 }

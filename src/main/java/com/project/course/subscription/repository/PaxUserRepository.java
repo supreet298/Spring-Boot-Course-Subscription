@@ -22,5 +22,4 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
     
     Optional<PaxUser> findByUuidAndType(String uuid, PaxUser.Type type);
 
-
 }

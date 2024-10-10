@@ -7,7 +7,12 @@ import java.time.LocalDateTime;
 public class PurchaseHistoryRequestDTO {
 
     private Long paxUserId;
+
     private Long subscriptionId;
+
     private int renewalCount;
+
+    private LocalDateTime purchaseDate;
+
     private LocalDateTime expiryDate;
 }

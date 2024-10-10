@@ -1,6 +1,8 @@
 package com.project.course.subscription.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,16 +30,19 @@ public class Subscription {
     private String uuid = UUID.randomUUID().toString();
 
     @Column(nullable = false)
+    @NotBlank(message = "PlanName is mandatory and cannot be blank.")
     private String planName;
 
     @Column(columnDefinition = "Text")
+    @NotBlank(message = "Description is mandatory and cannot be blank.")
     private String description;
 
     @Column(nullable = false)
+    @NotNull(message = "Cost is mandatory and cannot be blank.")
     private Double cost;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @NotNull(message = "SubscriptionType is mandatory and cannot be blank.")
     private SubscriptionType subscriptionType;
 
     @CreatedBy

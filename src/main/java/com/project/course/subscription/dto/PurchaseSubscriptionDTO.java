@@ -11,11 +11,17 @@ import java.time.LocalDateTime;
 public class PurchaseSubscriptionDTO {
 
     private String uuid;
+
     private String planName;
+
     private String paxUserHead;
+
     private boolean recurring;
+
     private boolean paid;
+
     private LocalDateTime purchaseDate;
+
     private LocalDateTime expiryDate;
 
 }
