@@ -47,11 +47,9 @@ public class PaxUser {
     private Type type;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Relation is mandatory and cannot be blank.")
     private Relation relation;
 
     @Column(name = "head_id")
-    @NotNull(message = "HeadID is mandatory and cannot be null.")
     private Long headId;
 
     @CreatedBy

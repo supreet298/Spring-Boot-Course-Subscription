@@ -2,6 +2,7 @@ package com.project.course.subscription.controller;
 
 import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.PaxMemberDTO;
+import com.project.course.subscription.dto.PaxMemberPostDTO;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.service.PaxUserService;
 import jakarta.validation.Valid;
@@ -25,7 +26,7 @@ public class PaxUserController {
 	}
 
 	@PostMapping("/addMember")
-	public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxUser paxUser) {
+	public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxMemberPostDTO paxUser) {
 		PaxUser createdUser = paxUserService.addPaxMember(paxUser);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
 	}

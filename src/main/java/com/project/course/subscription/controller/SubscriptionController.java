@@ -3,6 +3,7 @@ package com.project.course.subscription.controller;
 import com.project.course.subscription.dto.SubscriptionDTO;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.service.SubscriptionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class SubscriptionController {
     private SubscriptionService subscriptionService;
 
     @PostMapping
-    public ResponseEntity<Subscription> createSubscription(@RequestBody Subscription subscription) {
+    public ResponseEntity<Subscription> createSubscription(@Valid @RequestBody Subscription subscription) {
         Subscription createdSubscription = subscriptionService.createSubscription(subscription);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdSubscription);
     }

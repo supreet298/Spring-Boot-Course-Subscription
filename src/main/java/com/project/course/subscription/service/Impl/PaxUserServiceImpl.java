@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import com.project.course.subscription.dto.PaxMemberPostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,10 +33,8 @@ public class PaxUserServiceImpl implements PaxUserService {
         return paxUserRepository.save(head);
     }
 
-    @Override
-    public PaxUser addPaxMember(PaxUser paxUser) {
-
-        PaxUser head = paxUserRepository.findById(paxUser.getHeadId())
+    public PaxUser addPaxMember(PaxMemberPostDTO paxMemberDTO) {
+        PaxUser head = paxUserRepository.findById(paxMemberDTO.getHeadId())
                 .orElseThrow(() -> new IllegalArgumentException("Head ID does not exist."));
 
         if (head.getType() != PaxUser.Type.HEAD) {
@@ -43,12 +42,12 @@ public class PaxUserServiceImpl implements PaxUserService {
         }
 
         PaxUser member = new PaxUser();
-        member.setUserName(paxUser.getUserName());
-        member.setEmail(paxUser.getEmail());
-        member.setPhoneNumber(paxUser.getPhoneNumber());
+        member.setUserName(paxMemberDTO.getUserName());
+        member.setEmail(paxMemberDTO.getEmail());
+        member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
         member.setType(PaxUser.Type.MEMBER);
-        member.setHeadId(head.getId()); // Associate with the head
-        member.setRelation(paxUser.getRelation()); // Set relation
+        member.setHeadId(head.getId());
+        member.setRelation(PaxUser.Relation.valueOf(paxMemberDTO.getRelation()));
         return paxUserRepository.save(member);
     }
 

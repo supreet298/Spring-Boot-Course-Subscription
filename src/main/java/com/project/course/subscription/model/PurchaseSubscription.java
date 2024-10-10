@@ -31,19 +31,18 @@ public class PurchaseSubscription {
 
     @ManyToOne
     @JoinColumn(name = "pax_user_id",referencedColumnName = "id",updatable = false)
-    @NotBlank(message = "PaxUser is mandatory and cannot be blank.")
+    @NotNull(message = "PaxUser is mandatory and cannot be blank.")
     private PaxUser paxUser;
 
     @ManyToOne
     @JoinColumn(name = "subscription_id", referencedColumnName = "id",updatable = false)
-    @NotBlank(message = "Subscription is mandatory and cannot be blank.")
+    @NotNull(message = "Subscription is mandatory and cannot be blank.")
     private Subscription subscription;
 
     private boolean recurring;
 
-    @Column(nullable = false)
     @NotNull(message = "Paid cannot be null")
-    private boolean paid;
+    private Boolean paid;
 
     private LocalDateTime purchaseDate;
 

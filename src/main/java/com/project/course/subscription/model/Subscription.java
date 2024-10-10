@@ -29,7 +29,6 @@ public class Subscription {
     @Column(unique = true, nullable = false, updatable = false)
     private String uuid = UUID.randomUUID().toString();
 
-    @Column(nullable = false)
     @NotBlank(message = "PlanName is mandatory and cannot be blank.")
     private String planName;
 
@@ -37,7 +36,6 @@ public class Subscription {
     @NotBlank(message = "Description is mandatory and cannot be blank.")
     private String description;
 
-    @Column(nullable = false)
     @NotNull(message = "Cost is mandatory and cannot be blank.")
     private Double cost;
 

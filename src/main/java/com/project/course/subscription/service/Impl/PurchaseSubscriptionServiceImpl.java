@@ -152,7 +152,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         dto.setPlanName(purchaseSubscription.getSubscription().getPlanName());
         dto.setPaxUserHead(purchaseSubscription.getPaxUser().getUserName());
         dto.setRecurring(purchaseSubscription.isRecurring());
-        dto.setPaid(purchaseSubscription.isPaid());
+        dto.setPaid(purchaseSubscription.getPaid());
         dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
         dto.setExpiryDate(purchaseSubscription.getExpiryDate());
         return dto;
