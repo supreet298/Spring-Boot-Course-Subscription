@@ -69,16 +69,26 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
     @Scheduled(cron = "0 0 12 * * ?")
     public void renewExpiredRecurringSubscriptions() {
+        // Fetch expired recurring subscriptions
         List<PurchaseSubscription> expiredSubscriptions = purchaseSubscriptionRepository.findExpiredRecurringSubscriptions(LocalDateTime.now());
 
         for (PurchaseSubscription subscription : expiredSubscriptions) {
-            if (subscription.isRecurring()) {
+            // Check if the subscription is recurring and paid
+            boolean isRecurring = subscription.isRecurring();
+            Boolean getPaid = subscription.getPaid();
 
+            // If the subscription is recurring and paid is true, proceed with renewal
+            if (isRecurring && Boolean.TRUE.equals(getPaid)) {
+                // Increment the renewal count
+                int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
+
+                // Calculate new expiry date based on the subscription type
                 LocalDateTime newExpiryDate = calculateExpiryDate(subscription.getExpiryDate(), subscription.getSubscription().getSubscriptionType());
 
-                int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
+                // Create a new PurchaseHistory entry for the renewal
                 createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(), newExpiryDate, newRenewalCount);
             }
+            // Else, skip the renewal if either condition is not met
         }
     }
 
