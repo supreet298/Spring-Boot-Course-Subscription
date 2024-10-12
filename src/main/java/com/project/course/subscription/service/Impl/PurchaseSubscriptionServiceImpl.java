@@ -54,6 +54,11 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         LocalDateTime expiryDate = calculateExpiryDate(now, subscription.getSubscriptionType());
         purchaseSubscription.setExpiryDate(expiryDate);
 
+        // Validate if the purchase should proceed
+        if (purchaseSubscription.getPaid() == null || !purchaseSubscription.getPaid()){
+            throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made. ");
+        }
+
         // Check if the user has an active subscription for the same plan
         if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
             throw new IllegalArgumentException("PaxUser cannot purchase the same subscription until the previous one expires.");
