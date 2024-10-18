@@ -7,11 +7,13 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("api/admin/subscription")
 public class SubscriptionController {
 
@@ -25,9 +27,10 @@ public class SubscriptionController {
     }
 
     @GetMapping
-    public ResponseEntity<List<SubscriptionDTO>> getAllActiveSubscriptions() {
+    public String getAllActiveSubscriptions(Model model) {
         List<SubscriptionDTO> subscriptions = subscriptionService.getAllActiveSubscriptions();
-        return ResponseEntity.ok(subscriptions);
+        model.addAttribute("subscription",subscriptions);
+        return "subscriptions/index";
     }
 
     @GetMapping("/{uuid}")
