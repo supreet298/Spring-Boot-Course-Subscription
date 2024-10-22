@@ -26,24 +26,17 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public List<Subscription> getAllActiveSubscriptions() {
         return subscriptionRepository.findByIsActiveTrue();
-//        List<Subscription> categories = subscriptionRepository.findByIsActiveTrue();
-//        return categories.stream()
-//                .map(this::convertToDTO)
-//                .collect(Collectors.toList());
     }
 
     
     @Override
-    public Optional<SubscriptionDTO> getSubscriptionByUuid(String uuid) {
-        return Optional.ofNullable((subscriptionRepository.findByUuid(uuid)
-                .filter(Subscription::isActive)
-                .map(this::convertToDTO)
-                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid))));
+    public Optional<Subscription> getSubscriptionByUuid(String uuid) {
+        return subscriptionRepository.findByUuid(uuid);
     }
 
     @Override
     public void updateSubscription(String uuid, Subscription subscription) {
-        Subscription  existingSubscription= new Subscription();
+        Subscription  existingSubscription = subscriptionRepository.findByUuid(uuid).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Subscription not found"));
         existingSubscription.setPlanName(subscription.getPlanName());
         existingSubscription.setDescription(subscription.getDescription());
         existingSubscription.setCost(subscription.getCost());

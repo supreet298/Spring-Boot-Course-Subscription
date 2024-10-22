@@ -1,6 +1,5 @@
 package com.project.course.subscription.controller;
 
-import com.project.course.subscription.dto.SubscriptionDTO;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.service.SubscriptionService;
 import jakarta.validation.Valid;
@@ -44,10 +43,10 @@ public class SubscriptionController {
 
     @GetMapping("/edit/{uuid}")
     public String editSubscription(@PathVariable String uuid, Model model) {
-        Optional<SubscriptionDTO> optionalSubscription = subscriptionService.getSubscriptionByUuid(uuid);
+        Optional<Subscription> optionalSubscription = subscriptionService.getSubscriptionByUuid(uuid);
 
         if (optionalSubscription.isPresent()) {
-            SubscriptionDTO subscription = optionalSubscription.get();
+            Subscription subscription = optionalSubscription.get();
             model.addAttribute("subscription", subscription);
             return "subscriptions/edit_subscription";
         } else {

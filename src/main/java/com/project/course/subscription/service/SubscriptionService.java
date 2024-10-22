@@ -1,6 +1,5 @@
 package com.project.course.subscription.service;
 
-import com.project.course.subscription.dto.SubscriptionDTO;
 import com.project.course.subscription.model.Subscription;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -12,7 +11,7 @@ public interface SubscriptionService {
 
     List<Subscription> getAllActiveSubscriptions();
 
-    Optional<SubscriptionDTO> getSubscriptionByUuid(String uuid);
+    Optional<Subscription> getSubscriptionByUuid(String uuid);
 
     void updateSubscription(String uuid, Subscription subscription);
 
