@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,14 +8,18 @@
 </head>
 <body>
 <div class="container">
-  <h1 class="text-center my-4">Subscriptions</h1>
+  <div class="row" >
+    <h1>Subscription</h1>
+  </div>
+  <div class = "row">
+    <div class = "col-lg-3">
+      <a th:href = "@{/api/admin/subscription/subscriptions/new}" class = "btn btn-primary btn-sm mb-3"> Add Subscription</a>
+    </div>
+  </div>
 
-  <a class="btn btn-primary" href="/subscriptions">Create Subscription</a>
-
-  <table class="table">
-    <thead>
+  <table class="table table-striped table-bordered">
+    <thead class = "table-dark">
     <tr>
-      <th>UUID</th>
       <th>PlanName</th>
       <th>Description</th>
       <th>SubscriptionType</th>
@@ -25,23 +29,24 @@
     </thead>
     <tbody>
     <tr th:each = "subscription : ${subscriptions}">
-      <td th:text="${subscriptions.uuid}"></td>
-      <td th:text="${subscriptions.planName}"></td>
-      <td th:text="${subscriptions.description}"></td>
-      <td th:text="${subscriptions.subscriptionType}"></td>
-      <td th:text="${subscriptions.cost}"></td>
-      <td style="white-space:nowrap">
-        <a class="btn btn-primary btn-sm"
-           th:href="@{/subscription/edit (uuid=${subscription.uuid})}">Edit</a>
-        <a class="btn btn-danger btn-sm"
-           th:href="@{/subscription/delete (uuid=${subscription.uuid})}"
-           onclick="return confirm('Are you sure')">Delete</a>
+      <td th:text="${subscription.planName}"></td>
+      <td th:text="${subscription.description}"></td>
+      <td th:text="${subscription.subscriptionType}"></td>
+      <td th:text="${subscription.cost}"></td>
+      <td>
+        <a th:href="@{/api/admin/subscription/edit/{uuid}(uuid=${subscription.uuid})}"
+           class="btn btn-primary">Update</a>
+
+        <a th:href="@{/api/admin/subscription/delete/{uuid}(uuid=${subscription.uuid})}"
+           class="btn btn-danger">Delete</a>
+
+        <a th:href = "@{api/admin/purchaseSubscription/purchase}"
+           class = "btn btn-warning">Purchase</a>
       </td>
     </tr>
     </tbody>
+
   </table>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

@@ -8,15 +8,15 @@ import java.util.Optional;
 
 public interface SubscriptionService {
 
-    Subscription createSubscription(@Valid Subscription subscription);
+    void createSubscription(@Valid Subscription subscription);
 
-    List<SubscriptionDTO> getAllActiveSubscriptions();
+    List<Subscription> getAllActiveSubscriptions();
 
     Optional<SubscriptionDTO> getSubscriptionByUuid(String uuid);
 
-    Optional<Subscription> updateSubscription(String uuid, Subscription subscription);
+    void updateSubscription(String uuid, Subscription subscription);
 
-    boolean deleteSubscription(String uuid);
+    void deleteSubscription(String uuid);
 
     Subscription getSubscriptionById(Long id);
 }
