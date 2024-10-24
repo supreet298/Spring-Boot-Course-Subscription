@@ -15,7 +15,7 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
     @Query("SELECT ph FROM PurchaseHistory ph WHERE ph.paxUserHead.id = :userId AND ph.subscription.id = :subscriptionId")
     List<PurchaseHistory> findPurchaseHistoryByUserAndSubscription(@Param("userId") Long userId, @Param("subscriptionId") Long subscriptionId);
     
-   
+ 
 
         // Custom query to find clients with plans expiring in exactly 5 days
         @Query("SELECT p FROM PurchaseHistory p WHERE p.expiryDate = :expiryDate")
