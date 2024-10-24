@@ -14,6 +14,7 @@ import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.PaxMemberDTO;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.model.PaxUser.Type;
+import com.project.course.subscription.notification.PhoneNumberValidation;
 import com.project.course.subscription.repository.PaxUserRepository;
 import com.project.course.subscription.service.PaxUserService;
 
@@ -28,6 +29,8 @@ public class PaxUserServiceImpl implements PaxUserService {
         PaxUser head = new PaxUser();
         head.setName(paxUser.getName());
         head.setEmail(paxUser.getEmail());
+        if(!PhoneNumberValidation.isValid(paxUser.getPhoneNumber()))
+        	throw new IllegalArgumentException("Invalid Phonenumber,PhoneNumber starts with County codd Eg: +91xxxxxxxxxx");
         head.setPhoneNumber(paxUser.getPhoneNumber());
         head.setType(PaxUser.Type.HEAD);
         return paxUserRepository.save(head);
