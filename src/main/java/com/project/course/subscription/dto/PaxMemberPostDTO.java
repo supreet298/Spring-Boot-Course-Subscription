@@ -16,7 +16,7 @@ public class PaxMemberPostDTO {
     private String email;
 
     @NotNull(message = "PhoneNumber is mandatory and cannot be null.")
-    private Long phoneNumber;
+    private String phoneNumber;
 
     @NotNull(message = "HeadID is mandatory and cannot be null.")
     private Long headId;

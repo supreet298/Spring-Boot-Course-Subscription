@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+import com.project.course.subscription.model.PurchaseSubscription.NotificationType;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -25,9 +27,15 @@ public class PurchaseHistory {
     @JoinColumn(name = "subscription_id", referencedColumnName = "id", nullable = false, updatable = false)
     private Subscription subscription;
 
+    @JoinColumn(name = "client_name", nullable = false, updatable = false)
+    private String clientName;
+    
+    @JoinColumn(name = "client_email", nullable = false, updatable = false)
+    private String clientEmail;
+    
     @Column(name = "plan_name", nullable = false)
     private String planName;
-
+    
     @Column(name = "renewal_count", nullable = false)
     private int renewalCount;
 
@@ -36,4 +44,7 @@ public class PurchaseHistory {
 
     @Column(name = "expiry_date", nullable = false)
     private LocalDateTime expiryDate;
+    
+    @Column(name = "notification_type", nullable = false)
+    private  String notificationType;
 }

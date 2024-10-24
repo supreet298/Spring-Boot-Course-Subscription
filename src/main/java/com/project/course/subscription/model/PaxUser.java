@@ -41,7 +41,7 @@ public class PaxUser {
 
     @NotNull(message = "PhoneNumber is mandatory and cannot be null.")
     @Column(name = "phone_number", unique = true)
-    private Long phoneNumber;
+    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     private Type type;
