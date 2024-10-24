@@ -1,11 +1,13 @@
 package com.project.course.subscription.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
@@ -39,4 +41,12 @@ public class GlobalExceptionHandler {
         });
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+//    @ExceptionHandler(DataIntegrityViolationException.class)
+//    @ResponseStatus(HttpStatus.CONFLICT)
+//    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+//        // Customize the error message
+//        return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity violation: " + ex.getMostSpecificCause().getMessage());
+//
+//    }
 }

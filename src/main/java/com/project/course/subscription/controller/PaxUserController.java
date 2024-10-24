@@ -67,7 +67,7 @@ public class PaxUserController {
 	public ResponseEntity<?> dropPaxUser(@PathVariable String uuid) {
 		try {
 			PaxUser dropPaxHead = paxUserService.dropPaxUser(uuid);
-			return new ResponseEntity<>(dropPaxHead.getUserName()+" Deleted Successfully", HttpStatus.OK);
+			return new ResponseEntity<>(dropPaxHead.getName()+" Deleted Successfully", HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}

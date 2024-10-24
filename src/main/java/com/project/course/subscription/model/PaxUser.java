@@ -31,8 +31,8 @@ public class PaxUser {
     private String uuid = UUID.randomUUID().toString();
 
     @NotBlank(message = "Username is mandatory and cannot be blank.")
-    @Column(name = "user_name")
-    private String userName;
+    @Column(name = "name",unique = true)
+    private String name;
 
     @NotBlank(message = "Email is mandatory and cannot be blank.")
     @Email(message = "Email must be in a valid format.")

@@ -26,7 +26,7 @@ public class PaxUserServiceImpl implements PaxUserService {
     @Override
     public PaxUser addPaxHead(PaxUser paxUser) {
         PaxUser head = new PaxUser();
-        head.setUserName(paxUser.getUserName());
+        head.setName(paxUser.getName());
         head.setEmail(paxUser.getEmail());
         head.setPhoneNumber(paxUser.getPhoneNumber());
         head.setType(PaxUser.Type.HEAD);
@@ -42,7 +42,7 @@ public class PaxUserServiceImpl implements PaxUserService {
         }
 
         PaxUser member = new PaxUser();
-        member.setUserName(paxMemberDTO.getUserName());
+        member.setName(paxMemberDTO.getUserName());
         member.setEmail(paxMemberDTO.getEmail());
         member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
         member.setType(PaxUser.Type.MEMBER);
@@ -56,7 +56,7 @@ public class PaxUserServiceImpl implements PaxUserService {
         PaxUser existingHead = paxUserRepository.findByUuid(uuid)
                 .orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
 
-        existingHead.setUserName(request.getUserName());
+        existingHead.setName(request.getName());
         existingHead.setEmail(request.getEmail());
         existingHead.setPhoneNumber(request.getPhoneNumber());
         existingHead.setType(PaxUser.Type.HEAD);  
@@ -68,7 +68,7 @@ public class PaxUserServiceImpl implements PaxUserService {
     {
     	 PaxUser existingMember = paxUserRepository.findByUuidAndType(uuid, Type.MEMBER)
                  .orElseThrow(() -> new UsernameNotFoundException("No Member found for UUID: " + uuid));
-    	 existingMember.setUserName(paxMember.getUserName());
+    	 existingMember.setName(paxMember.getName());
     	 existingMember.setEmail(paxMember.getEmail());
     	 existingMember.setPhoneNumber(paxMember.getPhoneNumber());
     	 existingMember.setType(PaxUser.Type.MEMBER);
@@ -92,7 +92,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 
         // First, fetch heads to create a mapping
         List<PaxUser> heads = paxUserRepository.findAllHeads();
-        heads.forEach(head -> headIdToNameMap.put(head.getId(), head.getUserName()));
+        heads.forEach(head -> headIdToNameMap.put(head.getId(), head.getName()));
 
         return members.stream()
                 .map(member -> convertToMemberDTO(member, headIdToNameMap))
@@ -114,7 +114,7 @@ public class PaxUserServiceImpl implements PaxUserService {
     private PaxHeadDTO convertToHeadDTO(PaxUser paxUser){
         PaxHeadDTO dto =  new PaxHeadDTO();
         dto.setUuid(paxUser.getUuid());
-        dto.setUserName(paxUser.getUserName());
+        dto.setName(paxUser.getName());
         dto.setEmail(paxUser.getEmail());
         return dto;
     }
@@ -122,7 +122,7 @@ public class PaxUserServiceImpl implements PaxUserService {
     private PaxMemberDTO convertToMemberDTO(PaxUser member, Map<Long, String> headIdToNameMap) {
         PaxMemberDTO dto = new PaxMemberDTO();
         dto.setUuid(member.getUuid());
-        dto.setUserName(member.getUserName());
+        dto.setName(member.getName());
         dto.setEmail(member.getEmail());
         dto.setRelation(member.getRelation().name());
 

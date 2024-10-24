@@ -1,71 +1,52 @@
 package com.project.course.subscription.controller;
 
+import com.project.course.subscription.dto.SubscriptionDTO;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.service.SubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("api/admin/subscription")
 public class SubscriptionController {
 
     @Autowired
     private SubscriptionService subscriptionService;
 
-    @GetMapping("/subscriptions")
-    public String getAllActiveSubscriptions(Model model) {
-        List<Subscription> subscriptions = subscriptionService.getAllActiveSubscriptions();
-        model.addAttribute("subscriptions",subscriptions);
-        return "subscriptions/index";
+    @PostMapping
+    public ResponseEntity<Subscription> createSubscription(@Valid @RequestBody Subscription subscription) {
+        Subscription createdSubscription = subscriptionService.createSubscription(subscription);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubscription);
     }
 
-    @GetMapping("/subscriptions/new")
-    public String createSubscriptionForm(Model model) {
-        Subscription subscription = new Subscription();
-        model.addAttribute("subscription",subscription);
-        return "subscriptions/create_subscription";
+    @GetMapping
+    public ResponseEntity<List<SubscriptionDTO>> getAllActiveSubscriptions() {
+        List<SubscriptionDTO> subscriptions = subscriptionService.getAllActiveSubscriptions();
+        return ResponseEntity.ok(subscriptions);
     }
 
-    @PostMapping("/subscriptions")
-    public String createSubscription(@Valid @ModelAttribute("subscription") Subscription subscription, BindingResult result) {
-        if (result.hasErrors()) {
-            return "subscriptions/create_subscription";
-        }
-        subscriptionService.createSubscription(subscription);
-        return "redirect:/api/admin/subscription/subscriptions";
+    @GetMapping("/{uuid}")
+    public Optional<SubscriptionDTO> getSubscriptionByUuid(@PathVariable String uuid) {
+        return subscriptionService.getSubscriptionByUuid(uuid);
     }
 
-    @GetMapping("/edit/{uuid}")
-    public String editSubscription(@PathVariable String uuid, Model model) {
-        Optional<Subscription> optionalSubscription = subscriptionService.getSubscriptionByUuid(uuid);
+    @PutMapping("/{uuid}")
+    public Optional<Subscription> updateCategory(@PathVariable String uuid, @RequestBody Subscription Subscription) {
+        return subscriptionService.updateSubscription(uuid, Subscription);
+    }
 
-        if (optionalSubscription.isPresent()) {
-            Subscription subscription = optionalSubscription.get();
-            model.addAttribute("subscription", subscription);
-            return "subscriptions/edit_subscription";
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<String> deleteUserByUuid(@PathVariable String uuid) {
+        boolean deactivated = subscriptionService.deleteSubscription(uuid);
+        if (deactivated) {
+            return ResponseEntity.ok("Subscription is deleted");
         } else {
-            return "redirect:/api/admin/subscription/subscriptions";
+            return ResponseEntity.notFound().build();
         }
-    }
-
-    @PostMapping("/subscriptions/{uuid}")
-    public String updateSubscription(@PathVariable String uuid, @Valid @ModelAttribute("subscription") Subscription subscription, BindingResult result) {
-        if (result.hasErrors()) {
-            return "subscriptions/edit_subscription";
-        }
-        subscriptionService.updateSubscription(uuid, subscription);
-        return "redirect:/api/admin/subscription/subscriptions";
-    }
-
-    @GetMapping("/delete/{uuid}")
-    public String deleteSubscriptionByUuid(@PathVariable String uuid) {
-        subscriptionService.deleteSubscription(uuid);
-        return "redirect:/api/admin/subscription/subscriptions";
     }
 }

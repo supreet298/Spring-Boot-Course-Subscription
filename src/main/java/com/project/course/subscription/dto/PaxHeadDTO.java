@@ -7,7 +7,7 @@ public class PaxHeadDTO {
 
     private String uuid;
 
-    private String userName;
+    private String name;
 
     private String email;
 }
