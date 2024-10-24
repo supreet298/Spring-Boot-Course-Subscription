@@ -4,3 +4,4 @@ account_sid VARCHAR(256) NOT NULL,
 auth_token VARCHAR(256) NOT NULL,
 whatsapp_number VARCHAR(36) NOT NULL
 );
+
