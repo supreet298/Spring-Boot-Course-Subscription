@@ -4,15 +4,19 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class PurchaseHistoryRequestDTO {
+public class PurchaseHistoryDTO {
 
-    private Long paxUserId;
+    private String clientName;
 
-    private Long subscriptionId;
+    private String clientEmail;
+
+    private String planName;
 
     private int renewalCount;
 
     private LocalDateTime purchaseDate;
 
     private LocalDateTime expiryDate;
+
+    private String notificationType;
 }
