@@ -31,6 +31,16 @@ public class PaxUserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
 	}
 
+	@PostMapping("/addPaxMembers/{uuid}")
+	public ResponseEntity<?> addPaxMembers(@PathVariable String uuid, @RequestBody PaxMemberPostDTO paxMember) {
+		try {
+			PaxUser addpaxMember = paxUserService.addPaxMembers(uuid, paxMember);
+			return ResponseEntity.status(HttpStatus.CREATED).body(addpaxMember);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+
 	@GetMapping("/head")
 	public ResponseEntity<?> getAllPaxHeads() {
 		List<PaxHeadDTO> head = paxUserService.getAllHead();
@@ -67,7 +77,17 @@ public class PaxUserController {
 	public ResponseEntity<?> dropPaxUser(@PathVariable String uuid) {
 		try {
 			PaxUser dropPaxHead = paxUserService.dropPaxUser(uuid);
-			return new ResponseEntity<>(dropPaxHead.getName()+" Deleted Successfully", HttpStatus.OK);
+			return new ResponseEntity<>(dropPaxHead.getName() + " Deleted Successfully", HttpStatus.OK);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/{uuid}")
+	public ResponseEntity<?> getPaxHeadById(@PathVariable String uuid) {
+		try {
+			PaxUser paxHead = paxUserService.getPaxHeadById(uuid);
+			return new ResponseEntity<>(paxHead, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}

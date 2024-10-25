@@ -1,6 +1,8 @@
 package com.project.course.subscription.repository;
 
 import com.project.course.subscription.model.PaxUser;
+import com.project.course.subscription.model.PaxUser.Type;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -24,6 +26,7 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
     
     @Query("SELECT u FROM PaxUser u WHERE u.type = 'HEAD' AND u.isActive = true")
     List<PaxUser> findByIsActiveTrue();
+
 
 
 }

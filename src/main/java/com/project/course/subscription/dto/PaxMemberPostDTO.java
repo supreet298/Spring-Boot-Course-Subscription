@@ -10,7 +10,10 @@ public class PaxMemberPostDTO {
 
     @NotBlank(message = "Username is mandatory and cannot be blank.")
     private String userName;
-
+    
+    @NotBlank(message = "Head's Uuid is mandatory and cannot be blank.")
+    private String uuid;
+    
     @NotBlank(message = "Email is mandatory and cannot be blank.")
     @Email(message = "Email must be in a valid format.")
     private String email;

@@ -24,4 +24,9 @@ public interface PaxUserService {
     PaxUser dropPaxUser(String uuid);
 
     PaxUser getHeadUserById(Long id);
+
+	PaxUser getPaxHeadById(String uuid);
+
+	PaxUser addPaxMembers(String uuid,PaxMemberPostDTO paxMemberDTO);
+
 }

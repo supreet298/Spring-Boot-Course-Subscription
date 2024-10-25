@@ -10,7 +10,7 @@
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center">
     <h2>All PaxHeads</h2>
-    <a href="CreatePaxHead.html" class="btn btn-success">Add Head</a>
+    <a href="createPaxHead.html" class="btn btn-success">Add Head</a>
   </div>
 
   <table id="paxTable" class="table table-striped table-bordered">
@@ -46,6 +46,8 @@
                    <td>
                       <a href="updateHead.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm" >Update</a>
                       <button class="btn btn-danger btn-sm" onclick="deletePaxHead('${paxuser.uuid}')">Delete</button>
+                      <a href="createPaxMember.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm" >Add Member</a>
+                      <a href="ManagePaxMember.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm" >See Members</a>
                   </td> 
               `;
               paxTableBody.appendChild(row);

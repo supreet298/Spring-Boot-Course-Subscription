@@ -3,6 +3,7 @@ package com.project.course.subscription.service.Impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import com.project.course.subscription.dto.PaxMemberPostDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,23 @@ public class PaxUserServiceImpl implements PaxUserService {
         return paxUserRepository.save(member);
     }
 
+    public PaxUser addPaxMembers(String uuid,PaxMemberPostDTO paxMemberDTO) {
+        PaxUser head = paxUserRepository.findByUuidAndType(uuid, Type.HEAD)
+                .orElseThrow(() -> new IllegalArgumentException("Head's Uuid does not exist."));
+
+        PaxUser member = new PaxUser();
+        member.setName(paxMemberDTO.getUserName());
+        member.setEmail(paxMemberDTO.getEmail());
+        member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
+        member.setType(PaxUser.Type.MEMBER);
+        member.setHeadId(head.getId());
+        member.setRelation(PaxUser.Relation.valueOf(paxMemberDTO.getRelation()));
+        return paxUserRepository.save(member);
+    }
+
+
+    
+    
     @Override
     public PaxUser updatePaxHead(String uuid, PaxUser request) {
         PaxUser existingHead = paxUserRepository.findByUuid(uuid)
@@ -79,6 +97,8 @@ public class PaxUserServiceImpl implements PaxUserService {
     	 return paxUserRepository.save(existingMember);
     	
     }
+    
+  
     
     @Override
     public List<PaxHeadDTO> getAllHead() {
@@ -150,4 +170,17 @@ public class PaxUserServiceImpl implements PaxUserService {
 		return existingHead;
    	
 	}
+	
+	
+	public PaxUser getPaxHeadById(String uuid)
+	{
+		PaxUser paxHead=paxUserRepository.findByUuidAndType(uuid,Type.HEAD).orElseThrow(() -> new UsernameNotFoundException("No Member found for UUID: " + uuid));
+		return paxHead;
+		
+	}
+
+	
+
+	
+	
 }

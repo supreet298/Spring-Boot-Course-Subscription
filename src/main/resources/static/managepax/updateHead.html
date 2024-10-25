@@ -9,7 +9,7 @@
 <body>
 <div class="container mt-5">
   <h2>Update Pax Head</h2>
-  <form id="updateHead" class="mt-3">
+  <form id="updateHeadForm" class="mt-3">
     <div class="form-group">
       <label for="name">Name</label>
       <input type="text" id="name" class="form-control" required>
@@ -23,37 +23,51 @@
       <input type="text" id="phoneNumber" class="form-control" required>
     </div>
 
-    <button type="submit" class="btn btn-success">Create Head</button>
+    <button type="submit" class="btn btn-success">Update Head</button>
   </form>
 </div>
 
 <script>
-  document.getElementById('updateHead').addEventListener('submit', function(event) {
-      event.preventDefault();
+const urlParams = new URLSearchParams(window.location.search);
+const uuid = urlParams.get('uuid');
 
-      const paxHead = {
-          name: document.getElementById('name').value,
-          email: document.getElementById('email').value,
-          phoneNumber: document.getElementById('phoneNumber').value,
-      };
+// Fetch existing subscription details
+fetch(`/api/admin/pax/${uuid}`)
+    .then(response => response.json())
+    .then(paxUser => {
+        document.getElementById('name').value = paxUser.name;
+        document.getElementById('email').value = paxUser.email;
+        document.getElementById('phoneNumber').value = paxUser.phoneNumber;
+    })
+    .catch(error => console.error('Error fetching subscription:', error));
 
-      console.log('Sending data:', paxHead);
+document.getElementById('updateHeadForm').addEventListener('submit', function(event) {
+    event.preventDefault();
 
-      fetch('http://localhost:8080/api/admin/pax/updateHead/${uuid}', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(paxHead)
-      })
-      .then(response => {
-          console.log('Response status:', response.status);
-          return response.json();
-      })
-      .then(data => {
-          console.log('Server response:', data);
-          window.location.href = 'managepaxusers.html'; // Redirect on success
-      })
-      .catch(error => console.error('Error Updating Pax Head:', error));
-  });
+    const updatedHead = {
+        name: document.getElementById('name').value,
+        email: document.getElementById('email').value,
+        phoneNumber: document.getElementById('phoneNumber').value,
+    };
+
+    fetch(`/api/admin/pax/updateHead/${uuid}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedHead)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to update data');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Update successful:', data); // Confirm success
+        window.location.href = 'managePaxUsers.html';
+    })
+    .catch(error => console.error('Error updating subscription:', error));
+
+});
 </script>
 </body>
 </html>

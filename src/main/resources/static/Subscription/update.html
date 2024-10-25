@@ -60,7 +60,7 @@
           subscriptionType: document.getElementById('subscriptionType').value
       };
 
-      fetch(`/api/admin/subscription/${uuid}`, {
+      fetch(`/api/admin/updateHead/${uuid}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedSubscription)
