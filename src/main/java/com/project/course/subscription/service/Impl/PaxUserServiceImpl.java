@@ -82,25 +82,25 @@ public class PaxUserServiceImpl implements PaxUserService {
     
     @Override
     public List<PaxHeadDTO> getAllHead() {
-        List<PaxUser> heads = paxUserRepository.findAllHeads();
+        List<PaxUser> heads = paxUserRepository.findByIsActiveTrue();
         return heads.stream()
                 .map(this::convertToHeadDTO)
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<PaxMemberDTO> getAllMember() {
-        List<PaxUser> members = paxUserRepository.findAllMembers();
-        Map<Long, String> headIdToNameMap = new HashMap<>();
-
-        // First, fetch heads to create a mapping
-        List<PaxUser> heads = paxUserRepository.findAllHeads();
-        heads.forEach(head -> headIdToNameMap.put(head.getId(), head.getName()));
-
-        return members.stream()
-                .map(member -> convertToMemberDTO(member, headIdToNameMap))
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public List<PaxMemberDTO> getAllMember() {
+//        List<PaxUser> members = paxUserRepository.findAllMembers();
+//        Map<Long, String> headIdToNameMap = new HashMap<>();
+//
+//        // First, fetch heads to create a mapping
+//        List<PaxUser> heads = paxUserRepository.findAllHeads();
+//        heads.forEach(head -> headIdToNameMap.put(head.getId(), head.getName()));
+//
+//        return members.stream()
+//                .map(member -> convertToMemberDTO(member, headIdToNameMap))
+//                .collect(Collectors.toList());
+//    }
 
     public PaxUser getHeadUserById(Long id) {
         PaxUser paxUser = paxUserRepository.findById(id)
@@ -117,6 +117,7 @@ public class PaxUserServiceImpl implements PaxUserService {
     private PaxHeadDTO convertToHeadDTO(PaxUser paxUser){
         PaxHeadDTO dto =  new PaxHeadDTO();
         dto.setUuid(paxUser.getUuid());
+        dto.setPhoneNumber(paxUser.getPhoneNumber());
         dto.setName(paxUser.getName());
         dto.setEmail(paxUser.getEmail());
         return dto;

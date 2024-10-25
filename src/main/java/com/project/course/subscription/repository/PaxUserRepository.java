@@ -10,10 +10,10 @@ import java.util.Optional;
 @Repository
 public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
 
-    List<PaxUser> findByIsActiveTrue();
+    //List<PaxUser> findByIsActiveTrue();
 
     @Query("SELECT u FROM PaxUser u WHERE u.type = 'HEAD'")
-    List<PaxUser> findAllHeads();
+    List<PaxUser> findAllHeads(boolean var);
 
     @Query("SELECT u FROM PaxUser u WHERE u.type = 'MEMBER'")
     List<PaxUser> findAllMembers();
@@ -21,5 +21,9 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
     Optional<PaxUser> findByUuid(String uuid);
     
     Optional<PaxUser> findByUuidAndType(String uuid, PaxUser.Type type);
+    
+    @Query("SELECT u FROM PaxUser u WHERE u.type = 'HEAD' AND u.isActive = true")
+    List<PaxUser> findByIsActiveTrue();
+
 
 }

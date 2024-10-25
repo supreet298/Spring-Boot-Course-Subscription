@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UpdatePax Head</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Update Pax Head</h2>
+  <form id="updateHead" class="mt-3">
+    <div class="form-group">
+      <label for="name">Name</label>
+      <input type="text" id="name" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="text" id="email" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="phoneNumber">Phone Number</label>
+      <input type="text" id="phoneNumber" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Create Head</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('updateHead').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const paxHead = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          phoneNumber: document.getElementById('phoneNumber').value,
+      };
+
+      console.log('Sending data:', paxHead);
+
+      fetch('http://localhost:8080/api/admin/pax/updateHead/${uuid}', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(paxHead)
+      })
+      .then(response => {
+          console.log('Response status:', response.status);
+          return response.json();
+      })
+      .then(data => {
+          console.log('Server response:', data);
+          window.location.href = 'managepaxusers.html'; // Redirect on success
+      })
+      .catch(error => console.error('Error Updating Pax Head:', error));
+  });
+</script>
+</body>
+</html>
