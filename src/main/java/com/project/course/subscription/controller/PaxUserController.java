@@ -32,16 +32,16 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/head")
-	public ResponseEntity<List<PaxHeadDTO>> getAllPaxHeads() {
+	public ResponseEntity<?> getAllPaxHeads() {
 		List<PaxHeadDTO> head = paxUserService.getAllHead();
 		return ResponseEntity.ok(head);
 	}
 
-	@GetMapping("/member")
-	public ResponseEntity<List<PaxMemberDTO>> getAllPaxMembers() {
-		List<PaxMemberDTO> member = paxUserService.getAllMember();
-		return ResponseEntity.ok(member);
-	}
+//	@GetMapping("/member")
+//	public ResponseEntity<List<PaxMemberDTO>> getAllPaxMembers() {
+//		List<PaxMemberDTO> member = paxUserService.getAllMember();
+//		return ResponseEntity.ok(member);
+//	}
 
 	@PutMapping("/updateHead/{uuid}")
 	public ResponseEntity<?> updateHead(@PathVariable String uuid, @RequestBody PaxUser request) {

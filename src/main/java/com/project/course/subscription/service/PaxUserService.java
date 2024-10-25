@@ -15,7 +15,7 @@ public interface PaxUserService {
 
     List<PaxHeadDTO> getAllHead();
 
-    List<PaxMemberDTO> getAllMember();
+   // List<PaxMemberDTO> getAllMember();
 
     PaxUser updatePaxHead(String uuid,PaxUser request);
     
