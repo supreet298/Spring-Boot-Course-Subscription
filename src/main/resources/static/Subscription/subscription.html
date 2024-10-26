@@ -9,7 +9,7 @@
 <body>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center">
-    <h2>All Subscriptions</h2>
+    <h2 class="text-center mb-5">Subscriptions</h2>
     <a href="create.html" class="btn btn-success">Create Subscription</a>
   </div>
 
@@ -41,7 +41,7 @@
           subscriptions.forEach(subscription => {
               const row = document.createElement('tr');
               row.innerHTML = `
-                  <td><a href="details.html?uuid=${subscription.uuid}" class="text-primary">${subscription.planName}</a></td>
+                  <td>${subscription.planName}</td>
                   <td>${subscription.description}</td>
                   <td>${subscription.cost}</td>
                   <td>${subscription.subscriptionType}</td>

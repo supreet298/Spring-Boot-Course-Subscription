@@ -38,51 +38,54 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
 	@Autowired 
 	private EmailService emailservice;
+
 	@Override
-	public PurchaseSubscription createPurchaseSubscription(PurchaseSubscription purchaseSubscription) {
+	public PurchaseSubscriptionDTO createPurchaseSubscription(PurchaseSubscriptionDTO purchaseSubscriptionDTO) {
 
-		// Fetch the PaxUser and check if it's of type HEAD in one step
-		PaxUser paxUser = paxUserService.getHeadUserById(purchaseSubscription.getPaxUser().getId());
+		// Fetch PaxUser by ID
+		PaxUser paxUser = paxUserService.getHeadUserByUuid(purchaseSubscriptionDTO.getPaxUserUuid());
+		// Fetch Subscription by ID
+		Subscription subscription = subscriptionService.getSubscriptionById(purchaseSubscriptionDTO.getSubscriptionId());
+
+		// Initialize PurchaseSubscription from DTO
+		PurchaseSubscription purchaseSubscription = new PurchaseSubscription();
 		purchaseSubscription.setPaxUser(paxUser);
-		
-		purchaseSubscription.setNotificationType(purchaseSubscription.getNotificationType());
-
-		// Fetch the Subscription using the SubscriptionService
-		Subscription subscription = subscriptionService
-				.getSubscriptionById(purchaseSubscription.getSubscription().getId());
 		purchaseSubscription.setSubscription(subscription);
-		
+		purchaseSubscription.setNotificationType(purchaseSubscriptionDTO.getNotificationType());
+		purchaseSubscription.setPaid(purchaseSubscriptionDTO.getPaid());
+		purchaseSubscription.setRecurring(purchaseSubscriptionDTO.isRecurring());
 
-		// Automatically set purchaseDate
 		LocalDateTime now = LocalDateTime.now();
 		purchaseSubscription.setPurchaseDate(now);
-
-		// Set expiryDate based on SubscriptionType directly from subscription service
-		LocalDateTime expiryDate = calculateExpiryDate(now, subscription.getSubscriptionType());
-		purchaseSubscription.setExpiryDate(expiryDate);
+		purchaseSubscription.setExpiryDate(calculateExpiryDate(now, subscription.getSubscriptionType()));
 
 		// Validate if the purchase should proceed
 		if (purchaseSubscription.getPaid() == null || !purchaseSubscription.getPaid()) {
-			throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made. ");
+			throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made.");
 		}
 
 		// Check if the user has an active subscription for the same plan
 		if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
-			throw new IllegalArgumentException(
-					"PaxUser cannot purchase the same subscription until the previous one expires.");
+			throw new IllegalArgumentException("PaxUser cannot purchase the same subscription until the previous one expires.");
 		}
-		// Save the PurchaseSubscription
+
+		// Save PurchaseSubscription
 		PurchaseSubscription savedSubscription = purchaseSubscriptionRepository.save(purchaseSubscription);
-		
+
+		// Send confirmation email
 		String file = "SubscriptionConfirmation.html";
-		emailservice.sendConfirmEmail(paxUser.getEmail(), paxUser.getName().toString(),
-				purchaseSubscription.getSubscription().getPlanName(), now, expiryDate,
-				purchaseSubscription.getSubscription().getSubscriptionType(), file);
+		emailservice.sendConfirmEmail(
+				paxUser.getEmail(), paxUser.getName(),
+				subscription.getPlanName(), now,
+				purchaseSubscription.getExpiryDate(),
+				subscription.getSubscriptionType(), file
+		);
 
-		// Create PurchaseHistory with initial details
-		createPurchaseHistory(paxUser, subscription, now, expiryDate, 0,purchaseSubscription);
+		// Create purchase history entry
+		createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription);
 
-		return savedSubscription;
+		return convertToDTO(savedSubscription);
+
 	}
 
 	@Scheduled(cron = "0 0 12 * * ?")
@@ -161,10 +164,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
 	@Override
 	public Optional<PurchaseSubscriptionDTO> getPurchaseSubscriptionByUuid(String uuid) {
-		return Optional
-				.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid).filter(PurchaseSubscription::isActive)
-						.map(this::convertToDTO).orElseThrow(() -> new ResponseStatusException(NOT_FOUND,
-								"Purchase Subscription not found with UUID: " + uuid)));
+		return Optional.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid).filter(PurchaseSubscription::isActive)
+				.map(this::convertToDTO).orElseThrow(() -> new ResponseStatusException(NOT_FOUND,"Purchase Subscription not found with UUID: " + uuid)));
 	}
 
 	@Override
@@ -182,14 +183,13 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
 	private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {
 		PurchaseSubscriptionDTO dto = new PurchaseSubscriptionDTO();
-		dto.setUuid(purchaseSubscription.getUuid());
-		dto.setPlanName(purchaseSubscription.getSubscription().getPlanName());
-		dto.setPaxUserHead(purchaseSubscription.getPaxUser().getName());
+		dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
+		dto.setSubscriptionId(purchaseSubscription.getSubscription().getId());
 		dto.setRecurring(purchaseSubscription.isRecurring());
+		dto.setNotificationType(purchaseSubscription.getNotificationType());
 		dto.setPaid(purchaseSubscription.getPaid());
 		dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
 		dto.setExpiryDate(purchaseSubscription.getExpiryDate());
 		return dto;
 	}
-
 }

@@ -23,5 +23,5 @@ public interface PaxUserService {
     
     PaxUser dropPaxUser(String uuid);
 
-    PaxUser getHeadUserById(Long id);
+    PaxUser getHeadUserByUuid(String uuid);
 }

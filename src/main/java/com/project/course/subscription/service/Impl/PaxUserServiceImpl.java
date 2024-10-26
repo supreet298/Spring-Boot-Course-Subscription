@@ -30,7 +30,7 @@ public class PaxUserServiceImpl implements PaxUserService {
         head.setName(paxUser.getName());
         head.setEmail(paxUser.getEmail());
         if(!PhoneNumberValidation.isValid(paxUser.getPhoneNumber()))
-        	throw new IllegalArgumentException("Invalid Phonenumber,PhoneNumber starts with County codd Eg: +91xxxxxxxxxx");
+        	throw new IllegalArgumentException("Invalid PhoneNumber,PhoneNumber starts with County codd Eg: +91xxxxxxxxxx");
         head.setPhoneNumber(paxUser.getPhoneNumber());
         head.setType(PaxUser.Type.HEAD);
         return paxUserRepository.save(head);
@@ -102,8 +102,8 @@ public class PaxUserServiceImpl implements PaxUserService {
 //                .collect(Collectors.toList());
 //    }
 
-    public PaxUser getHeadUserById(Long id) {
-        PaxUser paxUser = paxUserRepository.findById(id)
+    public PaxUser getHeadUserByUuid(String uuid) {
+        PaxUser paxUser = paxUserRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PaxUser not found"));
 
         // Check if the PaxUser's type is HEAD

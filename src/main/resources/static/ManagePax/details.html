@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Subscription</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>Purchase Subscription</h2>
+  </div>
+
+  <form id="purchaseSubscriptionForm">
+
+    <div class="form-group">
+      <label for="subscriptionId">Subscription</label>
+      <input type="number" class="form-control" id="subscriptionId" placeholder="Enter Subscription" required>
+    </div>
+
+    <div class="form-group">
+      <label for="recurring">Recurring</label>
+      <select class="form-control" id="recurring" required>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="paid">Paid</label>
+      <select class="form-control" id="paid" required>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="notificationType">Notification Type</label>
+      <select class="form-control" id="notificationType" required>
+        <option value="EMAIL">Email</option>
+        <option value="WHATSAPP">WhatsApp</option>
+        <option value="BOTH">Both</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+<script>
+  // Function to get URL parameters
+  function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+  }
+
+  // Retrieve the paxUserUuid from the URL
+  const paxUserUuid = getQueryParam('paxUserUuid');
+
+ // Event listener for form submission
+  document.getElementById('purchaseSubscriptionForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const purchaseData = {
+      paxUserUuid: paxUserUuid, // Use paxUserUuid from the URL
+      subscriptionId: document.getElementById('subscriptionId').value,
+      recurring: document.getElementById('recurring').value === 'true',
+      paid: document.getElementById('paid').value === 'true',
+      notificationType: document.getElementById('notificationType').value
+    };
+
+    fetch('/api/admin/purchaseSubscription', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(purchaseData)
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Failed to create subscription');
+      }
+    })
+    .then(data => {
+      alert('Subscription purchased successfully!');
+      console.log('Purchase Data:', data);
+      window.location.href = 'managepaxusers.html';
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error purchasing subscription');
+    });
+  });
+</script>
+</body>
+</html>
