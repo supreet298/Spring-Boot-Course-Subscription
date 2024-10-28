@@ -6,8 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
-import com.project.course.subscription.model.PurchaseSubscription.NotificationType;
-
 @Entity
 @Data
 @AllArgsConstructor
@@ -20,8 +18,8 @@ public class PurchaseHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "pax_user_head_id", referencedColumnName = "id", nullable = false, updatable = false)
-    private PaxUser paxUserHead;
+    @JoinColumn(name = "pax_user_head_id", referencedColumnName = "uuid", nullable = false, updatable = false)
+    private PaxUser paxUser;
 
     @ManyToOne
     @JoinColumn(name = "subscription_id", referencedColumnName = "id", nullable = false, updatable = false)

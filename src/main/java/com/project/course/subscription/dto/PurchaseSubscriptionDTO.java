@@ -14,17 +14,14 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PurchaseSubscriptionDTO {
 
-//    @JsonIgnore
-//    private String uuid;
-
+    @JsonIgnore
+    private String uuid;
 
     private String paxUserUuid;
-
 
     private Long subscriptionId;
 
     private boolean recurring;
-
 
     private PurchaseSubscription.NotificationType notificationType;
 

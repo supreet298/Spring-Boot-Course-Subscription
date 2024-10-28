@@ -137,7 +137,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 	private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate,
 			LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription) {
 		PurchaseHistory purchaseHistory = new PurchaseHistory();
-		purchaseHistory.setPaxUserHead(paxUser);
+		purchaseHistory.setPaxUser(paxUser);
 		purchaseHistory.setSubscription(subscription);
 		purchaseHistory.setClientName(paxUser.getName());
 		purchaseHistory.setClientEmail(paxUser.getEmail());

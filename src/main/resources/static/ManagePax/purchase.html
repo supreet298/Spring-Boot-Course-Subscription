@@ -45,7 +45,7 @@
       </select>
     </div>
 
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Purchase</button>
   </form>
 </div>
 
@@ -88,7 +88,7 @@
     .then(data => {
       alert('Subscription purchased successfully!');
       console.log('Purchase Data:', data);
-      window.location.href = 'managepaxusers.html';
+      window.location.href = 'info.html';
     })
     .catch(error => {
       console.error('Error:', error);

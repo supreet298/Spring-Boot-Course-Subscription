@@ -40,7 +40,7 @@
           subscriptions.forEach(paxuser => {
               const row = document.createElement('tr');
               row.innerHTML = `
-                  <td><a href="details.html?paxUserUuid=${paxuser.uuid}" class="text-primary">${paxuser.name}</a></td>
+                  <td><a href="info.html?uuid=${paxuser.uuid}">${paxuser.name}</a></td>
                   <td>${paxuser.phoneNumber}</td>
                   <td>${paxuser.email}</td>
                    <td>

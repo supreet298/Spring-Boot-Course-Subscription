@@ -28,13 +28,20 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         purchaseHistoryRepository.save(purchaseHistory);
     }
 
-    @Override
     public List<PurchaseHistory> findPurchaseHistoryByUserAndSubscription(Long userId, Long subscriptionId) {
         return purchaseHistoryRepository.findPurchaseHistoryByUserAndSubscription(userId, subscriptionId);
     }
 
+    public List<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid) {
+        List<PurchaseHistory> histories = purchaseHistoryRepository.findByPaxUser_Uuid(uuid);
+        return histories.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private PurchaseHistoryDTO convertToDTO(PurchaseHistory history) {
         PurchaseHistoryDTO dto = new PurchaseHistoryDTO();
+        dto.setPaxUserUuid(history.getPaxUser().getUuid());
         dto.setClientName(history.getClientName());
         dto.setClientEmail(history.getClientEmail());
         dto.setPlanName(history.getPlanName());
