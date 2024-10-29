@@ -20,7 +20,7 @@ public class PaxUserController {
 	private PaxUserService paxUserService;
 
 	@PostMapping("/addHead")
-	public ResponseEntity<?> addPaxHead(@Valid @RequestBody PaxUser paxUser) throws Exception {
+	public ResponseEntity<Object> addPaxHead(@Valid @RequestBody PaxUser paxUser)   {
 		try {
 		PaxUser createdUser = paxUserService.addPaxHead(paxUser);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);

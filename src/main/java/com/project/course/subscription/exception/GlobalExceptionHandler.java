@@ -52,6 +52,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> ResourceNotFoundException(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+        
+        
     }
+    
+
+        @ExceptionHandler(RuntimeException.class)
+        public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", ex.getMessage());  // Provide detailed error message
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
+   
+
     
 }

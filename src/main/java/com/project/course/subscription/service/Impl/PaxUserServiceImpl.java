@@ -28,9 +28,12 @@ public class PaxUserServiceImpl implements PaxUserService {
 	private PaxUserRepository paxUserRepository;
 
 	@Override
-	public PaxUser addPaxHead(PaxUser paxUser) throws Exception {
+	public PaxUser addPaxHead(PaxUser paxUser)   {
 		PaxUser head = new PaxUser();
 		head.setName(paxUser.getName());
+		if (paxUserRepository.existsByEmail(paxUser.getEmail())) {
+            throw new RuntimeException("Email id already exists, try another.");
+        }
 		head.setEmail(paxUser.getEmail());
 		head.setAddress(paxUser.getAddress());
 		head.setCountry(paxUser.getCountry());
@@ -38,7 +41,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 //			throw new IllegalArgumentException(
 //					"Invalid Phonenumber,PhoneNumber starts with County codd Eg: +91xxxxxxxxxx");
 		if (paxUserRepository.existsByPhoneNumber(paxUser.getPhoneNumber())) {
-            throw new Exception("Mobile number already exists, try another.");
+            throw new RuntimeException("Mobile number already exists, try another.");
         }
 		head.setPhoneNumber(paxUser.getPhoneNumber());
 		head.setType(PaxUser.Type.HEAD);
@@ -64,19 +67,30 @@ public class PaxUserServiceImpl implements PaxUserService {
 	}
 
 	public PaxUser addPaxMembers(String uuid, PaxMemberPostDTO paxMemberDTO) {
-		PaxUser head = paxUserRepository.findByUuidAndType(uuid, Type.HEAD)
-				.orElseThrow(() -> new IllegalArgumentException("Head's Uuid does not exist."));
+	    PaxUser head = paxUserRepository.findByUuidAndType(uuid, Type.HEAD)
+	            .orElseThrow(() -> new IllegalArgumentException("Head's Uuid does not exist."));
 
-		PaxUser member = new PaxUser();
-		member.setName(paxMemberDTO.getUserName());
-		member.setEmail(paxMemberDTO.getEmail());
-		member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
-		member.setAddress(paxMemberDTO.getAddress());
-		member.setCountry(paxMemberDTO.getCountry());
-		member.setType(PaxUser.Type.MEMBER);
-		member.setHeadId(head.getId());
-		member.setRelation(PaxUser.Relation.valueOf(paxMemberDTO.getRelation()));
-		return paxUserRepository.save(member);
+	    PaxUser member = new PaxUser();
+	    member.setName(paxMemberDTO.getUserName());
+	    
+	    if(paxUserRepository.existsByEmail(paxMemberDTO.getEmail()))
+	    {
+	        throw new RuntimeException("Email id already exists, try another.");
+	    }
+	    member.setEmail(paxMemberDTO.getEmail());
+	    
+	    if (paxUserRepository.existsByPhoneNumber(paxMemberDTO.getPhoneNumber())) {
+	        throw new RuntimeException("Mobile number already exists, try another.");
+	    }
+	    
+	    member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
+	    member.setAddress(paxMemberDTO.getAddress());
+	    member.setCountry(paxMemberDTO.getCountry());
+	    member.setType(PaxUser.Type.MEMBER);
+	    member.setHeadId(head.getId());
+	    member.setRelation(PaxUser.Relation.valueOf(paxMemberDTO.getRelation()));
+	    
+	    return paxUserRepository.save(member);
 	}
 
 	@Override

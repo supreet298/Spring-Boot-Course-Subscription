@@ -81,47 +81,54 @@
   }
   
   // Submit form with uuid included in the fetch URL
-  document.getElementById('createMemberForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+ document.getElementById('createMemberForm').addEventListener('submit', function(event) {
+  event.preventDefault();
 
-    // Combine country code and phone number
-    const phoneNumber = document.getElementById('countryCode').value + document.getElementById('phone').value;
+  // Combine country code and phone number
+  const phoneNumber = document.getElementById('countryCode').value + document.getElementById('phone').value;
 
-    const member = {
-      userName: document.getElementById('name').value,
-      email: document.getElementById('email').value,
-      phoneNumber: phoneNumber, // Use combined phone number
-      relation: document.getElementById('relationType').value,
-      address: document.getElementById('address').value,
-      country: document.getElementById('country').value
-    };
+  const member = {
+    userName: document.getElementById('name').value,
+    email: document.getElementById('email').value,
+    phoneNumber: phoneNumber,
+    relation: document.getElementById('relationType').value,
+    address: document.getElementById('address').value,
+    country: document.getElementById('country').value
+  };
 
-    fetch(`/api/admin/pax/addPaxMembers/${uuid}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(member)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Failed to create member');
+  fetch(`/api/admin/pax/addPaxMembers/${uuid}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(member)
+  })
+  .then(response => {
+    // Check if response is JSON based on content-type
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        return response.json().then(json => { throw new Error(json.message || 'Failed to create member'); });
+      } else {
+        return response.text().then(text => { throw new Error(text || 'Failed to create member'); });
       }
-      return response.json();
-    })
-    .then(data => {
-      alert('Member created successfully!');
-      window.location.href = 'managePaxUsers.html';
-    })
-    .catch(error => {
-      console.error('Error creating member:', error);
-      showErrorMessage('Error creating member: ' + error.message);
-    });
+    }
+    return response.json();
+  })
+  .then(data => {
+    alert('Member created successfully!');
+    window.location.href = 'managePaxUsers.html';
+  })
+  .catch(error => {
+    console.error('Error creating member:', error);
+    showErrorMessage(error.message);
   });
+});
 
-  function showErrorMessage(message) {
-    const errorMessage = document.getElementById('errorMessage');
-    errorMessage.textContent = message;
-    errorMessage.classList.remove('d-none');
-  }
+function showErrorMessage(message) {
+  const errorMessage = document.getElementById('errorMessage');
+  errorMessage.textContent = message;
+  errorMessage.classList.remove('d-none');
+}
+
 </script>
 </body>
 </html>

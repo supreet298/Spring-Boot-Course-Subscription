@@ -9,6 +9,7 @@
 <body>
 <div class="container mt-5">
   <h2>Update Pax Head</h2>
+  <div id="errorMessage" class="alert alert-danger d-none"></div> <!-- Error message container -->
   <form id="updateHeadForm" class="mt-3">
     <div class="form-group">
       <label for="name">Name</label>
@@ -104,18 +105,34 @@ document.getElementById('updateHeadForm').addEventListener('submit', function(ev
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedHead)
     })
-    .then(response => {
+    then(response => {
+        // Check if response is JSON based on content-type
+        const contentType = response.headers.get("content-type");
         if (!response.ok) {
-            throw new Error('Failed to update data');
+          if (contentType && contentType.includes("application/json")) {
+            return response.json().then(json => { throw new Error(json.message || 'Failed to upate Head'); });
+          } else {
+            return response.text().then(text => { throw new Error(text || 'Failed to upate Head'); });
+          }
         }
         return response.json();
-    })
-    .then(data => {
-        console.log('Update successful:', data); // Confirm success
+      })
+      .then(data => {
+        alert('Head created successfully!');
         window.location.href = 'managePaxUsers.html';
-    })
-    .catch(error => console.error('Error updating subscription:', error));
-});
+      })
+      .catch(error => {
+        console.error('Error creating member:', error);
+        showErrorMessage(error.message);
+      });
+    });
+
+    function showErrorMessage(message) {
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = message;
+      errorMessage.classList.remove('d-none');
+    }
+
 </script>
 </body>
 </html>

@@ -40,4 +40,6 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
     
     boolean existsByPhoneNumber(String phoneNumber);
     
+    boolean existsByEmail(String email);
+    
 }
