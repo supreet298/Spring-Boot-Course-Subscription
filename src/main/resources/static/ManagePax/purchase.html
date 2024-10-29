@@ -17,7 +17,9 @@
 
     <div class="form-group">
       <label for="subscriptionId">Subscription</label>
-      <input type="number" class="form-control" id="subscriptionId" placeholder="Enter Subscription" required>
+      <select class="form-control" id="subscriptionId" required>
+        <option value="" disabled selected>Select a Subscription</option>
+      </select>
     </div>
 
     <div class="form-group">
@@ -58,6 +60,27 @@
 
   // Retrieve the paxUserUuid from the URL
   const paxUserUuid = getQueryParam('paxUserUuid');
+
+   // Fetch available subscriptions and populate the dropdown
+  function loadSubscriptions() {
+    fetch('/api/admin/subscription')
+      .then(response => response.json())
+      .then(subscriptions => {
+        const subscriptionSelect = document.getElementById('subscriptionId');
+        subscriptionSelect.innerHTML = '<option value="" disabled selected>Select a Subscription</option>'; // Clear and add default option
+
+        subscriptions.forEach(subscription => {
+          const option = document.createElement('option');
+          option.value = subscription.uuid; // Assumes subscription has a 'uuid' property
+          option.textContent = `${subscription.planName} - ${subscription.cost} Cost - ${subscription.subscriptionType}`;
+          subscriptionSelect.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Error loading subscriptions:', error));
+  }
+
+  // Load subscriptions when the page loads
+  window.addEventListener('DOMContentLoaded', loadSubscriptions);
 
  // Event listener for form submission
   document.getElementById('purchaseSubscriptionForm').addEventListener('submit', function(event) {
