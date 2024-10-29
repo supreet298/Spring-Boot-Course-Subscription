@@ -42,7 +42,13 @@ public class PaxUser {
     @NotNull(message = "PhoneNumber is mandatory and cannot be null.")
     @Column(name = "phone_number", unique = true)
     private String phoneNumber;
-
+    
+    @Column(columnDefinition = "Text")
+    @NotBlank(message = "Address is mandatory and cannot be blank.")
+    private String address;
+    
+    @NotNull(message = "Country is mandatory and cannot be null.")
+    private String country;
     @Enumerated(EnumType.STRING)
     private Type type;
 
@@ -63,7 +69,7 @@ public class PaxUser {
     @CreatedDate
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
-
+    
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = false)
     private LocalDateTime lastModifiedDate;
