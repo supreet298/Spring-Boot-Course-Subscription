@@ -67,21 +67,21 @@ fetch(`/api/admin/pax/${uuid}`)
         return response.json();
     })
     .then(paxUser => {
-        console.log('Fetched user details:', paxUser); // Log the fetched user details
+        console.log('Fetched user details:', paxUser);
 
         // Populate fields
         document.getElementById('name').value = paxUser.name;
         document.getElementById('email').value = paxUser.email;
-        document.getElementById('address').value = paxUser.address || ''; // Populate address
-        document.getElementById('country').value = paxUser.country || ''; // Populate country
+        document.getElementById('address').value = paxUser.address || '';
+        document.getElementById('country').value = paxUser.country || '';
 
-        // Assuming phoneNumber is in the format of "+XX XXXXXXXX"
-        const phoneParts = paxUser.phoneNumber.split(' '); // Split by space
+        // Assuming phoneNumber is in the format "+XX XXXXXXXX"
+        const phoneParts = paxUser.phoneNumber.split(' ');
         if (phoneParts.length > 1) {
-            document.getElementById('countryCode').value = phoneParts[0]; // Set the country code
-            document.getElementById('phone').value = phoneParts.slice(1).join(' '); // Set the phone number, join remaining parts
+            document.getElementById('countryCode').value = phoneParts[0];
+            document.getElementById('phone').value = phoneParts.slice(1).join(' ');
         } else {
-            document.getElementById('phone').value = paxUser.phoneNumber; // If no space, set whole number
+            document.getElementById('phone').value = paxUser.phoneNumber;
         }
     })
     .catch(error => console.error('Error fetching user details:', error));
@@ -97,7 +97,7 @@ document.getElementById('updateHeadForm').addEventListener('submit', function(ev
         email: document.getElementById('email').value,
         address: document.getElementById('address').value,
         country: document.getElementById('country').value,
-        phoneNumber: countryCode + ' ' + phone // Combine country code and phone number
+        phoneNumber: countryCode + ' ' + phone
     };
 
     fetch(`/api/admin/pax/updateHead/${uuid}`, {
@@ -105,33 +105,32 @@ document.getElementById('updateHeadForm').addEventListener('submit', function(ev
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedHead)
     })
-    then(response => {
-        // Check if response is JSON based on content-type
+    .then(response => {
         const contentType = response.headers.get("content-type");
         if (!response.ok) {
           if (contentType && contentType.includes("application/json")) {
-            return response.json().then(json => { throw new Error(json.message || 'Failed to upate Head'); });
+            return response.json().then(json => { throw new Error(json.message || 'Failed to update Head'); });
           } else {
-            return response.text().then(text => { throw new Error(text || 'Failed to upate Head'); });
+            return response.text().then(text => { throw new Error(text || 'Failed to update Head'); });
           }
         }
         return response.json();
-      })
-      .then(data => {
-        alert('Head created successfully!');
+    })
+    .then(data => {
+        alert('Head updated successfully!');
         window.location.href = 'managePaxUsers.html';
-      })
-      .catch(error => {
-        console.error('Error creating member:', error);
+    })
+    .catch(error => {
+        console.error('Error updating member:', error);
         showErrorMessage(error.message);
-      });
     });
+});
 
-    function showErrorMessage(message) {
-      const errorMessage = document.getElementById('errorMessage');
-      errorMessage.textContent = message;
-      errorMessage.classList.remove('d-none');
-    }
+function showErrorMessage(message) {
+  const errorMessage = document.getElementById('errorMessage');
+  errorMessage.textContent = message;
+  errorMessage.classList.remove('d-none');
+}
 
 </script>
 </body>
