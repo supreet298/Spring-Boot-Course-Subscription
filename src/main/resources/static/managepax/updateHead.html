@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UpdatePax Head</title>
+  <title>Update Pax Head</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -16,38 +16,87 @@
     </div>
     <div class="form-group">
       <label for="email">Email</label>
-      <input type="text" id="email" class="form-control" required>
+      <input type="email" id="email" class="form-control" required>
     </div>
     <div class="form-group">
-      <label for="phoneNumber">Phone Number</label>
-      <input type="text" id="phoneNumber" class="form-control" required>
+      <label for="address">Address</label>
+      <input type="text" id="address" class="form-control" required>
     </div>
-
+    <div class="form-group">
+      <label for="country">Country</label>
+      <input type="text" id="country" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="phone">Phone Number:</label>
+      <div style="display: flex;">
+        <select id="countryCode" name="countryCode" required class="form-control" style="max-width: 130px; margin-right: 5px;">
+          <option value="">Select Country</option>
+        </select>
+        <input type="tel" id="phone" name="phone" required placeholder="Enter phone number" class="form-control" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number">
+      </div>
+    </div>
     <button type="submit" class="btn btn-success">Update Head</button>
   </form>
 </div>
 
 <script>
+// Fetch country codes from JSON and populate dropdown
+fetch('data/countryCodes.json')  // Ensure the JSON file path is correct
+.then(response => response.json())
+.then(data => {
+  const countryCodeSelect = document.getElementById('countryCode');
+  data.forEach(country => {
+    const option = document.createElement('option');
+    option.value = country.dial_code;
+    option.textContent = `${country.name} (${country.dial_code})`;
+    countryCodeSelect.appendChild(option);
+  });
+})
+.catch(error => console.error('Error loading country codes:', error));
+
 const urlParams = new URLSearchParams(window.location.search);
 const uuid = urlParams.get('uuid');
 
-// Fetch existing subscription details
+// Fetch existing user details
 fetch(`/api/admin/pax/${uuid}`)
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to fetch user details');
+        }
+        return response.json();
+    })
     .then(paxUser => {
+        console.log('Fetched user details:', paxUser); // Log the fetched user details
+
+        // Populate fields
         document.getElementById('name').value = paxUser.name;
         document.getElementById('email').value = paxUser.email;
-        document.getElementById('phoneNumber').value = paxUser.phoneNumber;
+        document.getElementById('address').value = paxUser.address || ''; // Populate address
+        document.getElementById('country').value = paxUser.country || ''; // Populate country
+
+        // Assuming phoneNumber is in the format of "+XX XXXXXXXX"
+        const phoneParts = paxUser.phoneNumber.split(' '); // Split by space
+        if (phoneParts.length > 1) {
+            document.getElementById('countryCode').value = phoneParts[0]; // Set the country code
+            document.getElementById('phone').value = phoneParts.slice(1).join(' '); // Set the phone number, join remaining parts
+        } else {
+            document.getElementById('phone').value = paxUser.phoneNumber; // If no space, set whole number
+        }
     })
-    .catch(error => console.error('Error fetching subscription:', error));
+    .catch(error => console.error('Error fetching user details:', error));
 
 document.getElementById('updateHeadForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
+    const countryCode = document.getElementById('countryCode').value;
+    const phone = document.getElementById('phone').value;
+
     const updatedHead = {
         name: document.getElementById('name').value,
         email: document.getElementById('email').value,
-        phoneNumber: document.getElementById('phoneNumber').value,
+        address: document.getElementById('address').value,
+        country: document.getElementById('country').value,
+        phoneNumber: countryCode + ' ' + phone // Combine country code and phone number
     };
 
     fetch(`/api/admin/pax/updateHead/${uuid}`, {
@@ -66,7 +115,6 @@ document.getElementById('updateHeadForm').addEventListener('submit', function(ev
         window.location.href = 'managePaxUsers.html';
     })
     .catch(error => console.error('Error updating subscription:', error));
-
 });
 </script>
 </body>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Info</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h2 id="paxUserName">Subscription Info</h2>
+    <p>Details for PaxHead ID: <span id="paxUserId"></span></p>
+
+    <div class="mt-4">
+        <button id="purchaseButton" class="btn btn-success">Purchase</button>
+        <button id="historyButton" class="btn btn-info">History</button>
+    </div>
+</div>
+
+<script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuid = urlParams.get('uuid');
+
+    document.getElementById('paxUserId').textContent = uuid;
+
+    document.getElementById('purchaseButton').addEventListener('click', () => {
+        window.location.href = `purchase.html?paxUserUuid=${uuid}`;
+    });
+
+    document.getElementById('historyButton').addEventListener('click', () => {
+        window.location.href = `history.html?paxUserUuid=${uuid}`;  // Navigate to history page with the user's UUID
+    });
+
+</script>
+</body>
+</html>

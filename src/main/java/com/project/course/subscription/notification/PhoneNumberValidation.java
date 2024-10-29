@@ -5,7 +5,9 @@ import java.util.regex.Pattern;
 public class PhoneNumberValidation {
 
     // Regular expression for validating phone numbers
-    private static final String PHONE_NUMBER_REGEX = "^\\+91\\d{10}$";
+    //private static final String PHONE_NUMBER_REGEX = "^\\+91\\d{10}$";
+    private static final String PHONE_NUMBER_REGEX = "^\\+\\d{1,3}\\d{10}$";
+
 
     // Pattern for efficient matching
     private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile(PHONE_NUMBER_REGEX);
