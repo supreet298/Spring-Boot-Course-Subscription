@@ -12,11 +12,11 @@ public interface SubscriptionService {
 
     List<SubscriptionDTO> getAllActiveSubscriptions();
 
-    Optional<SubscriptionDTO> getSubscriptionByUuid(String uuid);
+    Optional<SubscriptionDTO> getSubscriptionDTOByUuid(String uuid);
 
     Optional<Subscription> updateSubscription(String uuid, Subscription subscription);
 
     boolean deleteSubscription(String uuid);
 
-    Subscription getSubscriptionById(Long id);
+    Subscription getSubscriptionByUuid(String uuid);
 }

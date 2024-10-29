@@ -102,7 +102,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 //    }
 
     public PaxUser getHeadUserByUuid(String uuid) {
-        PaxUser paxUser = paxUserRepository.findByUuid(uuid)
+        PaxUser paxUser = paxUserRepository.findByUuidAndIsActiveTrue(uuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PaxUser not found"));
 
         // Check if the PaxUser's type is HEAD

@@ -23,4 +23,6 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
     List<PurchaseHistory> findExpiringPlansBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
     List<PurchaseHistory> findByPaxUser_Uuid(String uuid);
+
+    List<PurchaseHistory> findByPaxUser_UuidAndPurchaseDateLessThanEqualAndExpiryDateGreaterThanEqual(String userUuid, LocalDateTime now, LocalDateTime now1);
 }

@@ -45,7 +45,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 		// Fetch PaxUser by ID
 		PaxUser paxUser = paxUserService.getHeadUserByUuid(purchaseSubscriptionDTO.getPaxUserUuid());
 		// Fetch Subscription by ID
-		Subscription subscription = subscriptionService.getSubscriptionById(purchaseSubscriptionDTO.getSubscriptionId());
+		Subscription subscription = subscriptionService.getSubscriptionByUuid(purchaseSubscriptionDTO.getSubscriptionUuid());
 
 		// Initialize PurchaseSubscription from DTO
 		PurchaseSubscription purchaseSubscription = new PurchaseSubscription();
@@ -126,7 +126,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
 	private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
 		return switch (subscriptionType) {
-		case MONTHLY -> startDate.plusMinutes(1);
+		case MONTHLY -> startDate.plusMonths(1);
 		case QUARTERLY -> startDate.plusMonths(3);
 		case HALF_YEARLY -> startDate.plusMonths(6);
 		case YEARLY -> startDate.plusYears(1);
@@ -184,7 +184,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 	private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {
 		PurchaseSubscriptionDTO dto = new PurchaseSubscriptionDTO();
 		dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
-		dto.setSubscriptionId(purchaseSubscription.getSubscription().getId());
+		dto.setSubscriptionUuid(purchaseSubscription.getSubscription().getUuid());
 		dto.setRecurring(purchaseSubscription.isRecurring());
 		dto.setNotificationType(purchaseSubscription.getNotificationType());
 		dto.setPaid(purchaseSubscription.getPaid());

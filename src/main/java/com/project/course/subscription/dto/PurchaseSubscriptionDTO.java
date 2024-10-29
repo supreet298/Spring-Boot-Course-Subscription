@@ -3,7 +3,6 @@ package com.project.course.subscription.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.project.course.subscription.model.PurchaseSubscription;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,7 +18,7 @@ public class PurchaseSubscriptionDTO {
 
     private String paxUserUuid;
 
-    private Long subscriptionId;
+    private String subscriptionUuid;
 
     private boolean recurring;
 

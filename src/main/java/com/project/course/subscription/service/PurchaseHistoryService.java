@@ -13,4 +13,6 @@ public interface PurchaseHistoryService {
     List<PurchaseHistory> findPurchaseHistoryByUserAndSubscription(Long userId, Long subscriptionId);
 
     List<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid);
+
+    List<PurchaseHistoryDTO> getActivePurchaseHistories(String uuid);
 }

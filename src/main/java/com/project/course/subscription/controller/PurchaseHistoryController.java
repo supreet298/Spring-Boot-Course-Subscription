@@ -29,4 +29,10 @@ public class PurchaseHistoryController {
         return ResponseEntity.ok(purchaseHistories);
     }
 
+    @GetMapping("/active/{uuid}")
+    public ResponseEntity<List<PurchaseHistoryDTO>> getActivePurchaseHistories(@PathVariable String uuid) {
+        List<PurchaseHistoryDTO> activePurchases = purchaseHistoryService.getActivePurchaseHistories(uuid);
+        return ResponseEntity.ok(activePurchases);
+    }
+
 }

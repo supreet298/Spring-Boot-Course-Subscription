@@ -6,6 +6,7 @@ import com.project.course.subscription.repository.PurchaseHistoryRepository;
 import com.project.course.subscription.service.PurchaseHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,15 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
 
     public List<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid) {
         List<PurchaseHistory> histories = purchaseHistoryRepository.findByPaxUser_Uuid(uuid);
+        return histories.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PurchaseHistoryDTO> getActivePurchaseHistories(String userUuid) {
+        LocalDateTime now = LocalDateTime.now();
+        List<PurchaseHistory> histories = purchaseHistoryRepository.findByPaxUser_UuidAndPurchaseDateLessThanEqualAndExpiryDateGreaterThanEqual(userUuid, now, now);
         return histories.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
