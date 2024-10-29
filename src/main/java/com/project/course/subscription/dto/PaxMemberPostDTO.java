@@ -1,5 +1,6 @@
 package com.project.course.subscription.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -23,7 +24,16 @@ public class PaxMemberPostDTO {
 
     @NotNull(message = "HeadID is mandatory and cannot be null.")
     private Long headId;
+    
+    @Column(columnDefinition = "Text")
+    @NotBlank(message = "Address is mandatory and cannot be blank.")
+    private String address;
+    
+    @NotNull(message = "Country is mandatory and cannot be null.")
+    private String country;
 
     @NotNull(message = "Relation is mandatory and cannot be blank.")
     private String relation;
+    
+    
 }

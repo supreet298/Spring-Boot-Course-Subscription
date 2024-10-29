@@ -5,6 +5,8 @@ import lombok.Data;
 @Data
 public class PaxHeadDTO {
 	
+	private Long id;
+	
 	private String uuid;
 	
     private String phoneNumber;

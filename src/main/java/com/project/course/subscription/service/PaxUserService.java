@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface PaxUserService {
 
-    PaxUser addPaxHead(@Valid PaxUser paxUser);
+    PaxUser addPaxHead(@Valid PaxUser paxUser) throws Exception;
 
     PaxUser addPaxMember(@Valid PaxMemberPostDTO paxMemberDTO);
 
@@ -22,11 +22,19 @@ public interface PaxUserService {
     PaxUser updatePaxMember(String uuid, PaxUser paxUserMember);
     
     PaxUser dropPaxUser(String uuid);
+    
+    PaxUser getHeadUserByUuid(String uuid);
 
     PaxUser getHeadUserById(Long id);
 
 	PaxUser getPaxHeadById(String uuid);
+	
+	PaxUser getPaxMemberById(String uuid);
 
 	PaxUser addPaxMembers(String uuid,PaxMemberPostDTO paxMemberDTO);
+	
+	//List<PaxMemberDTO> getAllPaxMemberByHeadId(String uuid);
+
+	List<PaxMemberDTO> getAllPaxMemberByHeadId(Long id);
 
 }

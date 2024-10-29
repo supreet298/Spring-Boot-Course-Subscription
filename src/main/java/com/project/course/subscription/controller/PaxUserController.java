@@ -20,25 +20,21 @@ public class PaxUserController {
 	private PaxUserService paxUserService;
 
 	@PostMapping("/addHead")
-	public ResponseEntity<PaxUser> addPaxHead(@Valid @RequestBody PaxUser paxUser) {
+	public ResponseEntity<?> addPaxHead(@Valid @RequestBody PaxUser paxUser) throws Exception {
+		try {
 		PaxUser createdUser = paxUserService.addPaxHead(paxUser);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+		}
+		catch(Exception e)
+		{
+			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
 	}
 
 	@PostMapping("/addMember")
 	public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxMemberPostDTO paxUser) {
 		PaxUser createdUser = paxUserService.addPaxMember(paxUser);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-	}
-
-	@PostMapping("/addPaxMembers/{uuid}")
-	public ResponseEntity<?> addPaxMembers(@PathVariable String uuid, @RequestBody PaxMemberPostDTO paxMember) {
-		try {
-			PaxUser addpaxMember = paxUserService.addPaxMembers(uuid, paxMember);
-			return ResponseEntity.status(HttpStatus.CREATED).body(addpaxMember);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		}
 	}
 
 	@GetMapping("/head")
@@ -92,5 +88,34 @@ public class PaxUserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
+	
+	@GetMapping("/getMember/{uuid}")
+	public ResponseEntity<?> getPaxMemberById(@PathVariable String uuid) {
+		try {
+			PaxUser paxHead = paxUserService.getPaxMemberById(uuid);
+			return new ResponseEntity<>(paxHead, HttpStatus.OK);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
 
+	@PostMapping("/addPaxMembers/{uuid}")
+	public ResponseEntity<?> addPaxMembers(@PathVariable String uuid, @RequestBody PaxMemberPostDTO paxMember) {
+		try {
+			PaxUser addpaxMember = paxUserService.addPaxMembers(uuid, paxMember);
+			return ResponseEntity.status(HttpStatus.CREATED).body(addpaxMember);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
+
+	@GetMapping("/getMemberByHeadId/{id}")
+	public ResponseEntity<?> getPaxAllMemberByHadaId(@PathVariable Long id) {
+		try {
+			List<PaxMemberDTO> AllMember = paxUserService.getAllPaxMemberByHeadId(id);
+			return new ResponseEntity<>(AllMember, HttpStatus.OK);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+		}
+	}
 }
