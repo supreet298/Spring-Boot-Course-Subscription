@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Management</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>All PaxHeads</h2>
+    <a href="CreatePaxHead.html" class="btn btn-success">Add Head</a>
+  </div>
+
+  <table id="paxTable" class="table table-striped table-bordered">
+    <thead class = "table-dark">
+    <tr>
+      <th>Name </th>
+      <th>PhoneNumber</th>
+      <th>Email</th>
+     <th>Action</th> <!-- Action column for buttons -->
+      
+    </tr>
+    </thead>
+    <tbody id="paxTableBody">
+    <!-- Rows with subscription data will be dynamically inserted here -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  // Fetch and display subscriptions dynamically
+  fetch('/api/admin/pax/head')
+      .then(response => response.json())
+      .then(subscriptions => {
+          const paxTableBody = document.getElementById('paxTableBody');
+          paxTableBody.innerHTML = ''; // Clear any existing rows
+
+          subscriptions.forEach(paxuser => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                  <td><a href="info.html?uuid=${paxuser.uuid}">${paxuser.name}</a></td>
+                  <td>${paxuser.phoneNumber}</td>
+                  <td>${paxuser.email}</td>
+                   <td>
+                      <a href="updateHead.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm" >Update</a>
+                      <button class="btn btn-danger btn-sm" onclick="deletePaxHead('${paxuser.uuid}')">Delete</button>
+                  </td> 
+              `;
+              paxTableBody.appendChild(row);
+          });
+      })
+      .catch(error => console.error('Error fetching subscriptions:', error));
+
+  // Function to delete paxHead
+   function deletePaxHead(uuid) {
+      if (confirm("Are you sure you want to delete this subscription?")) {
+          fetch(`/api/admin/pax/dropPaxUser/${uuid}`, { method: 'DELETE' })
+              .then(response => {
+                  if (response.ok) {
+                      location.reload(); // Reload the page after deletion
+                  } else {
+                      alert("Failed to delete the subscription.");
+                  }
+              });
+      }
+  } 
+</script>
+</body>
+</html>

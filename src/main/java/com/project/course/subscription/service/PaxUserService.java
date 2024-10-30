@@ -33,4 +33,5 @@ public interface PaxUserService {
 
 	List<PaxMemberDTO> getAllPaxMemberByHeadId(Long id);
 
+    PaxUser getHeadUserByUuid(String uuid);
 }

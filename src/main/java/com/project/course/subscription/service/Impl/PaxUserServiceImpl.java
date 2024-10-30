@@ -1,6 +1,5 @@
 package com.project.course.subscription.service.Impl;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,12 +26,33 @@ public class PaxUserServiceImpl implements PaxUserService {
 	@Autowired
 	private PaxUserRepository paxUserRepository;
 
+<<<<<<< HEAD
 	@Override
 	public PaxUser addPaxHead(PaxUser paxUser)   {
 		PaxUser head = new PaxUser();
 		head.setName(paxUser.getName());
 		if (paxUserRepository.existsByEmail(paxUser.getEmail())) {
             throw new RuntimeException("Email id already exists, try another.");
+=======
+    @Override
+    public PaxUser addPaxHead(PaxUser paxUser) {
+        PaxUser head = new PaxUser();
+        head.setName(paxUser.getName());
+        head.setEmail(paxUser.getEmail());
+        if(!PhoneNumberValidation.isValid(paxUser.getPhoneNumber()))
+        	throw new IllegalArgumentException("Invalid PhoneNumber,PhoneNumber starts with County codd Eg: +91xxxxxxxxxx");
+        head.setPhoneNumber(paxUser.getPhoneNumber());
+        head.setType(PaxUser.Type.HEAD);
+        return paxUserRepository.save(head);
+    }
+
+    public PaxUser addPaxMember(PaxMemberPostDTO paxMemberDTO) {
+        PaxUser head = paxUserRepository.findById(paxMemberDTO.getHeadId())
+                .orElseThrow(() -> new IllegalArgumentException("Head ID does not exist."));
+
+        if (head.getType() != PaxUser.Type.HEAD) {
+            throw new IllegalArgumentException("Only users of type HEAD can create members.");
+>>>>>>> master
         }
 		head.setEmail(paxUser.getEmail());
 		head.setAddress(paxUser.getAddress());
@@ -146,7 +166,11 @@ public class PaxUserServiceImpl implements PaxUserService {
 //                .collect(Collectors.toList());
 //    }
 
+<<<<<<< HEAD
 	public PaxUser getHeadUserByUuid(String uuid) {
+=======
+    public PaxUser getHeadUserByUuid(String uuid) {
+>>>>>>> master
         PaxUser paxUser = paxUserRepository.findByUuidAndIsActiveTrue(uuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PaxUser not found"));
 

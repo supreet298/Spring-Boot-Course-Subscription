@@ -21,7 +21,9 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
 
     @Query("SELECT u FROM PaxUser u WHERE u.type = 'MEMBER'")
     List<PaxUser> findAllMembers();
-    
+
+    Optional<PaxUser> findByUuidAndIsActiveTrue(String uuid);
+
     Optional<PaxUser> findByUuid(String uuid);
     
     Optional<PaxUser> findByUuidAndType(String uuid, PaxUser.Type type);

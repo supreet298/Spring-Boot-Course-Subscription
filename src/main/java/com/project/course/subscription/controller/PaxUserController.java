@@ -1,7 +1,6 @@
 package com.project.course.subscription.controller;
 
 import com.project.course.subscription.dto.PaxHeadDTO;
-import com.project.course.subscription.dto.PaxMemberDTO;
 import com.project.course.subscription.dto.PaxMemberPostDTO;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.service.PaxUserService;

@@ -10,4 +10,8 @@ CREATE TABLE IF NOT EXISTS email_setting(
 );
 
 INSERT INTO email_setting (host, port, user_name, password, smtp_auth, starttls_enable,renewal_day_alert) 
+<<<<<<< HEAD
 VALUES ('smtp.gmail.com', 587, 'karthikeyan190100@gmail.com', '123ovqlyooqaqgcpyvd456', TRUE, TRUE,5);
+=======
+VALUES ('smtp.gmail.com', 587, 'karthikeyan190100@gmail.com', '12345ovqlyooqaqgcpyvd', TRUE, TRUE,5);
+>>>>>>> master
