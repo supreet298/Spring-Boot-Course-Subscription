@@ -32,7 +32,7 @@ public class SubscriptionController {
 
     @GetMapping("/{uuid}")
     public Optional<SubscriptionDTO> getSubscriptionByUuid(@PathVariable String uuid) {
-        return subscriptionService.getSubscriptionByUuid(uuid);
+        return subscriptionService.getSubscriptionDTOByUuid(uuid);
     }
 
     @PutMapping("/{uuid}")

@@ -68,10 +68,10 @@ public class NotificationService {
 			
 			if(type.equals("WHATSAPP")||type.equals("BOTH"))
 				whatsappService.sendWhatsAppMessage(
-						history.getPaxUserHead().getPhoneNumber(),
+						history.getPaxUser().getPhoneNumber(),
 						history.getPlanName()+" Your plan Will expiring soon please renewal to enjoy uninterupted services");
 			
-			System.out.println("MessageSent sent Sucessfully: " + history.getPaxUserHead().getPhoneNumber().toString());
+			System.out.println("MessageSent sent Sucessfully: " + history.getPaxUser().getPhoneNumber().toString());
 		}
 		}
 	

@@ -20,14 +20,12 @@ public class PaxUserController {
 	private PaxUserService paxUserService;
 
 	@PostMapping("/addHead")
-	public ResponseEntity<Object> addPaxHead(@Valid @RequestBody PaxUser paxUser)   {
+	public ResponseEntity<Object> addPaxHead(@Valid @RequestBody PaxUser paxUser) {
 		try {
-		PaxUser createdUser = paxUserService.addPaxHead(paxUser);
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-		}
-		catch(Exception e)
-		{
-			 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			PaxUser createdUser = paxUserService.addPaxHead(paxUser);
+			return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
 
@@ -88,7 +86,7 @@ public class PaxUserController {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
-	
+
 	@GetMapping("/getMember/{uuid}")
 	public ResponseEntity<?> getPaxMemberById(@PathVariable String uuid) {
 		try {

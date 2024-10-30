@@ -40,7 +40,7 @@
           subscriptions.forEach(subscription => {
               const row = document.createElement('tr');
               row.innerHTML = `
-                  <td><a href="details.html?uuid=${subscription.uuid}" class="text-primary">${subscription.planName}</a></td>
+                  <td>${subscription.planName}</td>
                   <td>${subscription.description}</td>
                   <td>${subscription.cost}</td>
                   <td>${subscription.subscriptionType}</td>

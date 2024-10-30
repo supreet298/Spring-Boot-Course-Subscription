@@ -42,4 +42,7 @@ public interface PaxUserRepository extends JpaRepository<PaxUser,Long> {
     
     boolean existsByEmail(String email);
     
+    Optional<PaxUser> findByUuidAndIsActiveTrue(String uuid);
+
+    
 }

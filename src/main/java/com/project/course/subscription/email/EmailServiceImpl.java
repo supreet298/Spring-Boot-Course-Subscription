@@ -105,7 +105,7 @@ public class EmailServiceImpl implements EmailService  {
 
 			// Send the email
 			mailSender.send(message);
-			System.out.println("Expiration Email Sent Sucessfully !");
+			System.out.println("Purchase Email Sent Sucessfully !");
 
 		} catch (MessagingException e) {
 			e.printStackTrace();

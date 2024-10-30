@@ -39,7 +39,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		head.setCountry(paxUser.getCountry());
 //		if (!PhoneNumberValidation.isValid(paxUser.getPhoneNumber()))
 //			throw new IllegalArgumentException(
-//					"Invalid Phonenumber,PhoneNumber starts with County codd Eg: +91xxxxxxxxxx");
+//					"Invalid PhoneNumber,PhoneNumber starts with County code Eg: +91xxxxxxxxxx");
 		if (paxUserRepository.existsByPhoneNumber(paxUser.getPhoneNumber())) {
             throw new RuntimeException("Mobile number already exists, try another.");
         }
@@ -97,9 +97,13 @@ public class PaxUserServiceImpl implements PaxUserService {
 	public PaxUser updatePaxHead(String uuid, PaxUser request) {
 		PaxUser existingHead = paxUserRepository.findByUuid(uuid)
 				.orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
-
+			
 		existingHead.setName(request.getName());
 		existingHead.setEmail(request.getEmail());
+		 if(paxUserRepository.existsByEmail(request.getEmail()))
+		    {
+		        throw new RuntimeException("Email id already exists, try another.");
+		    }
 		existingHead.setPhoneNumber(request.getPhoneNumber());
 		existingHead.setAddress(request.getAddress());
 		existingHead.setCountry(request.getCountry());
@@ -143,7 +147,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 //    }
 
 	public PaxUser getHeadUserByUuid(String uuid) {
-        PaxUser paxUser = paxUserRepository.findByUuid(uuid)
+        PaxUser paxUser = paxUserRepository.findByUuidAndIsActiveTrue(uuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PaxUser not found"));
 
         // Check if the PaxUser's type is HEAD
@@ -153,17 +157,6 @@ public class PaxUserServiceImpl implements PaxUserService {
 
         return paxUser; // Return the PaxUser if the check passes
     }
-	public PaxUser getHeadUserById(Long id) {
-		PaxUser paxUser = paxUserRepository.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PaxUser not found"));
-
-		// Check if the PaxUser's type is HEAD
-		if (!paxUser.getType().equals(PaxUser.Type.HEAD)) {
-			throw new IllegalArgumentException("Only PaxUser of type HEAD can purchase subscription.");
-		}
-
-		return paxUser; // Return the PaxUser if the check passes
-	}
 
 	private PaxHeadDTO convertToHeadDTO(PaxUser paxUser) {
 		PaxHeadDTO dto = new PaxHeadDTO();
@@ -225,6 +218,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 	        throw new ResourceNotFoundException("No members are found under this head");
 	    }
 	}
+
 
 
 }

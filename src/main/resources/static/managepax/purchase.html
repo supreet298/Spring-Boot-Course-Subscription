@@ -8,16 +8,18 @@
 </head>
 <body>
 <div class="container mt-5">
+
   <div class="d-flex justify-content-between align-items-center">
     <h2>Purchase Subscription</h2>
   </div>
 
   <form id="purchaseSubscriptionForm">
 
+    <!-- Subscription Selection -->
     <div class="form-group">
       <label for="subscriptionId">Subscription</label>
-      <select class="form-control" id="subscriptionId" required>
-        <option value="" disabled selected>Select a Subscription</option>
+      <select id="subscriptionId" class="form-control" required>
+        <option value="" disabled selected>Select a plan</option>
       </select>
     </div>
 
@@ -60,34 +62,33 @@
   // Retrieve the paxUserUuid from the URL
   const paxUserUuid = getQueryParam('paxUserUuid');
 
-  // Fetch available subscriptions and populate the dropdown
-  function loadSubscriptions() {
+  // Load subscription options from the API
+  function loadSubscriptionOptions() {
     fetch('/api/admin/subscription')
       .then(response => response.json())
-      .then(subscriptions => {
+      .then(data => {
         const subscriptionSelect = document.getElementById('subscriptionId');
-        subscriptionSelect.innerHTML = '<option value="" disabled selected>Select a Subscription</option>'; // Clear and add default option
-
-        subscriptions.forEach(subscription => {
+        data.forEach(subscription => {
           const option = document.createElement('option');
-          option.value = subscription.uuid; // Assumes subscription has a 'uuid' property
-          option.textContent = subscription.planName; // Assumes subscription has a 'planName' property
+          option.value = subscription.uuid;
+          option.textContent = `${subscription.planName} - ${subscription.cost} Cost - ${subscription.subscriptionType}`;
           subscriptionSelect.appendChild(option);
         });
       })
-      .catch(error => console.error('Error loading subscriptions:', error));
+      .catch(error => console.error('Error loading subscription options:', error));
   }
 
-  // Load subscriptions when the page loads
-  window.addEventListener('DOMContentLoaded', loadSubscriptions);
+  // Call function to populate subscriptions on page load
+  document.addEventListener('DOMContentLoaded', loadSubscriptionOptions);
 
-// Event listener for form submission
+
+ // Event listener for form submission
   document.getElementById('purchaseSubscriptionForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const purchaseData = {
       paxUserUuid: paxUserUuid, // Use paxUserUuid from the URL
-      subscriptionId: document.getElementById('subscriptionId').value,
+      subscriptionUuid: document.getElementById('subscriptionId').value || null,
       recurring: document.getElementById('recurring').value === 'true',
       paid: document.getElementById('paid').value === 'true',
       notificationType: document.getElementById('notificationType').value
@@ -110,7 +111,7 @@
     .then(data => {
       alert('Subscription purchased successfully!');
       console.log('Purchase Data:', data);
-      window.location.href = 'info.html';
+      window.location.href = 'managePaxUsers.html';
     })
     .catch(error => {
       console.error('Error:', error);

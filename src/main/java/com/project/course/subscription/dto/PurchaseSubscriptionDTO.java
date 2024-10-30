@@ -1,5 +1,8 @@
 package com.project.course.subscription.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.project.course.subscription.model.PurchaseSubscription;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,18 +13,23 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PurchaseSubscriptionDTO {
 
+    @JsonIgnore
     private String uuid;
 
-    private String planName;
+    private String paxUserUuid;
 
-    private String paxUserHead;
+    private String subscriptionUuid;
 
     private boolean recurring;
 
-    private boolean paid;
+    private PurchaseSubscription.NotificationType notificationType;
 
+    private Boolean paid;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime purchaseDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy HH:mm:ss")
     private LocalDateTime expiryDate;
 
 }

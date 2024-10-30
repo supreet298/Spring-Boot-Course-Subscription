@@ -11,5 +11,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription,Long>
 
     List<Subscription> findByIsActiveTrue();
 
-    Optional<Subscription> findByUuid(String uuid);
+    Optional<Subscription> findByUuidAndIsActiveTrue(String uuid);
+
 }

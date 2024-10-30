@@ -1,7 +1,6 @@
 package com.project.course.subscription.controller;
 
 import com.project.course.subscription.dto.PurchaseSubscriptionDTO;
-import com.project.course.subscription.model.PurchaseSubscription;
 import com.project.course.subscription.service.PurchaseSubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,9 @@ public class PurchaseSubscriptionController {
     private PurchaseSubscriptionService purchaseSubscriptionService;
 
     @PostMapping
-    public ResponseEntity<PurchaseSubscription> createSubscription(@Valid @RequestBody PurchaseSubscription purchaseSubscription) {
-        PurchaseSubscription CreatedpurchaseSubscription = purchaseSubscriptionService.createPurchaseSubscription(purchaseSubscription);
-        return ResponseEntity.status(HttpStatus.CREATED).body(CreatedpurchaseSubscription);
+    public ResponseEntity<PurchaseSubscriptionDTO> purchaseSubscription(@Valid @RequestBody PurchaseSubscriptionDTO purchaseSubscriptionDTO) {
+        PurchaseSubscriptionDTO purchaseSubscription = purchaseSubscriptionService.createPurchaseSubscription(purchaseSubscriptionDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(purchaseSubscription);
     }
 
     @GetMapping

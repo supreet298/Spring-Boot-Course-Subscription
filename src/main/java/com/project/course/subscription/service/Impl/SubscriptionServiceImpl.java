@@ -12,7 +12,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -39,16 +38,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Optional<SubscriptionDTO> getSubscriptionByUuid(String uuid) {
-        return Optional.ofNullable(subscriptionRepository.findByUuid(uuid)
-                .filter(Subscription::isActive)
+    public Optional<SubscriptionDTO> getSubscriptionDTOByUuid(String uuid) {
+        return Optional.ofNullable(subscriptionRepository.findByUuidAndIsActiveTrue(uuid)
                 .map(this::convertToDTO)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid)));
     }
 
     @Override
     public Optional<Subscription> updateSubscription(String uuid, Subscription subscription) {
-        return Optional.ofNullable(subscriptionRepository.findByUuid(uuid).map(existingSubscription -> {
+        return Optional.ofNullable(subscriptionRepository.findByUuidAndIsActiveTrue(uuid).map(existingSubscription -> {
                     // Update the existing category with values from categoryDetails
                     existingSubscription.setPlanName(subscription.getPlanName());
                     existingSubscription.setDescription(subscription.getDescription());
@@ -62,7 +60,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public boolean deleteSubscription(String uuid) {
-        Optional<Subscription> existingSubscription = subscriptionRepository.findByUuid(uuid);
+        Optional<Subscription> existingSubscription = subscriptionRepository.findByUuidAndIsActiveTrue(uuid);
         if (existingSubscription.isPresent()) {
             Subscription subscription = existingSubscription.get();
             subscription.setActive(false);
@@ -73,9 +71,9 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         }
     }
 
-    public Subscription getSubscriptionById(Long id) {
-        return subscriptionRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "SubscriptionType not found"));
+    public Subscription getSubscriptionByUuid(String uuid) {
+        return subscriptionRepository.findByUuidAndIsActiveTrue(uuid)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
     }
 
     private SubscriptionDTO convertToDTO(Subscription subscription) {

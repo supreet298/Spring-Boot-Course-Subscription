@@ -1,7 +1,6 @@
 package com.project.course.subscription.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,20 +31,15 @@ public class PurchaseSubscription {
 
     @ManyToOne
     @JoinColumn(name = "pax_user_id",referencedColumnName = "id",updatable = false)
-
-    @NotNull(message = "PaxUser is mandatory and cannot be blank.")
     private PaxUser paxUser;
 
     @ManyToOne
     @JoinColumn(name = "subscription_id", referencedColumnName = "id",updatable = false)
-  //  @NotBlank(message = "Subscription is mandatory and cannot be blank.")
-    @NotNull(message = "Subscription is mandatory and cannot be blank.")
     private Subscription subscription;
 
     private boolean recurring;
 
     @Column(nullable = false)
-    @NotNull(message = "Paid cannot be null")
     private Boolean paid;
 
     private LocalDateTime purchaseDate;
@@ -73,13 +67,13 @@ public class PurchaseSubscription {
     
     @Version
     private int version;
-    
+
+    @Enumerated(EnumType.STRING)
+    private NotificationType notificationType;
     
     public enum NotificationType
     {
     	EMAIL,WHATSAPP,BOTH
     }
-    
-    @Enumerated(EnumType.STRING)
-    private NotificationType notificationType;
+
 }

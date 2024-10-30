@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 @Data
 public class PurchaseHistoryDTO {
 
+    private String paxUserUuid;
+
     private String clientName;
 
     private String clientEmail;
