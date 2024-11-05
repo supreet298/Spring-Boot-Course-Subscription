@@ -1,21 +1,13 @@
 package com.project.course.subscription.email;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Properties;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-
-import com.project.course.subscription.model.PaxUser;
-import com.project.course.subscription.model.PurchaseSubscription;
-import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.model.Subscription.SubscriptionType;
-
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
@@ -81,7 +73,7 @@ public class EmailServiceImpl implements EmailService  {
 
 	@Override
 	public void sendConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
-			LocalDateTime ExpirayTime, SubscriptionType subscriptionType,String htmlfile) {
+			LocalDateTime ExpiryTime, SubscriptionType subscriptionType,String htmlfile) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -94,7 +86,7 @@ public class EmailServiceImpl implements EmailService  {
 			context.setVariable("userName", userName);
 			context.setVariable("planName", planName);
 			context.setVariable("setPurchaseDate", setPurchaseDate);
-			context.setVariable("ExpirayTime", ExpirayTime);
+			context.setVariable("ExpiryTime", ExpiryTime);
 			context.setVariable("subscriptionType", subscriptionType);
 
 			// Process the HTML template with Thymeleaf
@@ -105,7 +97,7 @@ public class EmailServiceImpl implements EmailService  {
 
 			// Send the email
 			mailSender.send(message);
-			System.out.println("Purchase Email Sent Sucessfully !");
+			System.out.println("Purchase Email Sent Successfully !");
 
 		} catch (MessagingException e) {
 			e.printStackTrace();
@@ -116,7 +108,7 @@ public class EmailServiceImpl implements EmailService  {
 
 	@Override
 	public void sendExpiryNotification(String to, String clientName, String PlanName, Object setPurchaseDate,
-			LocalDateTime ExpirayDate, String htmlfile) {
+			LocalDateTime ExpiryDate, String htmlfile) {
 		try {
 			MimeMessage message = mailSender.createMimeMessage();
 			MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -129,7 +121,7 @@ public class EmailServiceImpl implements EmailService  {
 			context.setVariable("clientName", clientName);
 			context.setVariable("planName", PlanName);
 			context.setVariable("purchaseDate", setPurchaseDate);
-			context.setVariable("expiryDate", ExpirayDate);
+			context.setVariable("expiryDate", ExpiryDate);
 
 			// Process the HTML template with Thymeleaf
 			String htmlContent = templateEngine.process(htmlfile, context);

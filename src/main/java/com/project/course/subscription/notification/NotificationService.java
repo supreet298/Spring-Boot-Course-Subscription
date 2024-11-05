@@ -2,10 +2,8 @@ package com.project.course.subscription.notification;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.project.course.subscription.email.EmailRepository;
 import com.project.course.subscription.email.EmailService;
 import com.project.course.subscription.email.EmailSetting;

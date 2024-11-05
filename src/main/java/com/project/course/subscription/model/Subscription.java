@@ -1,6 +1,7 @@
 package com.project.course.subscription.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -38,6 +39,7 @@ public class Subscription {
     private String description;
 
     @NotNull(message = "Cost is mandatory and cannot be blank.")
+    @Min(value = 1 ,message = "minimum value should be 1.")
     private Double cost;
 
     @Enumerated(EnumType.STRING)

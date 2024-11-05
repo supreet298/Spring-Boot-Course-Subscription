@@ -7,11 +7,9 @@ import com.project.course.subscription.model.PurchaseHistory;
 import com.project.course.subscription.model.PurchaseSubscription;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.repository.PurchaseSubscriptionRepository;
-import com.project.course.subscription.service.PaxUserService;
-import com.project.course.subscription.service.PurchaseHistoryService;
-import com.project.course.subscription.service.PurchaseSubscriptionService;
-import com.project.course.subscription.service.SubscriptionService;
+import com.project.course.subscription.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -143,6 +141,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 		purchaseHistory.setClientEmail(paxUser.getEmail());
 		purchaseHistory.setPlanName(subscription.getPlanName());
 		purchaseHistory.setRenewalCount(renewalCount);
+		purchaseHistory.setPurchaseSubscriptionUuid(purchaseSubscription.getUuid());
 		purchaseHistory.setPurchaseDate(purchaseDate);
 		purchaseHistory.setExpiryDate(expiryDate);
 		purchaseHistory.setNotificationType(purchaseSubscription.getNotificationType().toString());
@@ -179,6 +178,27 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 		} else {
 			throw new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid);
 		}
+	}
+
+	@Override
+	public boolean disableRecurringForSubscription(String uuid) {
+		Optional<PurchaseSubscription> subscriptionOpt = purchaseSubscriptionRepository.findByUuid(uuid);
+
+		if (subscriptionOpt.isPresent()) {
+			PurchaseSubscription subscription = subscriptionOpt.get();
+
+			// Set recurring to false and save
+			subscription.setRecurring(false);
+			purchaseSubscriptionRepository.save(subscription);
+			return true;
+		} else {
+			throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
+		}
+	}
+
+	public PurchaseSubscription getPurchaseSubscriptionId(Long id) {
+		return purchaseSubscriptionRepository.findById(id)
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purchase Subscription not found"));
 	}
 
 	private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {

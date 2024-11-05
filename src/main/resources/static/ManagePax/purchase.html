@@ -111,11 +111,7 @@
     .then(data => {
       alert('Subscription purchased successfully!');
       console.log('Purchase Data:', data);
-<<<<<<< HEAD:src/main/resources/static/managepax/purchase.html
-      window.location.href = 'managePaxUsers.html';
-=======
-      window.location.href = 'managepaxusers.html';
->>>>>>> master:src/main/resources/static/ManagePax/purchase.html
+      window.location.href = `info.html?uuid=${purchaseData.paxUserUuid}`;
     })
     .catch(error => {
       console.error('Error:', error);

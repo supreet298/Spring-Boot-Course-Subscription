@@ -43,4 +43,14 @@ public class PurchaseSubscriptionController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @DeleteMapping("/{uuid}/disable")
+    public ResponseEntity<String> disableRecurring(@PathVariable String uuid) {
+        boolean success = purchaseSubscriptionService.disableRecurringForSubscription(uuid);
+        if (success) {
+            return ResponseEntity.ok("Recurring has been disabled for the subscription.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subscription not found.");
+        }
+    }
 }

@@ -8,6 +8,8 @@ public class PurchaseHistoryDTO {
 
     private String paxUserUuid;
 
+    private String purchaseSubscriptionUuid;
+
     private String clientName;
 
     private String clientEmail;

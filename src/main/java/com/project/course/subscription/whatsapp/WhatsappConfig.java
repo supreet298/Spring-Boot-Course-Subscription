@@ -1,12 +1,10 @@
 package com.project.course.subscription.whatsapp;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
-
 import com.twilio.Twilio;
-
 import jakarta.annotation.PostConstruct;
+
 @Service
 public class WhatsappConfig {
 

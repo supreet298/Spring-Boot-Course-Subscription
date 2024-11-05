@@ -52,6 +52,7 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
     private PurchaseHistoryDTO convertToDTO(PurchaseHistory history) {
         PurchaseHistoryDTO dto = new PurchaseHistoryDTO();
         dto.setPaxUserUuid(history.getPaxUser().getUuid());
+        dto.setPurchaseSubscriptionUuid(history.getPurchaseSubscriptionUuid());
         dto.setClientName(history.getClientName());
         dto.setClientEmail(history.getClientEmail());
         dto.setPlanName(history.getPlanName());

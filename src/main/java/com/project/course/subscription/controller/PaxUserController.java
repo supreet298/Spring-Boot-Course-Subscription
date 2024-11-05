@@ -1,6 +1,7 @@
 package com.project.course.subscription.controller;
 
 import com.project.course.subscription.dto.PaxHeadDTO;
+import com.project.course.subscription.dto.PaxMemberDTO;
 import com.project.course.subscription.dto.PaxMemberPostDTO;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.service.PaxUserService;
@@ -99,15 +100,15 @@ public class PaxUserController {
 	@PostMapping("/addPaxMembers/{uuid}")
 	public ResponseEntity<?> addPaxMembers(@PathVariable String uuid, @RequestBody PaxMemberPostDTO paxMember) {
 		try {
-			PaxUser addpaxMember = paxUserService.addPaxMembers(uuid, paxMember);
-			return ResponseEntity.status(HttpStatus.CREATED).body(addpaxMember);
+			PaxUser addPaxMember = paxUserService.addPaxMembers(uuid, paxMember);
+			return ResponseEntity.status(HttpStatus.CREATED).body(addPaxMember);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
 	@GetMapping("/getMemberByHeadId/{id}")
-	public ResponseEntity<?> getPaxAllMemberByHadaId(@PathVariable Long id) {
+	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable Long id) {
 		try {
 			List<PaxMemberDTO> AllMember = paxUserService.getAllPaxMemberByHeadId(id);
 			return new ResponseEntity<>(AllMember, HttpStatus.OK);

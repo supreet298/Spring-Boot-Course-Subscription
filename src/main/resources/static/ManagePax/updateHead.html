@@ -41,96 +41,96 @@
 </div>
 
 <script>
-// Fetch country codes from JSON and populate dropdown
-fetch('data/countryCodes.json')  // Ensure the JSON file path is correct
-.then(response => response.json())
-.then(data => {
-  const countryCodeSelect = document.getElementById('countryCode');
-  data.forEach(country => {
-    const option = document.createElement('option');
-    option.value = country.dial_code;
-    option.textContent = `${country.name} (${country.dial_code})`;
-    countryCodeSelect.appendChild(option);
-  });
-})
-.catch(error => console.error('Error loading country codes:', error));
-
-const urlParams = new URLSearchParams(window.location.search);
-const uuid = urlParams.get('uuid');
-
-// Fetch existing user details
-fetch(`/api/admin/pax/${uuid}`)
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch user details');
-        }
-        return response.json();
-    })
-    .then(paxUser => {
-        console.log('Fetched user details:', paxUser);
-
-        // Populate fields
-        document.getElementById('name').value = paxUser.name;
-        document.getElementById('email').value = paxUser.email;
-        document.getElementById('address').value = paxUser.address || '';
-        document.getElementById('country').value = paxUser.country || '';
-
-        // Assuming phoneNumber is in the format "+XX XXXXXXXX"
-        const phoneParts = paxUser.phoneNumber.split(' ');
-        if (phoneParts.length > 1) {
-            document.getElementById('countryCode').value = phoneParts[0];
-            document.getElementById('phone').value = phoneParts.slice(1).join(' ');
-        } else {
-            document.getElementById('phone').value = paxUser.phoneNumber;
-        }
-    })
-    .catch(error => console.error('Error fetching user details:', error));
-
-document.getElementById('updateHeadForm').addEventListener('submit', function(event) {
-    event.preventDefault();
-
-    const countryCode = document.getElementById('countryCode').value;
-    const phone = document.getElementById('phone').value;
-
-    const updatedHead = {
-        name: document.getElementById('name').value,
-        email: document.getElementById('email').value,
-        address: document.getElementById('address').value,
-        country: document.getElementById('country').value,
-        phoneNumber: countryCode + ' ' + phone
-    };
-
-    fetch(`/api/admin/pax/updateHead/${uuid}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedHead)
-    })
-    .then(response => {
-        const contentType = response.headers.get("content-type");
-        if (!response.ok) {
-          if (contentType && contentType.includes("application/json")) {
-            return response.json().then(json => { throw new Error(json.message || 'Failed to update Head'); });
-          } else {
-            return response.text().then(text => { throw new Error(text || 'Failed to update Head'); });
-          }
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert('Head updated successfully!');
-        window.location.href = 'managePaxUsers.html';
-    })
-    .catch(error => {
-        console.error('Error updating member:', error);
-        showErrorMessage(error.message);
+  // Fetch country codes from JSON and populate dropdown
+  fetch('data/countryCodes.json')  // Ensure the JSON file path is correct
+  .then(response => response.json())
+  .then(data => {
+    const countryCodeSelect = document.getElementById('countryCode');
+    data.forEach(country => {
+      const option = document.createElement('option');
+      option.value = country.dial_code;
+      option.textContent = `${country.name} (${country.dial_code})`;
+      countryCodeSelect.appendChild(option);
     });
-});
+  })
+  .catch(error => console.error('Error loading country codes:', error));
 
-function showErrorMessage(message) {
-  const errorMessage = document.getElementById('errorMessage');
-  errorMessage.textContent = message;
-  errorMessage.classList.remove('d-none');
-}
+  const urlParams = new URLSearchParams(window.location.search);
+  const uuid = urlParams.get('uuid');
+
+  // Fetch existing user details
+  fetch(`/api/admin/pax/${uuid}`)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error('Failed to fetch user details');
+          }
+          return response.json();
+      })
+      .then(paxUser => {
+          console.log('Fetched user details:', paxUser);
+
+          // Populate fields
+          document.getElementById('name').value = paxUser.name;
+          document.getElementById('email').value = paxUser.email;
+          document.getElementById('address').value = paxUser.address || '';
+          document.getElementById('country').value = paxUser.country || '';
+
+          // Assuming phoneNumber is in the format "+XX XXXXXXXX"
+          const phoneParts = paxUser.phoneNumber.split(' ');
+          if (phoneParts.length > 1) {
+              document.getElementById('countryCode').value = phoneParts[0];
+              document.getElementById('phone').value = phoneParts.slice(1).join(' ');
+          } else {
+              document.getElementById('phone').value = paxUser.phoneNumber;
+          }
+      })
+      .catch(error => console.error('Error fetching user details:', error));
+
+  document.getElementById('updateHeadForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const countryCode = document.getElementById('countryCode').value;
+      const phone = document.getElementById('phone').value;
+
+      const updatedHead = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          address: document.getElementById('address').value,
+          country: document.getElementById('country').value,
+          phoneNumber: countryCode + ' ' + phone
+      };
+
+      fetch(`/api/admin/pax/updateHead/${uuid}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedHead)
+      })
+      .then(response => {
+          const contentType = response.headers.get("content-type");
+          if (!response.ok) {
+            if (contentType && contentType.includes("application/json")) {
+              return response.json().then(json => { throw new Error(json.message || 'Failed to update Head'); });
+            } else {
+              return response.text().then(text => { throw new Error(text || 'Failed to update Head'); });
+            }
+          }
+          return response.json();
+      })
+      .then(data => {
+          alert('Head updated successfully!');
+          window.location.href = 'managePaxUsers.html';
+      })
+      .catch(error => {
+          console.error('Error updating member:', error);
+          showErrorMessage(error.message);
+      });
+  });
+
+  function showErrorMessage(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('d-none');
+  }
 
 </script>
 </body>

@@ -18,7 +18,7 @@ public class PurchaseHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "pax_user_head_id", referencedColumnName = "uuid", nullable = false, updatable = false)
+    @JoinColumn(name = "pax_user_id", referencedColumnName = "id", nullable = false, updatable = false)
     private PaxUser paxUser;
 
     @ManyToOne
@@ -36,6 +36,9 @@ public class PurchaseHistory {
     
     @Column(name = "renewal_count", nullable = false)
     private int renewalCount;
+
+    @Column(name = "purchase_subscription_uuid", nullable = false)
+    private String purchaseSubscriptionUuid;
 
     @Column(name = "purchase_date", nullable = false,updatable = false)
     private LocalDateTime purchaseDate;

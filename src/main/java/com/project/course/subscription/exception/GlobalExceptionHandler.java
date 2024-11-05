@@ -1,13 +1,11 @@
 package com.project.course.subscription.exception;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 import java.util.HashMap;
@@ -30,7 +28,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBadCredentialsException(BadCredentialsException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
-    
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
@@ -42,28 +40,18 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler(DataIntegrityViolationException.class)
-//    @ResponseStatus(HttpStatus.CONFLICT)
-//    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-//        // Customize the error message
-//        return ResponseEntity.status(HttpStatus.CONFLICT).body("Data integrity violation: " + ex.getMostSpecificCause().getMessage());
-//
-//    }
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<String> ResourceNotFoundException(ResourceNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
-        
-        
+
+
     }
-    
 
-        @ExceptionHandler(RuntimeException.class)
-        public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", ex.getMessage());  // Provide detailed error message
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
-        }
-   
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());  // Provide detailed error message
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
-    
 }
