@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Subscription</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>Purchase Subscription</h2>
+  </div>
+
+  <form id="purchaseSubscriptionForm">
+
+    <!-- Subscription Selection -->
+    <div class="form-group">
+      <label for="subscriptionId">Subscription</label>
+      <select id="subscriptionId" class="form-control" required>
+        <option value="" disabled selected>Select a plan</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="recurring">Recurring</label>
+      <select class="form-control" id="recurring" required>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="paid">Paid</label>
+      <select class="form-control" id="paid" required>
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="notificationType">Notification Type</label>
+      <select class="form-control" id="notificationType" required>
+        <option value="EMAIL">Email</option>
+        <option value="WHATSAPP">WhatsApp</option>
+        <option value="BOTH">Both</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Purchase</button>
+  </form>
+</div>
+
+<script>
+  // Function to get URL parameters
+  function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+  }
+
+  // Retrieve the paxUserUuid from the URL
+  const paxUserUuid = getQueryParam('paxUserUuid');
+
+  // Load subscription options from the API
+  function loadSubscriptionOptions() {
+    fetch('/api/admin/subscription')
+      .then(response => response.json())
+      .then(data => {
+        const subscriptionSelect = document.getElementById('subscriptionId');
+        data.forEach(subscription => {
+          const option = document.createElement('option');
+          option.value = subscription.uuid;
+          option.textContent = `${subscription.planName} - ${subscription.cost} Cost - ${subscription.subscriptionType}`;
+          subscriptionSelect.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Error loading subscription options:', error));
+  }
+
+  // Call function to populate subscriptions on page load
+  document.addEventListener('DOMContentLoaded', loadSubscriptionOptions);
+
+
+ // Event listener for form submission
+  document.getElementById('purchaseSubscriptionForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const purchaseData = {
+      paxUserUuid: paxUserUuid, // Use paxUserUuid from the URL
+      subscriptionUuid: document.getElementById('subscriptionId').value || null,
+      recurring: document.getElementById('recurring').value === 'true',
+      paid: document.getElementById('paid').value === 'true',
+      notificationType: document.getElementById('notificationType').value
+    };
+
+    fetch('/api/admin/purchaseSubscription', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(purchaseData)
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Failed to create subscription');
+      }
+    })
+    .then(data => {
+      alert('Subscription purchased successfully!');
+      console.log('Purchase Data:', data);
+      window.location.href = `info.html?uuid=${purchaseData.paxUserUuid}`;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error purchasing subscription');
+    });
+  });
+</script>
+</body>
+</html>

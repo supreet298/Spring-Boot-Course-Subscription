@@ -73,7 +73,8 @@
           email: document.getElementById('email').value,
           address: document.getElementById('address').value,
           country: document.getElementById('country').value,
-          phoneNumber: countryCode + phone // Combine country code and phone number
+          countryCode:document.getElementById('countryCode').value,
+          phoneNumber: document.getElementById('phone').value
       };
 
       console.log('Sending data:', paxHead);
@@ -93,6 +94,7 @@
       })
       .then(data => {
           console.log('Server response:', data);
+          alert('PaxHead created successfully!');
           window.location.href = 'managePaxUsers.html'; // Redirect on success
       })
       .catch(error => showErrorMessage('Error creating Pax Head: ' + error.message));

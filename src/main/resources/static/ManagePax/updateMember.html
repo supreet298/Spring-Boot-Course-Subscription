@@ -84,10 +84,11 @@
                 document.getElementById('address').value = paxUser.address || "";
                 document.getElementById('country').value = paxUser.country || "";
                 document.getElementById('relationType').value = paxUser.relation || "FATHER";
+                document.getElementById('countryCode').value = paxUser.countryCode || "";
+
 
                 // Handle phone and country code
                 const phoneParts = paxUser.phoneNumber ? paxUser.phoneNumber.split(' ') : [];
-                document.getElementById('countryCode').value = phoneParts[0] || "";
                 document.getElementById('phone').value = phoneParts.slice(1).join(' ') || paxUser.phoneNumber || "";
             }
         })
@@ -106,7 +107,7 @@
             address: document.getElementById('address').value,
             country: document.getElementById('country').value,
             countryCode: document.getElementById('countryCode').value,
-            phoneNumber: document.getElementById('countryCode').value + ' ' + document.getElementById('phone').value,
+            phoneNumber: document.getElementById('phone').value,
             relation: document.getElementById('relationType').value
         };
 

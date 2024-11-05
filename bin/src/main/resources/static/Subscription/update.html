@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Update Subscription</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Update Subscription</h2>
+  <form id="updateSubscriptionForm" class="mt-3">
+    <div class="form-group">
+      <label for="planName">Plan Name</label>
+      <input type="text" id="planName" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="cost">Cost</label>
+      <input type="number" id="cost" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="subscriptionType">Subscription Type</label>
+      <select id="subscriptionType" class="form-control" required>
+        <option value="MONTHLY">Monthly</option>
+        <option value="QUARTERLY">Quarterly</option>
+        <option value="HALF_YEARLY">Half-Yearly</option>
+        <option value="YEARLY">Yearly</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Subscription</button>
+  </form>
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const uuid = urlParams.get('uuid');
+
+  // Fetch existing subscription details
+  fetch(`/api/admin/subscription/${uuid}`)
+      .then(response => response.json())
+      .then(subscription => {
+          document.getElementById('planName').value = subscription.planName;
+          document.getElementById('description').value = subscription.description;
+          document.getElementById('cost').value = subscription.cost;
+          document.getElementById('subscriptionType').value = subscription.subscriptionType;
+      })
+      .catch(error => console.error('Error fetching subscription:', error));
+
+  document.getElementById('updateSubscriptionForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const updatedSubscription = {
+          planName: document.getElementById('planName').value,
+          description: document.getElementById('description').value,
+          cost: document.getElementById('cost').value,
+          subscriptionType: document.getElementById('subscriptionType').value
+      };
+
+      fetch(`/api/admin/updateHead/${uuid}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedSubscription)
+      })
+      .then(response => response.json())
+      .then(data => {
+          window.location.href = 'subscription.html'; // Redirect to subscription list
+      })
+      .catch(error => console.error('Error updating subscription:', error));
+  });
+</script>
+</body>
+</html>

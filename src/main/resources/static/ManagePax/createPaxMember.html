@@ -34,7 +34,7 @@
         <select id="countryCode" name="countryCode" required class="form-control" style="max-width: 130px; margin-right: 5px;">
           <option value="">Select Country</option>
         </select>
-        <input type="tel" id="phone" name="phone" required placeholder="Enter phone number" class="form-control">
+        <input type="tel" id="phone" name="phone" required placeholder="Enter phone number" class="form-control" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number">
       </div>
     </div>
 
@@ -81,53 +81,61 @@
   }
   
   // Submit form with uuid included in the fetch URL
- document.getElementById('createMemberForm').addEventListener('submit', function(event) {
-  event.preventDefault();
+  document.getElementById('createMemberForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    
+    // Disable the submit button
+    const submitButton = event.target.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
 
-  // Combine country code and phone number
-  const phoneNumber = document.getElementById('countryCode').value + document.getElementById('phone').value;
+    // Combine country code and phone number
+    const phoneNumber = document.getElementById('countryCode').value + document.getElementById('phone').value;
 
-  const member = {
-    userName: document.getElementById('name').value,
-    email: document.getElementById('email').value,
-    phoneNumber: phoneNumber,
-    relation: document.getElementById('relationType').value,
-    address: document.getElementById('address').value,
-    country: document.getElementById('country').value
-  };
+    const member = {
+      userName: document.getElementById('name').value,
+      email: document.getElementById('email').value,
+      address: document.getElementById('address').value,
+      country: document.getElementById('country').value,
+      countryCode: document.getElementById('countryCode').value,
+      phoneNumber: document.getElementById('phone').value, // Use the combined phone number
+      relation: document.getElementById('relationType').value
+    };
 
-  fetch(`/api/admin/pax/addPaxMembers/${uuid}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(member)
-  })
-  .then(response => {
-    // Check if response is JSON based on content-type
-    const contentType = response.headers.get("content-type");
-    if (!response.ok) {
-      if (contentType && contentType.includes("application/json")) {
-        return response.json().then(json => { throw new Error(json.message || 'Failed to create member'); });
-      } else {
-        return response.text().then(text => { throw new Error(text || 'Failed to create member'); });
+    fetch(`/api/admin/pax/addPaxMembers/${uuid}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(member)
+    })
+    .then(response => {
+      const contentType = response.headers.get("content-type");
+      if (!response.ok) {
+        if (contentType && contentType.includes("application/json")) {
+          return response.json().then(json => { throw new Error(json.message || 'Failed to create member'); });
+        } else {
+          return response.text().then(text => { throw new Error(text || 'Failed to create member'); });
+        }
       }
-    }
-    return response.json();
-  })
-  .then(data => {
-    alert('Member created successfully!');
-    window.location.href = 'managePaxUsers.html';
-  })
-  .catch(error => {
-    console.error('Error creating member:', error);
-    showErrorMessage(error.message);
+      return response.json();
+    })
+    .then(data => {
+      alert('Member created successfully!');
+      window.location.href = 'managePaxUsers.html';
+    })
+    .catch(error => {
+      console.error('Error creating member:', error);
+      showErrorMessage(error.message);
+    })
+    .finally(() => {
+      // Re-enable the submit button
+      submitButton.disabled = false;
+    });
   });
-});
 
-function showErrorMessage(message) {
-  const errorMessage = document.getElementById('errorMessage');
-  errorMessage.textContent = message;
-  errorMessage.classList.remove('d-none');
-}
+  function showErrorMessage(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('d-none');
+  }
 
 </script>
 </body>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Update PaxMember</title>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+	<h2>Update PaxMember</h2>
+	<div id="errorMessage" class="alert alert-danger d-none"></div> <!-- Error message container -->
+	<form id="updateMemberForm" class="mt-3">
+		<div class="form-group">
+			<label for="name">Name</label>
+			<input type="text" id="name" class="form-control" required>
+		</div>
+		<div class="form-group">
+			<label for="email">Email</label>
+			<input type="email" id="email" class="form-control" required>
+		</div>
+		<div class="form-group">
+			<label for="address">Address</label>
+			<input type="text" id="address" class="form-control" required>
+		</div>
+		<div class="form-group">
+			<label for="country">Country</label>
+			<input type="text" id="country" class="form-control" required>
+		</div>
+		<div class="form-group">
+			<label for="phone">Phone Number:</label>
+			<div style="display: flex;">
+				<select id="countryCode" name="countryCode" required class="form-control" style="max-width: 130px; margin-right: 5px;">
+					<option value="">Select Country</option>
+				</select>
+				<input type="tel" id="phone" name="phone" required placeholder="Enter phone number" class="form-control" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number">
+			</div>
+		</div>
+		<div class="form-group">
+			<label for="relationType">Relation Type</label>
+			<select id="relationType" class="form-control" required>
+				<option value="FATHER">Father</option>
+				<option value="DAUGHTER">Daughter</option>
+				<option value="SON">Son</option>
+				<option value="WIFE">Wife</option>
+			</select>
+		</div>
+		<button type="submit" class="btn btn-success">Update Member</button>
+	</form>
+</div>
+
+<script>
+	// Load country codes from JSON
+    fetch('data/countryCodes.json')
+        .then(response => response.json())
+        .then(data => {
+            const countryCodeSelect = document.getElementById('countryCode');
+            data.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country.dial_code;
+                option.textContent = `${country.name} (${country.dial_code})`;
+                countryCodeSelect.appendChild(option);
+            });
+        })
+        .catch(error => console.error('Error loading country codes:', error));
+
+    // Get UUID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuid = urlParams.get('uuid');
+
+    // Fetch existing member details
+    fetch(`/api/admin/pax/getMember/${uuid}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch member details");
+            }
+            return response.json();
+        })
+        .then(paxUser => {
+            console.log("Fetched data:", paxUser);
+            if (paxUser) {
+                document.getElementById('name').value = paxUser.name || "";
+                document.getElementById('email').value = paxUser.email || "";
+                document.getElementById('address').value = paxUser.address || "";
+                document.getElementById('country').value = paxUser.country || "";
+                document.getElementById('relationType').value = paxUser.relation || "FATHER";
+
+                // Handle phone and country code
+                const phoneParts = paxUser.phoneNumber ? paxUser.phoneNumber.split(' ') : [];
+                document.getElementById('countryCode').value = phoneParts[0] || "";
+                document.getElementById('phone').value = phoneParts.slice(1).join(' ') || paxUser.phoneNumber || "";
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching member details:', error);
+            showErrorMessage(error.message);
+        });
+
+    // Handle form submission
+    document.getElementById('updateMemberForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const updatedMember = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            address: document.getElementById('address').value,
+            country: document.getElementById('country').value,
+            countryCode: document.getElementById('countryCode').value,
+            phoneNumber: document.getElementById('countryCode').value + ' ' + document.getElementById('phone').value,
+            relation: document.getElementById('relationType').value
+        };
+
+        // Make PUT request to update member
+        fetch(`/api/admin/pax/UpdateMember/${uuid}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedMember)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update member');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Update successful:', data);
+            window.location.href = 'managePaxUsers.html';
+        })
+        .catch(error => {
+            console.error('Error updating member:', error);
+            showErrorMessage(error.message);
+        });
+    });
+
+    function showErrorMessage(message) {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('d-none');
+    }
+</script>
+</body>
+</html>

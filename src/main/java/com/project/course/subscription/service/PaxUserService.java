@@ -31,6 +31,7 @@ public interface PaxUserService {
 
 	PaxUser addPaxMembers(String uuid, PaxMemberPostDTO paxMemberDTO);
 
-	List<PaxMemberDTO> getAllPaxMemberByHeadId(Long id);
+
+	List<PaxMemberDTO> getAllPaxMemberByHeadUuid(String uuid);
 
 }

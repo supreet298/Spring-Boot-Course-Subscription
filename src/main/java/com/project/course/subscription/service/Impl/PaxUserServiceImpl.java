@@ -27,22 +27,49 @@ public class PaxUserServiceImpl implements PaxUserService {
 	public PaxUser addPaxHead(PaxUser paxUser)   {
 		PaxUser head = new PaxUser();
 		head.setName(paxUser.getName());
-		if (paxUserRepository.existsByEmail(paxUser.getEmail())) {
+		if (paxUserRepository.existsByEmailAndIsActiveTrue(paxUser.getEmail())) {
 			throw new RuntimeException("Email id already exists, try another.");
 		}
 		head.setEmail(paxUser.getEmail());
 		head.setAddress(paxUser.getAddress());
 		head.setCountry(paxUser.getCountry());
-//		if (!PhoneNumberValidation.isValid(paxUser.getPhoneNumber()))
-//			throw new IllegalArgumentException(
-//					"Invalid PhoneNumber,PhoneNumber starts with County code Eg: +91xxxxxxxxxx");
-		if (paxUserRepository.existsByPhoneNumber(paxUser.getPhoneNumber())) {
+		head.setCountryCode(paxUser.getCountryCode());
+		if (paxUserRepository.existsByPhoneNumberAndIsActiveTrue(paxUser.getPhoneNumber())) {
 			throw new RuntimeException("Mobile number already exists, try another.");
 		}
 		head.setPhoneNumber(paxUser.getPhoneNumber());
 		head.setType(PaxUser.Type.HEAD);
 		return paxUserRepository.save(head);
 	}
+	
+	@Override
+	public PaxUser updatePaxHead(String uuid, PaxUser request) {
+		PaxUser existingHead = paxUserRepository.findByUuid(uuid)
+				.orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
+
+		existingHead.setName(request.getName());
+		if (!existingHead.getEmail().equals(request.getEmail())) {
+	        // Step 3: If email is different, check if any other active user has the same email
+	        if (paxUserRepository.existsByEmailAndIsActiveTrue(request.getEmail())) {
+	        	throw new RuntimeException("Email id already exists, try another." );
+	        }
+	    }
+		existingHead.setEmail(request.getEmail());
+		if(!existingHead.getPhoneNumber().equals(request.getPhoneNumber()))
+		{
+			if (paxUserRepository.existsByPhoneNumberAndIsActiveTrue(request.getPhoneNumber())) {
+				throw new RuntimeException("Mobile number already exists, try another.");
+			}
+		}
+		existingHead.setCountryCode(request.getCountryCode());
+		existingHead.setPhoneNumber(request.getPhoneNumber());
+		existingHead.setAddress(request.getAddress());
+		existingHead.setCountry(request.getCountry());
+		existingHead.setType(PaxUser.Type.HEAD);
+		return paxUserRepository.save(existingHead);
+	}
+
+
 
 	public PaxUser addPaxMember(PaxMemberPostDTO paxMemberDTO) {
 		PaxUser head = paxUserRepository.findById(paxMemberDTO.getHeadId())
@@ -57,7 +84,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		member.setEmail(paxMemberDTO.getEmail());
 		member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
 		member.setType(PaxUser.Type.MEMBER);
-		member.setHeadId(head.getId());
+		member.setHeadUuid(head.getUuid());
 		member.setRelation(PaxUser.Relation.valueOf(paxMemberDTO.getRelation()));
 		return paxUserRepository.save(member);
 	}
@@ -69,50 +96,49 @@ public class PaxUserServiceImpl implements PaxUserService {
 		PaxUser member = new PaxUser();
 		member.setName(paxMemberDTO.getUserName());
 
-		if(paxUserRepository.existsByEmail(paxMemberDTO.getEmail()))
+		if(paxUserRepository.existsByEmailAndIsActiveTrue(paxMemberDTO.getEmail()))
 		{
 			throw new RuntimeException("Email id already exists, try another.");
 		}
 		member.setEmail(paxMemberDTO.getEmail());
 
-		if (paxUserRepository.existsByPhoneNumber(paxMemberDTO.getPhoneNumber())) {
+		if (paxUserRepository.existsByPhoneNumberAndIsActiveTrue(paxMemberDTO.getPhoneNumber())) {
 			throw new RuntimeException("Mobile number already exists, try another.");
 		}
-
+		
+		member.setCountryCode(paxMemberDTO.getCountryCode());
 		member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
 		member.setAddress(paxMemberDTO.getAddress());
 		member.setCountry(paxMemberDTO.getCountry());
 		member.setType(PaxUser.Type.MEMBER);
-		member.setHeadId(head.getId());
+		member.setHeadUuid(head.getUuid());
 		member.setRelation(PaxUser.Relation.valueOf(paxMemberDTO.getRelation()));
 
 		return paxUserRepository.save(member);
 	}
 
-	@Override
-	public PaxUser updatePaxHead(String uuid, PaxUser request) {
-		PaxUser existingHead = paxUserRepository.findByUuid(uuid)
-				.orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
-
-		existingHead.setName(request.getName());
-		existingHead.setEmail(request.getEmail());
-		if(paxUserRepository.existsByEmail(request.getEmail()))
-		{
-			throw new RuntimeException("Email id already exists, try another.");
-		}
-		existingHead.setPhoneNumber(request.getPhoneNumber());
-		existingHead.setAddress(request.getAddress());
-		existingHead.setCountry(request.getCountry());
-		existingHead.setType(PaxUser.Type.HEAD);
-		return paxUserRepository.save(existingHead);
-	}
 
 	@Override
 	public PaxUser updatePaxMember(String uuid, PaxUser paxMember) {
 		PaxUser existingMember = paxUserRepository.findByUuidAndType(uuid, Type.MEMBER)
 				.orElseThrow(() -> new UsernameNotFoundException("No Member found for UUID: " + uuid));
+		
 		existingMember.setName(paxMember.getName());
+		if (!existingMember.getEmail().equals(paxMember.getEmail())) {
+	        // Step 3: If email is different, check if any other active user has the same email
+	        if (paxUserRepository.existsByEmailAndIsActiveTrue(paxMember.getEmail())) {
+	        	throw new RuntimeException("Email id already exists, try another." );
+	        }
+	    }
+
 		existingMember.setEmail(paxMember.getEmail());
+		if(!existingMember.getPhoneNumber().equals(paxMember.getPhoneNumber()))
+		{
+			if (paxUserRepository.existsByPhoneNumberAndIsActiveTrue(paxMember.getPhoneNumber())) {
+				throw new RuntimeException("Mobile number already exists, try another.");
+			}
+		}
+		existingMember.setCountryCode(paxMember.getCountryCode());
 		existingMember.setPhoneNumber(paxMember.getPhoneNumber());
 		existingMember.setAddress(paxMember.getAddress());
 		existingMember.setCountry(paxMember.getCountry());
@@ -161,6 +187,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		dto.setPhoneNumber(paxUser.getPhoneNumber());
 		dto.setName(paxUser.getName());
 		dto.setEmail(paxUser.getEmail());
+		dto.setCountryCode(paxUser.getCountryCode());
 		return dto;
 	}
 
@@ -172,7 +199,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		dto.setRelation(member.getRelation().name());
 
 		// Retrieve head name from the map
-		String headName = headIdToNameMap.get(member.getHeadId());
+		String headName = headIdToNameMap.get(member.getHeadUuid());
 		dto.setHeadName(headName != null ? headName : "Head not found");
 
 		return dto;
@@ -205,8 +232,8 @@ public class PaxUserServiceImpl implements PaxUserService {
 	}
 
 	@Override
-	public List getAllPaxMemberByHeadId(Long id) {
-		List<PaxUser> allMembers = paxUserRepository.findAllActiveMembersByHeadId(id);
+	public List getAllPaxMemberByHeadUuid(String uuid) {
+		List<PaxUser> allMembers = paxUserRepository.findAllActiveMembersByHeadUuid(uuid);
 
 		if (!allMembers.isEmpty()) {
 			return allMembers;
@@ -214,5 +241,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 			throw new ResourceNotFoundException("No members are found under this head");
 		}
 	}
+	
+	
 
 }

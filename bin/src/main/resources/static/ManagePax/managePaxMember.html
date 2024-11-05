@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Management</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    #search {
+      width: 250px; /* Set a width for the search input */
+      text-align: center;
+      color: black; /* Change text color */
+      margin-bottom: 5px; /* Add space below the search input */
+      margin-left:800px
+    }
+
+    .d-flex {
+      margin-bottom: 15px; /* Add some space below the flex container */
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Members of PaxHead</h2>
+
+  <div class="d-flex align-items-center">
+    <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-2">
+  </div>
+
+  <table id="memberTable" class="table table-striped table-bordered">
+    <thead class="table-dark">
+    <tr>
+      <th>Name</th>
+      <th>PhoneNumber</th>
+      <th>Email</th>
+      <th>Relation</th>
+      <th>Action</th> <!-- Action column for buttons -->
+    </tr>
+    </thead>
+    <tbody id="memberTableBody">
+    <!-- Rows with member data will be dynamically inserted here -->
+    </tbody>
+  </table>
+</div>
+
+<script>
+  let members = []; // To store fetched member data
+
+  // Fetch and display members related to the headId
+  function loadMembers() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const headId = urlParams.get('id');
+
+    fetch(`/api/admin/pax/getMemberByHeadId/${headId}`)
+        .then(response => response.json())
+        .then(data => {
+            members = data; // Store fetched members in members array
+            displayMembers(members); // Display all members initially
+        })
+        .catch(error => console.error('Error fetching members:', error));
+  }
+
+  // Function to display members in the table
+  function displayMembers(membersToDisplay) {
+    const memberTableBody = document.getElementById('memberTableBody');
+    memberTableBody.innerHTML = ''; // Clear any existing rows
+
+    membersToDisplay.forEach(member => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${member.name}</td>
+            <td>${member.phoneNumber}</td>
+            <td>${member.email}</td>
+            <td>${member.relation}</td>
+            <td>
+                <a href="updateMember.html?uuid=${member.uuid}" class="btn btn-primary btn-sm">Update</a>
+                <button class="btn btn-danger btn-sm" onclick="deleteMember('${member.uuid}')">Delete</button>
+            </td>
+        `;
+        memberTableBody.appendChild(row);
+    });
+  }
+
+  // Function to delete member
+  function deleteMember(uuid) {
+    if (confirm("Are you sure you want to delete this member?")) {
+        fetch(`/api/admin/pax/dropPaxUser/${uuid}`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    loadMembers(); // Reload members after deletion
+                } else {
+                    alert("Failed to delete the member.");
+                }
+            });
+    }
+  }
+
+  // Event listener for search input
+  document.getElementById('search').addEventListener('input', function (e) {
+    const searchText = e.target.value.toLowerCase();
+    const filteredMembers = members.filter(member =>
+      member.name.toLowerCase().includes(searchText) ||
+      member.phoneNumber.includes(searchText) ||
+      member.email.toLowerCase().includes(searchText)
+    );
+    displayMembers(filteredMembers); // Display filtered members
+  });
+
+  // Initialize by loading all members
+  loadMembers();
+</script>
+</body>
+</html>
