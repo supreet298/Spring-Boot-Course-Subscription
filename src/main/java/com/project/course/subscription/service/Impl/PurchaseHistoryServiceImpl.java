@@ -5,6 +5,8 @@ import com.project.course.subscription.model.PurchaseHistory;
 import com.project.course.subscription.repository.PurchaseHistoryRepository;
 import com.project.course.subscription.service.PurchaseHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,11 +35,9 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         return purchaseHistoryRepository.findPurchaseHistoryByUserAndSubscription(userId, subscriptionId);
     }
 
-    public List<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid) {
-        List<PurchaseHistory> histories = purchaseHistoryRepository.findByPaxUser_Uuid(uuid);
-        return histories.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+    public Page<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid,Pageable pageable) {
+        return purchaseHistoryRepository.findByPaxUser_Uuid(uuid,pageable)
+                .map(this::convertToDTO);
     }
 
     @Override

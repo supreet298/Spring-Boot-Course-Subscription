@@ -6,6 +6,8 @@ import com.project.course.subscription.repository.SubscriptionRepository;
 import com.project.course.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,7 +32,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<SubscriptionDTO> getAllActiveSubscriptions() {
+    public Page<SubscriptionDTO> getAllActiveSubscriptions(Pageable pageable) {
+        return subscriptionRepository.findByIsActiveTrue(pageable)
+                .map(this::convertToDTO);
+    }
+
+    @Override
+    public List<SubscriptionDTO> getAllActiveSubscriptionList() {
         List<Subscription> categories = subscriptionRepository.findByIsActiveTrue();
         return categories.stream()
                 .map(this::convertToDTO)

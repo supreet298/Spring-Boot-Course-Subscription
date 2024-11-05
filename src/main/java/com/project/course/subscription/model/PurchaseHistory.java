@@ -25,10 +25,10 @@ public class PurchaseHistory {
     @JoinColumn(name = "subscription_id", referencedColumnName = "id", nullable = false, updatable = false)
     private Subscription subscription;
 
-    @JoinColumn(name = "client_name", nullable = false, updatable = false)
+    @Column(name = "client_name", nullable = false, updatable = false)
     private String clientName;
     
-    @JoinColumn(name = "client_email", nullable = false, updatable = false)
+    @Column(name = "client_email", nullable = false, updatable = false)
     private String clientEmail;
     
     @Column(name = "plan_name", nullable = false)

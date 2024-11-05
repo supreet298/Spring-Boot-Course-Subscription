@@ -41,18 +41,20 @@
                     <th>Plan Name</th>
                     <th>Purchase Date</th>
                     <th>Expiry Date</th>
-                    <th>Action</th> <!-- Action column for buttons -->
+                    <th>Action</th>
                 </tr>
                 </thead>
                 <tbody id="subscriptionTableBody">
-                <!-- Rows with subscription data will be dynamically inserted here -->
                 </tbody>
             </table>
         </div>
 
-        <!-- History Tab with Table -->
         <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
             <h4 class="text-center mb-3">Purchase History</h4>
+            <div class="d-flex justify-content-end align-items-center mb-3">
+                <button id="prevPage" class="btn btn-success btn-sm" disabled>Previous</button>
+                <button id="nextPage" class="btn btn-success btn-sm ms-2">Next</button>
+            </div>
             <table class="table table-striped table-bordered">
                 <thead class="table-dark">
                 <tr>
@@ -65,39 +67,41 @@
                 </tr>
                 </thead>
                 <tbody id="purchaseHistoryTable">
-                <!-- Rows with subscription data will be dynamically inserted here -->
                 </tbody>
             </table>
+            <div id="paginationInfo" class="mb-3 text-center">
+                <!-- Pagination information will be displayed here -->
+                <span id="pageInfo"></span>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-
-
-    // Get the UUID from the URL
     const urlParams = new URLSearchParams(window.location.search);
     const uuid = urlParams.get('uuid');
 
-    // Fetch the user's purchase history
-    async function fetchPurchaseHistory() {
+    let currentPage = 0; // Keep track of the current page for purchase history
+    const pageSize = 10; // Set the number of items per page
+
+    async function fetchPurchaseHistory(page) {
         try {
-            const response = await fetch(`/api/admin/purchaseHistory/${uuid}`); // Use your existing API endpoint
+            const response = await fetch(`/api/admin/purchaseHistory/${uuid}?page=${page}&size=${pageSize}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
             const data = await response.json();
             populatePurchaseHistoryTable(data);
+            updatePaginationButtons(data);
         } catch (error) {
             console.error('There was a problem fetching the purchase history:', error);
         }
     }
 
-    // Populate the history table with data
     function populatePurchaseHistoryTable(data) {
         const tableBody = document.getElementById('purchaseHistoryTable');
         tableBody.innerHTML = ''; // Clear previous data
-        data.forEach(item => {
+        data.content.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${item.clientName}</td>
@@ -111,9 +115,32 @@
         });
     }
 
+    function updatePaginationButtons(data) {
+        document.getElementById('prevPage').disabled = data.first;
+        document.getElementById('nextPage').disabled = data.last;
+        updatePageInfo(data); // Update the page information
+    }
+
+    function updatePageInfo(data) {
+        const pageInfo = document.getElementById('pageInfo');
+        pageInfo.textContent = `Page ${currentPage + 1} of ${data.totalPages}`; // Adjusted for zero-based index
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 0) {
+            currentPage--;
+            fetchPurchaseHistory(currentPage);
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        currentPage++;
+        fetchPurchaseHistory(currentPage);
+    });
+
     async function fetchSubscriptions() {
         try {
-            const response = await fetch(`/api/admin/purchaseHistory/active/${uuid}`); // Use your API endpoint for subscriptions
+            const response = await fetch(`/api/admin/purchaseHistory/active/${uuid}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -124,7 +151,6 @@
         }
     }
 
-    // Populate the subscription table with data
     function populateSubscriptionTable(data) {
         const tableBody = document.getElementById('subscriptionTableBody');
         tableBody.innerHTML = ''; // Clear previous data
@@ -135,32 +161,32 @@
                 <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
                 <td>${new Date(item.expiryDate).toLocaleDateString()}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm"onclick="disableRecurring('${item.purchaseSubscriptionUuid}')">Cancel</button>
+                    <button class="btn btn-danger btn-sm" onclick="disableRecurring('${item.purchaseSubscriptionUuid}')">Cancel</button>
                 </td>
             `;
             tableBody.appendChild(row);
         });
     }
 
-  function disableRecurring(uuid) {
-    if (confirm("Are you sure you want to off recurring the subscription ?")) {
-        fetch(`/api/admin/purchaseSubscription/${uuid}/disable`, { method: 'DELETE' })
-            .then(response => {
-                if (response.ok) {
-                    fetchSubscriptions();
-                } else {
-                    alert("Failed to off recurring the subscription.");
-                }
-            });
+    function disableRecurring(uuid) {
+        if (confirm("Are you sure you want to off recurring the subscription?")) {
+            fetch(`/api/admin/purchaseSubscription/${uuid}/disable`, { method: 'DELETE' })
+                .then(response => {
+                    if (response.ok) {
+                        fetchSubscriptions();
+                    } else {
+                        alert("Failed to off recurring the subscription.");
+                    }
+                });
+        }
     }
-  }
 
     document.getElementById('purchaseButton').addEventListener('click', () => {
         window.location.href = `purchase.html?paxUserUuid=${uuid}`;
     });
 
     // Fetch data when the page loads
-    fetchPurchaseHistory();
+    fetchPurchaseHistory(currentPage);
     fetchSubscriptions();
 </script>
 

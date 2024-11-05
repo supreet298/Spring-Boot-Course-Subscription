@@ -64,7 +64,7 @@
 
   // Load subscription options from the API
   function loadSubscriptionOptions() {
-    fetch('/api/admin/subscription')
+    fetch('/api/admin/subscription/list')
       .then(response => response.json())
       .then(data => {
         const subscriptionSelect = document.getElementById('subscriptionId');

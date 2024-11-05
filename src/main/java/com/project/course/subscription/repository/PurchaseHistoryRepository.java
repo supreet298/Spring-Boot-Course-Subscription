@@ -1,6 +1,8 @@
 package com.project.course.subscription.repository;
 
 import com.project.course.subscription.model.PurchaseHistory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,7 +24,7 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
     @Query("SELECT p FROM PurchaseHistory p WHERE p.expiryDate BETWEEN :start AND :end")
     List<PurchaseHistory> findExpiringPlansBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    List<PurchaseHistory> findByPaxUser_Uuid(String uuid);
+    Page<PurchaseHistory> findByPaxUser_Uuid(String uuid, Pageable pageable);
 
     List<PurchaseHistory> findByPaxUser_UuidAndPurchaseDateLessThanEqualAndExpiryDateGreaterThanEqual(String userUuid, LocalDateTime now, LocalDateTime now1);
 }
