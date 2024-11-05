@@ -61,13 +61,13 @@
       const row = document.createElement('tr');
       row.innerHTML = `
         <td><a href="info.html?uuid=${paxuser.uuid}">${paxuser.name}</a></td>
-        <td>${paxuser.phoneNumber}</td>
+        <td>${paxuser.countryCode+paxuser.phoneNumber}</td>
         <td>${paxuser.email}</td>
         <td>
-          <a href="updateHead.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">Update</a>
+          <a href="updateHead.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">Edit</a>
           <button class="btn btn-danger btn-sm" onclick="deletePaxHead('${paxuser.uuid}')">Delete</button>
           <a href="createPaxMember.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">Add Member</a>
-          <a href="managePaxMember.html?id=${paxuser.id}" class="btn btn-primary btn-sm">See Members</a>
+          <a href="managePaxMember.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">See Members</a>
         </td>
       `;
       paxTableBody.appendChild(row);

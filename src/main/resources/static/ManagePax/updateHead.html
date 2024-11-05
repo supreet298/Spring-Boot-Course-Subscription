@@ -74,15 +74,11 @@
           document.getElementById('email').value = paxUser.email;
           document.getElementById('address').value = paxUser.address || '';
           document.getElementById('country').value = paxUser.country || '';
+          document.getElementById('countryCode').value=paxUser.countryCode
+          document.getElementById('phone').value = paxUser.phoneNumber;
 
-          // Assuming phoneNumber is in the format "+XX XXXXXXXX"
-          const phoneParts = paxUser.phoneNumber.split(' ');
-          if (phoneParts.length > 1) {
-              document.getElementById('countryCode').value = phoneParts[0];
-              document.getElementById('phone').value = phoneParts.slice(1).join(' ');
-          } else {
-              document.getElementById('phone').value = paxUser.phoneNumber;
-          }
+
+        
       })
       .catch(error => console.error('Error fetching user details:', error));
 
@@ -97,7 +93,8 @@
           email: document.getElementById('email').value,
           address: document.getElementById('address').value,
           country: document.getElementById('country').value,
-          phoneNumber: countryCode + ' ' + phone
+          countryCode: document.getElementById('countryCode').value,
+          phoneNumber: document.getElementById('phone').value
       };
 
       fetch(`/api/admin/pax/updateHead/${uuid}`, {

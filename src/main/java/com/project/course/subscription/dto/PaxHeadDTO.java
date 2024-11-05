@@ -10,8 +10,11 @@ public class PaxHeadDTO {
 	private String uuid;
 	
     private String phoneNumber;
-
+    
+    private String countryCode;
+    
     private String name;
 
     private String email;
+    
 }

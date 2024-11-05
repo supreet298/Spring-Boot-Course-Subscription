@@ -107,10 +107,10 @@ public class PaxUserController {
 		}
 	}
 
-	@GetMapping("/getMemberByHeadId/{id}")
-	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable Long id) {
+	@GetMapping("/getMemberByHeadId/{uuid}")
+	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable String uuid) {
 		try {
-			List<PaxMemberDTO> AllMember = paxUserService.getAllPaxMemberByHeadId(id);
+			List<PaxMemberDTO> AllMember = paxUserService.getAllPaxMemberByHeadUuid(uuid);
 			return new ResponseEntity<>(AllMember, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

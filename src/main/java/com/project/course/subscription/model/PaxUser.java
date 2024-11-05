@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -31,16 +32,20 @@ public class PaxUser {
     private String uuid = UUID.randomUUID().toString();
 
     @NotBlank(message = "Username is mandatory and cannot be blank.")
-    @Column(name = "name",unique = true)
+    @Column(name = "name")
     private String name;
 
     @NotBlank(message = "Email is mandatory and cannot be blank.")
     @Email(message = "Email must be in a valid format.")
-    @Column(unique = true)
     private String email;
+    
+        
+    @NotBlank(message = "Country code is required")
+    @Pattern(regexp = "\\+\\d{1,3}", message = "Invalid country code format (e.g., +1, +91)")
+    private String countryCode;
 
-    @NotNull(message = "PhoneNumber is mandatory and cannot be null.")
-    @Column(name = "phone_number", unique = true)
+    @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be exactly 10 digits")
     private String phoneNumber;
     
     @Column(columnDefinition = "Text")
@@ -55,8 +60,8 @@ public class PaxUser {
     @Enumerated(EnumType.STRING)
     private Relation relation;
 
-    @Column(name = "head_id")
-    private Long headId;
+    @Column(name = "head_uuid")
+    private String headUuid;
 
     @CreatedBy
     @Column(name = "created_by")

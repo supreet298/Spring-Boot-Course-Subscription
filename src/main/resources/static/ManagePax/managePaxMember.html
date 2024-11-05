@@ -49,9 +49,9 @@
   // Fetch and display members related to the headId
   function loadMembers() {
     const urlParams = new URLSearchParams(window.location.search);
-    const headId = urlParams.get('id');
+    const headUuid = urlParams.get('uuid');
 
-    fetch(`/api/admin/pax/getMemberByHeadId/${headId}`)
+    fetch(`/api/admin/pax/getMemberByHeadId/${headUuid}`)
         .then(response => response.json())
         .then(data => {
             members = data; // Store fetched members in members array
@@ -69,11 +69,11 @@
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${member.name}</td>
-            <td>${member.phoneNumber}</td>
+            <td>${member.countryCode+member.phoneNumber}</td>
             <td>${member.email}</td>
             <td>${member.relation}</td>
             <td>
-                <a href="updateMember.html?uuid=${member.uuid}" class="btn btn-primary btn-sm">Update</a>
+                <a href="updateMember.html?uuid=${member.uuid}" class="btn btn-primary btn-sm">Edit</a>
                 <button class="btn btn-danger btn-sm" onclick="deleteMember('${member.uuid}')">Delete</button>
             </td>
         `;
