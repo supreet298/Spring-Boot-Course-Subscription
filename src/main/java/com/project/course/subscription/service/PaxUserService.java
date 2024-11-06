@@ -7,15 +7,12 @@ import com.project.course.subscription.model.PaxUser;
 import jakarta.validation.Valid;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface PaxUserService {
 
 	PaxUser addPaxHead(@Valid PaxUser paxUser) throws Exception;
-
-	PaxUser addPaxMember(@Valid PaxMemberPostDTO paxMemberDTO);
-
-	List<PaxHeadDTO> getAllHead();
-
-	// List<PaxMemberDTO> getAllMember();
 
 	PaxUser updatePaxHead(String uuid, PaxUser request);
 
@@ -31,7 +28,8 @@ public interface PaxUserService {
 
 	PaxUser addPaxMembers(String uuid, PaxMemberPostDTO paxMemberDTO);
 
-
-	List<PaxMemberDTO> getAllPaxMemberByHeadUuid(String uuid);
+	Page<PaxUser> getAllPaxMemberByHeadUuid(String uuid,Pageable pageable);
+	
+	Page<PaxHeadDTO> getAllHead(Pageable pageable);
 
 }

@@ -11,7 +11,7 @@
       text-align: center;
       color: black; /* Change text color */
       margin-bottom: 5px; /* Add space below the search input */
-      margin-left:800px
+      margin-left: 800px;
     }
 
     .d-flex {
@@ -41,26 +41,38 @@
     <!-- Rows with member data will be dynamically inserted here -->
     </tbody>
   </table>
+
+  <!-- Pagination Controls -->
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <button id="prevPage" class="btn btn-success">Previous</button>
+    <span id="pageInfo">Page 1</span>
+    <button id="nextPage" class="btn btn-success">Next</button>
+  </div>
 </div>
 
 <script>
-  let members = []; // To store fetched member data
+  let currentPage = 0; // Current page index
+  const pageSize = 1; // Number of members per page
+  let members = []; // Store fetched members
+  let totalPages = 1; // Total number of pages
 
-  // Fetch and display members related to the headId
-  function loadMembers() {
+  // Fetch members based on current page and display them
+  function loadMembers(page = 0) {
     const urlParams = new URLSearchParams(window.location.search);
     const headUuid = urlParams.get('uuid');
-
-    fetch(`/api/admin/pax/getMemberByHeadId/${headUuid}`)
-        .then(response => response.json())
-        .then(data => {
-            members = data; // Store fetched members in members array
-            displayMembers(members); // Display all members initially
-        })
-        .catch(error => console.error('Error fetching members:', error));
+    
+    fetch(`/api/admin/pax/getMemberByHeadId/${headUuid}?page=${page}&size=${pageSize}`)
+      .then(response => response.json())
+      .then(data => {
+        members = data.content; // Store members from current page
+        totalPages = data.totalPages; // Get total pages from API response
+        displayMembers(members); // Display members for current page
+        updatePagination(); // Update pagination controls
+      })
+      .catch(error => console.error('Error fetching members:', error));
   }
 
-  // Function to display members in the table
+  // Display members in the table
   function displayMembers(membersToDisplay) {
     const memberTableBody = document.getElementById('memberTableBody');
     memberTableBody.innerHTML = ''; // Clear any existing rows
@@ -69,7 +81,7 @@
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${member.name}</td>
-            <td>${member.countryCode+member.phoneNumber}</td>
+            <td>${member.countryCode + member.phoneNumber}</td>
             <td>${member.email}</td>
             <td>${member.relation}</td>
             <td>
@@ -81,13 +93,13 @@
     });
   }
 
-  // Function to delete member
+  // Delete a member
   function deleteMember(uuid) {
     if (confirm("Are you sure you want to delete this member?")) {
         fetch(`/api/admin/pax/dropPaxUser/${uuid}`, { method: 'DELETE' })
             .then(response => {
                 if (response.ok) {
-                    loadMembers(); // Reload members after deletion
+                    loadMembers(currentPage); // Reload members after deletion
                 } else {
                     alert("Failed to delete the member.");
                 }
@@ -95,18 +107,45 @@
     }
   }
 
+  // Update pagination controls
+  function updatePagination() {
+    document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
+    document.getElementById('prevPage').disabled = currentPage <= 0;
+    document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
+  }
+
+  // Event listeners for pagination buttons
+  document.getElementById('prevPage').addEventListener('click', () => {
+    if (currentPage > 0) {
+      currentPage--;
+      loadMembers(currentPage);
+    }
+  });
+
+  document.getElementById('nextPage').addEventListener('click', () => {
+    if (currentPage < totalPages - 1) {
+      currentPage++;
+      loadMembers(currentPage);
+    }
+  });
+
   // Event listener for search input
   document.getElementById('search').addEventListener('input', function (e) {
     const searchText = e.target.value.toLowerCase();
-    const filteredMembers = members.filter(member =>
-      member.name.toLowerCase().includes(searchText) ||
-      member.phoneNumber.includes(searchText) ||
-      member.email.toLowerCase().includes(searchText)
-    );
+
+    const filteredMembers = members.filter(member => {
+      const fullPhoneNumber = (member.countryCode + member.phoneNumber).toLowerCase();
+      return (
+        member.name.toLowerCase().includes(searchText) ||
+        fullPhoneNumber.includes(searchText) || // Use full phone number for search
+        member.email.toLowerCase().includes(searchText)
+      );
+    });
+
     displayMembers(filteredMembers); // Display filtered members
   });
 
-  // Initialize by loading all members
+  // Initialize by loading members for the first page
   loadMembers();
 </script>
 </body>

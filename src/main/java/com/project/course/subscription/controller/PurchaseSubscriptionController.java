@@ -34,15 +34,6 @@ public class PurchaseSubscriptionController {
         return purchaseSubscriptionService.getPurchaseSubscriptionByUuid(uuid);
     }
 
-    @DeleteMapping("/{uuid}")
-    public ResponseEntity<String> deletePurchaseSubscriptionByUuid(@PathVariable String uuid) {
-        boolean deactivated = purchaseSubscriptionService.deletePurchaseSubscription(uuid);
-        if (deactivated) {
-            return ResponseEntity.ok("Purchase Subscription is deleted");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
 
     @DeleteMapping("/{uuid}/disable")
     public ResponseEntity<String> disableRecurring(@PathVariable String uuid) {

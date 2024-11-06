@@ -167,18 +167,6 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 				.map(this::convertToDTO).orElseThrow(() -> new ResponseStatusException(NOT_FOUND,"Purchase Subscription not found with UUID: " + uuid)));
 	}
 
-	@Override
-	public boolean deletePurchaseSubscription(String uuid) {
-		Optional<PurchaseSubscription> existingPurchaseSubscription = purchaseSubscriptionRepository.findByUuid(uuid);
-		if (existingPurchaseSubscription.isPresent()) {
-			PurchaseSubscription purchaseSubscription = existingPurchaseSubscription.get();
-			purchaseSubscription.setActive(false);
-			purchaseSubscriptionRepository.save(purchaseSubscription);
-			return true;
-		} else {
-			throw new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid);
-		}
-	}
 
 	@Override
 	public boolean disableRecurringForSubscription(String uuid) {
@@ -194,11 +182,6 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 		} else {
 			throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
 		}
-	}
-
-	public PurchaseSubscription getPurchaseSubscriptionId(Long id) {
-		return purchaseSubscriptionRepository.findById(id)
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Purchase Subscription not found"));
 	}
 
 	private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {

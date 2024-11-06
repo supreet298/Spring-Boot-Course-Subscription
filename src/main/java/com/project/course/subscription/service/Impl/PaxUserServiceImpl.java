@@ -6,6 +6,8 @@ import java.util.stream.Collectors;
 import com.project.course.subscription.dto.PaxMemberPostDTO;
 import com.project.course.subscription.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -24,7 +26,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 	private PaxUserRepository paxUserRepository;
 
 	@Override
-	public PaxUser addPaxHead(PaxUser paxUser)   {
+	public PaxUser addPaxHead(PaxUser paxUser) {
 		PaxUser head = new PaxUser();
 		head.setName(paxUser.getName());
 		if (paxUserRepository.existsByEmailAndIsActiveTrue(paxUser.getEmail())) {
@@ -41,7 +43,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		head.setType(PaxUser.Type.HEAD);
 		return paxUserRepository.save(head);
 	}
-	
+
 	@Override
 	public PaxUser updatePaxHead(String uuid, PaxUser request) {
 		PaxUser existingHead = paxUserRepository.findByUuid(uuid)
@@ -49,14 +51,14 @@ public class PaxUserServiceImpl implements PaxUserService {
 
 		existingHead.setName(request.getName());
 		if (!existingHead.getEmail().equals(request.getEmail())) {
-	        // Step 3: If email is different, check if any other active user has the same email
-	        if (paxUserRepository.existsByEmailAndIsActiveTrue(request.getEmail())) {
-	        	throw new RuntimeException("Email id already exists, try another." );
-	        }
-	    }
+			// Step 3: If email is different, check if any other active user has the same
+			// email
+			if (paxUserRepository.existsByEmailAndIsActiveTrue(request.getEmail())) {
+				throw new RuntimeException("Email id already exists, try another.");
+			}
+		}
 		existingHead.setEmail(request.getEmail());
-		if(!existingHead.getPhoneNumber().equals(request.getPhoneNumber()))
-		{
+		if (!existingHead.getPhoneNumber().equals(request.getPhoneNumber())) {
 			if (paxUserRepository.existsByPhoneNumberAndIsActiveTrue(request.getPhoneNumber())) {
 				throw new RuntimeException("Mobile number already exists, try another.");
 			}
@@ -69,26 +71,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		return paxUserRepository.save(existingHead);
 	}
 
-
-
-	public PaxUser addPaxMember(PaxMemberPostDTO paxMemberDTO) {
-		PaxUser head = paxUserRepository.findById(paxMemberDTO.getHeadId())
-				.orElseThrow(() -> new IllegalArgumentException("Head ID does not exist."));
-
-		if (head.getType() != PaxUser.Type.HEAD) {
-			throw new IllegalArgumentException("Only users of type HEAD can create members.");
-		}
-
-		PaxUser member = new PaxUser();
-		member.setName(paxMemberDTO.getUserName());
-		member.setEmail(paxMemberDTO.getEmail());
-		member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
-		member.setType(PaxUser.Type.MEMBER);
-		member.setHeadUuid(head.getUuid());
-		member.setRelation(PaxUser.Relation.valueOf(paxMemberDTO.getRelation()));
-		return paxUserRepository.save(member);
-	}
-
+	@Override
 	public PaxUser addPaxMembers(String uuid, PaxMemberPostDTO paxMemberDTO) {
 		PaxUser head = paxUserRepository.findByUuidAndType(uuid, Type.HEAD)
 				.orElseThrow(() -> new IllegalArgumentException("Head's Uuid does not exist."));
@@ -96,8 +79,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		PaxUser member = new PaxUser();
 		member.setName(paxMemberDTO.getUserName());
 
-		if(paxUserRepository.existsByEmailAndIsActiveTrue(paxMemberDTO.getEmail()))
-		{
+		if (paxUserRepository.existsByEmailAndIsActiveTrue(paxMemberDTO.getEmail())) {
 			throw new RuntimeException("Email id already exists, try another.");
 		}
 		member.setEmail(paxMemberDTO.getEmail());
@@ -105,7 +87,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		if (paxUserRepository.existsByPhoneNumberAndIsActiveTrue(paxMemberDTO.getPhoneNumber())) {
 			throw new RuntimeException("Mobile number already exists, try another.");
 		}
-		
+
 		member.setCountryCode(paxMemberDTO.getCountryCode());
 		member.setPhoneNumber(paxMemberDTO.getPhoneNumber());
 		member.setAddress(paxMemberDTO.getAddress());
@@ -117,23 +99,22 @@ public class PaxUserServiceImpl implements PaxUserService {
 		return paxUserRepository.save(member);
 	}
 
-
 	@Override
 	public PaxUser updatePaxMember(String uuid, PaxUser paxMember) {
 		PaxUser existingMember = paxUserRepository.findByUuidAndType(uuid, Type.MEMBER)
 				.orElseThrow(() -> new UsernameNotFoundException("No Member found for UUID: " + uuid));
-		
+
 		existingMember.setName(paxMember.getName());
 		if (!existingMember.getEmail().equals(paxMember.getEmail())) {
-	        // Step 3: If email is different, check if any other active user has the same email
-	        if (paxUserRepository.existsByEmailAndIsActiveTrue(paxMember.getEmail())) {
-	        	throw new RuntimeException("Email id already exists, try another." );
-	        }
-	    }
+			// Step 3: If email is different, check if any other active user has the same
+			// email
+			if (paxUserRepository.existsByEmailAndIsActiveTrue(paxMember.getEmail())) {
+				throw new RuntimeException("Email id already exists, try another.");
+			}
+		}
 
 		existingMember.setEmail(paxMember.getEmail());
-		if(!existingMember.getPhoneNumber().equals(paxMember.getPhoneNumber()))
-		{
+		if (!existingMember.getPhoneNumber().equals(paxMember.getPhoneNumber())) {
 			if (paxUserRepository.existsByPhoneNumberAndIsActiveTrue(paxMember.getPhoneNumber())) {
 				throw new RuntimeException("Mobile number already exists, try another.");
 			}
@@ -149,25 +130,11 @@ public class PaxUserServiceImpl implements PaxUserService {
 	}
 
 	@Override
-	public List<PaxHeadDTO> getAllHead() {
-		List<PaxUser> heads = paxUserRepository.findByIsActiveTrue();
-		return heads.stream().map(this::convertToHeadDTO).collect(Collectors.toList());
+	public Page<PaxHeadDTO> getAllHead(Pageable pageable) {
+		return paxUserRepository.findByIsActiveTrue(pageable).map(this::convertToHeadDTO);
 	}
 
-//    @Override
-//    public List<PaxMemberDTO> getAllMember() {
-//        List<PaxUser> members = paxUserRepository.findAllMembers();
-//        Map<Long, String> headIdToNameMap = new HashMap<>();
-//
-//        // First, fetch heads to create a mapping
-//        List<PaxUser> heads = paxUserRepository.findAllHeads();
-//        heads.forEach(head -> headIdToNameMap.put(head.getId(), head.getName()));
-//
-//        return members.stream()
-//                .map(member -> convertToMemberDTO(member, headIdToNameMap))
-//                .collect(Collectors.toList());
-//    }
-
+	@Override
 	public PaxUser getHeadUserByUuid(String uuid) {
 		PaxUser paxUser = paxUserRepository.findByUuidAndIsActiveTrue(uuid)
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PaxUser not found"));
@@ -218,12 +185,15 @@ public class PaxUserServiceImpl implements PaxUserService {
 
 	}
 
+	@Override
 	public PaxUser getPaxHeadById(String uuid) {
 		PaxUser paxHead = paxUserRepository.findByUuidAndType(uuid, Type.HEAD)
 				.orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
 		return paxHead;
 
 	}
+
+	@Override
 	public PaxUser getPaxMemberById(String uuid) {
 		PaxUser paxMember = paxUserRepository.findByUuidAndType(uuid, Type.MEMBER)
 				.orElseThrow(() -> new UsernameNotFoundException("No Member found for UUID: " + uuid));
@@ -232,8 +202,8 @@ public class PaxUserServiceImpl implements PaxUserService {
 	}
 
 	@Override
-	public List getAllPaxMemberByHeadUuid(String uuid) {
-		List<PaxUser> allMembers = paxUserRepository.findAllActiveMembersByHeadUuid(uuid);
+	public Page getAllPaxMemberByHeadUuid(String uuid, Pageable pageable) {
+		Page<PaxUser> allMembers = paxUserRepository.findAllActiveMembersByHeadUuid(uuid, pageable);
 
 		if (!allMembers.isEmpty()) {
 			return allMembers;
@@ -241,7 +211,5 @@ public class PaxUserServiceImpl implements PaxUserService {
 			throw new ResourceNotFoundException("No members are found under this head");
 		}
 	}
-	
-	
 
 }

@@ -7,6 +7,9 @@ import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.service.PaxUserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,17 +32,17 @@ public class PaxUserController {
 		}
 	}
 
-	@PostMapping("/addMember")
-	public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxMemberPostDTO paxUser) {
-		PaxUser createdUser = paxUserService.addPaxMember(paxUser);
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-	}
+//	@PostMapping("/addMember")
+//	public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxMemberPostDTO paxUser) {
+//		PaxUser createdUser = paxUserService.addPaxMember(paxUser);
+//		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+//	}
 
-	@GetMapping("/head")
-	public ResponseEntity<?> getAllPaxHeads() {
-		List<PaxHeadDTO> head = paxUserService.getAllHead();
-		return ResponseEntity.ok(head);
-	}
+//	@GetMapping("/head")
+//	public ResponseEntity<?> getAllPaxHeads() {
+//		List<PaxHeadDTO> head = paxUserService.getAllHead();
+//		return ResponseEntity.ok(head);
+//	}
 
 //	@GetMapping("/member")
 //	public ResponseEntity<List<PaxMemberDTO>> getAllPaxMembers() {
@@ -108,12 +111,21 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/getMemberByHeadId/{uuid}")
-	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable String uuid) {
+	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable String uuid,@RequestParam(defaultValue = "0") int page, 
+            @RequestParam(defaultValue = "10") int size) {
 		try {
-			List<PaxMemberDTO> AllMember = paxUserService.getAllPaxMemberByHeadUuid(uuid);
+			Pageable pageable = PageRequest.of(page, size);
+			Page<PaxUser> AllMember = paxUserService.getAllPaxMemberByHeadUuid(uuid,pageable);
 			return new ResponseEntity<>(AllMember, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
+	
+	@GetMapping("/head")
+    public Page<PaxHeadDTO> getPaxHeads(@RequestParam(defaultValue = "0") int page, 
+                                     @RequestParam(defaultValue = "10") int size) {
+		Pageable pageable = PageRequest.of(page, size);
+        return paxUserService.getAllHead(pageable);
+    }
 }

@@ -78,7 +78,8 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
         }
     }
-
+    
+    @Override
     public Subscription getSubscriptionByUuid(String uuid) {
         return subscriptionRepository.findByUuidAndIsActiveTrue(uuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));

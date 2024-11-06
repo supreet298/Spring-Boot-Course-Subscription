@@ -14,9 +14,6 @@ public interface PurchaseSubscriptionService {
 
     Optional<PurchaseSubscriptionDTO> getPurchaseSubscriptionByUuid(String uuid);
 
-    boolean deletePurchaseSubscription(String uuid);
-
     boolean disableRecurringForSubscription(String uuid);
 
-    PurchaseSubscription getPurchaseSubscriptionId(Long id);
 }
