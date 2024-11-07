@@ -1,10 +1,10 @@
 package com.project.course.subscription.service.Impl;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import com.project.course.subscription.dto.PaxMemberPostDTO;
-import com.project.course.subscription.exception.ResourceNotFoundException;
+
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +12,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
 import com.project.course.subscription.dto.PaxHeadDTO;
-import com.project.course.subscription.dto.PaxMemberDTO;
+import com.project.course.subscription.dto.PaxMemberPostDTO;
+import com.project.course.subscription.dto.PaxUsersDTO;
+import com.project.course.subscription.exception.ResourceNotFoundException;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.model.PaxUser.Type;
 import com.project.course.subscription.repository.PaxUserRepository;
@@ -24,6 +27,9 @@ public class PaxUserServiceImpl implements PaxUserService {
 
 	@Autowired
 	private PaxUserRepository paxUserRepository;
+	
+	@Autowired
+    private ModelMapper modelMapper;
 
 	@Override
 	public PaxUser addPaxHead(PaxUser paxUser) {
@@ -158,20 +164,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		return dto;
 	}
 
-	private PaxMemberDTO convertToMemberDTO(PaxUser member, Map<Long, String> headIdToNameMap) {
-		PaxMemberDTO dto = new PaxMemberDTO();
-		dto.setUuid(member.getUuid());
-		dto.setName(member.getName());
-		dto.setEmail(member.getEmail());
-		dto.setRelation(member.getRelation().name());
-
-		// Retrieve head name from the map
-		String headName = headIdToNameMap.get(member.getHeadUuid());
-		dto.setHeadName(headName != null ? headName : "Head not found");
-
-		return dto;
-	}
-
+	
 	@Override
 	public PaxUser dropPaxUser(String uuid) {
 		PaxUser existingHead = paxUserRepository.findByUuid(uuid)
@@ -186,12 +179,23 @@ public class PaxUserServiceImpl implements PaxUserService {
 	}
 
 	@Override
-	public PaxUser getPaxHeadById(String uuid) {
-		PaxUser paxHead = paxUserRepository.findByUuidAndType(uuid, Type.HEAD)
-				.orElseThrow(() -> new UsernameNotFoundException("No HEAD found for UUID: " + uuid));
-		return paxHead;
+	public List<PaxUsersDTO> getPaxHeadById(String uuid) {
+		Optional<PaxUser> paxHead = paxUserRepository.findByUuidAndType(uuid, Type.HEAD);
+		return paxHead.stream()
+                .map(paxUser -> {
+                    PaxUsersDTO dto = new PaxUsersDTO();
+                    dto.setName(paxUser.getName());
+                    dto.setEmail(paxUser.getEmail());
+                    dto.setAddress(paxUser.getAddress());
+                    dto.setCountry(paxUser.getCountry());
+                    dto.setPhoneNumber(paxUser.getCountryCode()+paxUser.getPhoneNumber());
+                    dto.setType(paxUser.getType().toString());
+                    // Exclude relation
+                    return dto;
+                })
+                .collect(Collectors.toList());
+}
 
-	}
 
 	@Override
 	public PaxUser getPaxMemberById(String uuid) {
@@ -211,5 +215,45 @@ public class PaxUserServiceImpl implements PaxUserService {
 			throw new ResourceNotFoundException("No members are found under this head");
 		}
 	}
+	
+	 @Override
+	    public List<PaxUsersDTO> searchHead(String query) {
+	        // Fetch the list of PaxUser entities
+	        List<PaxUser> paxUsers = paxUserRepository.searchByMultipleFieldsAndHeadType(query);
 
+	        // Manually map the fields, excluding the 'relation' field
+	        return paxUsers.stream()
+	                       .map(paxUser -> {
+	                           PaxUsersDTO dto = new PaxUsersDTO();
+	                           dto.setName(paxUser.getName());
+	                           dto.setEmail(paxUser.getEmail());
+	                           dto.setAddress(paxUser.getAddress());
+	                           dto.setCountry(paxUser.getCountry());
+	                           dto.setPhoneNumber(paxUser.getCountryCode()+paxUser.getPhoneNumber());
+	                           dto.setType(paxUser.getType().toString());
+	                           // Exclude relation
+	                           return dto;
+	                       })
+	                       .collect(Collectors.toList());
+	    }
+
+	@Override
+	public List<PaxUsersDTO> searchMemberByHeadUuid(String uuid,String query) {
+		List<PaxUser> paxUsers=paxUserRepository.searchByMultipleFieldsAndMemberTypeByHeadUuid(uuid,query);
+		 return paxUsers.stream()
+                 .map(paxUser -> {
+                     PaxUsersDTO dto = new PaxUsersDTO();
+                     dto.setName(paxUser.getName());
+                     dto.setEmail(paxUser.getEmail());
+                     dto.setAddress(paxUser.getAddress());
+                     dto.setCountry(paxUser.getCountry());
+                     dto.setPhoneNumber(paxUser.getCountryCode()+paxUser.getPhoneNumber());
+                     dto.setType(paxUser.getType().toString());
+                     dto.setRelation(paxUser.getRelation().toString());
+                     // Exclude relation
+                     return dto;
+                 })
+                 .collect(Collectors.toList());
+}
+	 	
 }

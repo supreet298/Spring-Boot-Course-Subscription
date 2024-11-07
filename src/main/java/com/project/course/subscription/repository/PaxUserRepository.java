@@ -1,7 +1,7 @@
 package com.project.course.subscription.repository;
 
-import com.project.course.subscription.dto.PaxMemberDTO;
-import com.project.course.subscription.model.PaxUser;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.List;
-import java.util.Optional;
+
+import com.project.course.subscription.model.PaxUser;
 
 @Repository
 public interface PaxUserRepository extends JpaRepository<PaxUser, Long> {
@@ -37,6 +37,19 @@ public interface PaxUserRepository extends JpaRepository<PaxUser, Long> {
 
 	boolean existsByEmailAndIsActiveTrue(String email);
 	
-	Page<PaxUser> findAll(Pageable pageable);
+	@Query("SELECT i FROM PaxUser i WHERE (" +
+		       "LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+		       "LOWER(i.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+		       "LOWER(i.phoneNumber) LIKE LOWER(CONCAT('%', :query, '%')) )" +
+		       "AND i.type = 'HEAD'AND i.isActive = true")
+		List<PaxUser> searchByMultipleFieldsAndHeadType(@Param("query") String query);
+
+	@Query("SELECT i FROM PaxUser i WHERE i.headUuid = :headUuid " +
+		       "AND (LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+		       "LOWER(i.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+		       "LOWER(i.phoneNumber) LIKE LOWER(CONCAT('%', :query, '%'))) " +
+		       "AND i.type = 'MEMBER' AND i.isActive = true")
+		List<PaxUser> searchByMultipleFieldsAndMemberTypeByHeadUuid(@Param("headUuid") String uuid, @Param("query") String query);
+
 
 }

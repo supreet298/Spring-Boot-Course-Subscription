@@ -1,19 +1,30 @@
 package com.project.course.subscription.controller;
 
-import com.project.course.subscription.dto.PaxHeadDTO;
-import com.project.course.subscription.dto.PaxMemberDTO;
-import com.project.course.subscription.dto.PaxMemberPostDTO;
-import com.project.course.subscription.model.PaxUser;
-import com.project.course.subscription.service.PaxUserService;
-import jakarta.validation.Valid;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import java.util.List;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.project.course.subscription.dto.PaxHeadDTO;
+import com.project.course.subscription.dto.PaxMemberPostDTO;
+import com.project.course.subscription.dto.PaxUsersDTO;
+import com.project.course.subscription.model.PaxUser;
+import com.project.course.subscription.service.PaxUserService;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/admin/pax")
@@ -31,24 +42,6 @@ public class PaxUserController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 	}
-
-//	@PostMapping("/addMember")
-//	public ResponseEntity<PaxUser> addPaxMember(@Valid @RequestBody PaxMemberPostDTO paxUser) {
-//		PaxUser createdUser = paxUserService.addPaxMember(paxUser);
-//		return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-//	}
-
-//	@GetMapping("/head")
-//	public ResponseEntity<?> getAllPaxHeads() {
-//		List<PaxHeadDTO> head = paxUserService.getAllHead();
-//		return ResponseEntity.ok(head);
-//	}
-
-//	@GetMapping("/member")
-//	public ResponseEntity<List<PaxMemberDTO>> getAllPaxMembers() {
-//		List<PaxMemberDTO> member = paxUserService.getAllMember();
-//		return ResponseEntity.ok(member);
-//	}
 
 	@PutMapping("/updateHead/{uuid}")
 	public ResponseEntity<?> updateHead(@PathVariable String uuid, @RequestBody PaxUser request) {
@@ -83,7 +76,7 @@ public class PaxUserController {
 	@GetMapping("/{uuid}")
 	public ResponseEntity<?> getPaxHeadById(@PathVariable String uuid) {
 		try {
-			PaxUser paxHead = paxUserService.getPaxHeadById(uuid);
+			List<PaxUsersDTO> paxHead = paxUserService.getPaxHeadById(uuid);
 			return new ResponseEntity<>(paxHead, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -111,21 +104,33 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/getMemberByHeadId/{uuid}")
-	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable String uuid,@RequestParam(defaultValue = "0") int page, 
-            @RequestParam(defaultValue = "10") int size) {
+	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable String uuid,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
 		try {
 			Pageable pageable = PageRequest.of(page, size);
-			Page<PaxUser> AllMember = paxUserService.getAllPaxMemberByHeadUuid(uuid,pageable);
+			Page<PaxUser> AllMember = paxUserService.getAllPaxMemberByHeadUuid(uuid, pageable);
 			return new ResponseEntity<>(AllMember, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
-	
+
 	@GetMapping("/head")
-    public Page<PaxHeadDTO> getPaxHeads(@RequestParam(defaultValue = "0") int page, 
-                                     @RequestParam(defaultValue = "10") int size) {
+	public Page<PaxHeadDTO> getPaxHeads(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size);
-        return paxUserService.getAllHead(pageable);
-    }
+		return paxUserService.getAllHead(pageable);
+	}
+
+	@GetMapping("/searchHead")
+	public ResponseEntity<List<PaxUsersDTO>> searchByHeadItems(@RequestParam String query) {
+		List<PaxUsersDTO> results = paxUserService.searchHead(query);
+		return ResponseEntity.ok(results);
+	}
+
+	@GetMapping("/searchMember/{uuid}")
+	public ResponseEntity<List<PaxUsersDTO>> searchbyMemberItems(@PathVariable String uuid,@RequestParam String query) {
+		List<PaxUsersDTO> results = paxUserService.searchMemberByHeadUuid(uuid,query);
+		return ResponseEntity.ok(results);
+	}
 }

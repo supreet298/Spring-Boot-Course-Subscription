@@ -3,150 +3,151 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Member Management</title>
+  <title>PaxMember Management</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
     #search {
-      width: 250px; /* Set a width for the search input */
+      width: 250px;
       text-align: center;
-      color: black; /* Change text color */
-      margin-bottom: 5px; /* Add space below the search input */
-      margin-left: 800px;
-    }
-
-    .d-flex {
-      margin-bottom: 15px; /* Add some space below the flex container */
+      color: black;
     }
   </style>
 </head>
 <body>
-<div class="container mt-5">
-  <h2>Members of PaxHead</h2>
+  <div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+    <a class="btn btn-primary" href="managePaxUsers.html">ManagePax</a>
+      <h2>All PaxMembers</h2>
+      <div class="d-flex align-items-center">
+        <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-2">
+      </div>
+    </div>
 
-  <div class="d-flex align-items-center">
-    <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-2">
+    <table id="paxMemberTable" class="table table-striped table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>Name</th>
+          <th>PhoneNumber</th>
+          <th>Email</th>
+          <th>Relation</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="paxMemberTableBody">
+      </tbody>
+    </table>
+
+    <!-- Pagination Controls -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <button id="prevPage" class="btn btn-success">Previous</button>
+      <span id="pageInfo">Page 1</span>
+      <button id="nextPage" class="btn btn-success">Next</button>
+    </div>
   </div>
 
-  <table id="memberTable" class="table table-striped table-bordered">
-    <thead class="table-dark">
-    <tr>
-      <th>Name</th>
-      <th>PhoneNumber</th>
-      <th>Email</th>
-      <th>Relation</th>
-      <th>Action</th> <!-- Action column for buttons -->
-    </tr>
-    </thead>
-    <tbody id="memberTableBody">
-    <!-- Rows with member data will be dynamically inserted here -->
-    </tbody>
-  </table>
-
-  <!-- Pagination Controls -->
-  <div class="d-flex justify-content-between align-items-center mt-3">
-    <button id="prevPage" class="btn btn-success">Previous</button>
-    <span id="pageInfo">Page 1</span>
-    <button id="nextPage" class="btn btn-success">Next</button>
-  </div>
-</div>
-
-<script>
-  let currentPage = 0; // Current page index
-  const pageSize = 1; // Number of members per page
-  let members = []; // Store fetched members
-  let totalPages = 1; // Total number of pages
-
-  // Fetch members based on current page and display them
-  function loadMembers(page = 0) {
+  <script>
     const urlParams = new URLSearchParams(window.location.search);
-    const headUuid = urlParams.get('uuid');
-    
-    fetch(`/api/admin/pax/getMemberByHeadId/${headUuid}?page=${page}&size=${pageSize}`)
-      .then(response => response.json())
-      .then(data => {
-        members = data.content; // Store members from current page
-        totalPages = data.totalPages; // Get total pages from API response
-        displayMembers(members); // Display members for current page
-        updatePagination(); // Update pagination controls
-      })
-      .catch(error => console.error('Error fetching members:', error));
-  }
+    const uuid = urlParams.get('uuid');
 
-  // Display members in the table
-  function displayMembers(membersToDisplay) {
-    const memberTableBody = document.getElementById('memberTableBody');
-    memberTableBody.innerHTML = ''; // Clear any existing rows
+    let currentPage = 0;
+    const pageSize = 2;
+    let paxMembers = []; // Store fetched PaxMember data
+    let totalPages = 1; // Total number of pages
 
-    membersToDisplay.forEach(member => {
+    // Fetch and display PaxMembers dynamically
+    function loadPaxMembers(page = 0, query = '') {
+      const apiUrl = query 
+        ? `/api/admin/pax/searchMember/${uuid}?query=${query}` 
+        : `/api/admin/pax/getMemberByHeadId/${uuid}?page=${page}&size=${pageSize}`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (query) {
+            paxMembers = data;
+            totalPages = 1;
+          } else {
+            paxMembers = data.content;
+            totalPages = data.totalPages;
+          }
+          displayPaxMembers(paxMembers);
+          updatePagination();
+        })
+        .catch(error => {
+          console.error('Error fetching PaxMembers:', error);
+          alert('Failed to load PaxMembers');
+        });
+    }
+
+    // Display PaxMembers in the table
+    function displayPaxMembers(paxMembers) {
+      const paxMemberTableBody = document.getElementById('paxMemberTableBody');
+      paxMemberTableBody.innerHTML = '';
+
+      paxMembers.forEach(member => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${member.name}</td>
-            <td>${member.countryCode + member.phoneNumber}</td>
-            <td>${member.email}</td>
-            <td>${member.relation}</td>
-            <td>
-                <a href="updateMember.html?uuid=${member.uuid}" class="btn btn-primary btn-sm">Edit</a>
-                <button class="btn btn-danger btn-sm" onclick="deleteMember('${member.uuid}')">Delete</button>
-            </td>
+          <td>${member.name}</td>
+          <td>${(member.countryCode || '') + (member.phoneNumber || '')}</td>
+          <td>${member.email}</td>
+          <td>${member.relation}</td>
+          <td>
+            <a href="updateMember.html?uuid=${member.uuid}" class="btn btn-primary btn-sm">Edit</a>
+            <button class="btn btn-danger btn-sm" onclick="deletePaxMember('${member.uuid}')">Delete</button>
+          </td>
         `;
-        memberTableBody.appendChild(row);
-    });
-  }
-
-  // Delete a member
-  function deleteMember(uuid) {
-    if (confirm("Are you sure you want to delete this member?")) {
-        fetch(`/api/admin/pax/dropPaxUser/${uuid}`, { method: 'DELETE' })
-            .then(response => {
-                if (response.ok) {
-                    loadMembers(currentPage); // Reload members after deletion
-                } else {
-                    alert("Failed to delete the member.");
-                }
-            });
+        paxMemberTableBody.appendChild(row);
+      });
     }
-  }
 
-  // Update pagination controls
-  function updatePagination() {
-    document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
-    document.getElementById('prevPage').disabled = currentPage <= 0;
-    document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
-  }
-
-  // Event listeners for pagination buttons
-  document.getElementById('prevPage').addEventListener('click', () => {
-    if (currentPage > 0) {
-      currentPage--;
-      loadMembers(currentPage);
+    // Function to delete PaxMember
+    function deletePaxMember(uuid) {
+      if (confirm("Are you sure you want to delete this PaxMember?")) {
+        fetch(`/api/admin/pax/deleteMember/${uuid}`, { method: 'DELETE' })
+          .then(response => {
+            if (response.ok) {
+              loadPaxMembers(currentPage); // Reload PaxMembers after deletion
+            } else {
+              alert("Failed to delete the PaxMember.");
+            }
+          });
+      }
     }
-  });
 
-  document.getElementById('nextPage').addEventListener('click', () => {
-    if (currentPage < totalPages - 1) {
-      currentPage++;
-      loadMembers(currentPage);
+    // Update pagination controls
+    function updatePagination() {
+      document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
+      document.getElementById('prevPage').disabled = currentPage <= 0;
+      document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
     }
-  });
 
-  // Event listener for search input
-  document.getElementById('search').addEventListener('input', function (e) {
-    const searchText = e.target.value.toLowerCase();
-
-    const filteredMembers = members.filter(member => {
-      const fullPhoneNumber = (member.countryCode + member.phoneNumber).toLowerCase();
-      return (
-        member.name.toLowerCase().includes(searchText) ||
-        fullPhoneNumber.includes(searchText) || // Use full phone number for search
-        member.email.toLowerCase().includes(searchText)
-      );
+    // Event listeners for pagination buttons
+    document.getElementById('prevPage').addEventListener('click', () => {
+      if (currentPage > 0) {
+        currentPage--;
+        loadPaxMembers(currentPage);
+      }
     });
 
-    displayMembers(filteredMembers); // Display filtered members
-  });
+    document.getElementById('nextPage').addEventListener('click', () => {
+      if (currentPage < totalPages - 1) {
+        currentPage++;
+        loadPaxMembers(currentPage);
+      }
+    });
 
-  // Initialize by loading members for the first page
-  loadMembers();
-</script>
+    // Event listener for search input
+    document.getElementById('search').addEventListener('input', function (e) {
+      const searchText = e.target.value.trim().toLowerCase();
+      if (searchText) {
+        loadPaxMembers(0, searchText);  // Reset to the first page for search results
+      } else {
+        loadPaxMembers(currentPage);    // Show current page when search is cleared
+      }
+    });
+
+    // Initialize by loading all PaxMembers for the first page
+    loadPaxMembers();
+  </script>
 </body>
 </html>

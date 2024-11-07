@@ -29,7 +29,7 @@
       <th>Name</th>
       <th>PhoneNumber</th>
       <th>Email</th>
-      <th>Action</th> 
+      <th>Action</th>
     </tr>
     </thead>
     <tbody id="paxTableBody">
@@ -51,12 +51,19 @@
   let totalPages = 1; // Total number of pages
 
   // Fetch and display PaxHeads dynamically
-  function loadPaxHeads(page = 0) {
-    fetch(`/api/admin/pax/head?page=${page}&size=${pageSize}`)
+  function loadPaxHeads(page = 0, query = '') {
+    const apiUrl = query ? `/api/admin/pax/searchHead?query=${query}` : `/api/admin/pax/head?page=${page}&size=${pageSize}`;
+
+    fetch(apiUrl)
       .then(response => response.json())
       .then(data => {
-        paxHeads = data.content; // Store fetched data in paxHeads array
-        totalPages = data.totalPages;
+        if (query) {
+          paxHeads = data; // In case of search, we get the data directly
+          totalPages = 1; // No pagination for search results
+        } else {
+          paxHeads = data.content;
+          totalPages = data.totalPages;
+        }
         displayPaxHeads(paxHeads);
         updatePagination();
       })
@@ -72,7 +79,7 @@
       const row = document.createElement('tr');
       row.innerHTML = `
         <td><a href="info.html?uuid=${paxuser.uuid}">${paxuser.name}</a></td>
-        <td>${paxuser.countryCode + paxuser.phoneNumber}</td>
+        <td>${(paxuser.countryCode || '') + (paxuser.phoneNumber || '')}</td>
         <td>${paxuser.email}</td>
         <td>
           <a href="updateHead.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">Edit</a>
@@ -123,19 +130,16 @@
 
   // Event listener for search input
   document.getElementById('search').addEventListener('input', function (e) {
-    const searchText = e.target.value.toLowerCase(); // Get the input value
-    const filteredPaxHeads = paxHeads.filter(paxuser => {
-      const fullPhone = (paxuser.countryCode + paxuser.phoneNumber).toLowerCase(); // Concatenate and lower-case phone number
-      return paxuser.name.toLowerCase().includes(searchText) ||
-             fullPhone.includes(searchText) ||
-             paxuser.email.toLowerCase().includes(searchText); // Check if any field includes the search text
-    });
-    displayPaxHeads(filteredPaxHeads); // Display filtered PaxHeads
+    const searchText = e.target.value.trim().toLowerCase();
+    if (searchText) {
+      loadPaxHeads(0, searchText); // Trigger search when there's input
+    } else {
+      loadPaxHeads(currentPage); // Reset to current page if search is cleared
+    }
   });
 
   // Initialize by loading all PaxHeads for the first page
   loadPaxHeads();
-
 </script>
 </body>
 </html>

@@ -5,6 +5,10 @@ import lombok.Data;
 @Data
 public class PaxHeadDTO {
 	
+	private String name;
+
+    private String email;
+	
 	private Long id;
 	
 	private String uuid;
@@ -13,8 +17,5 @@ public class PaxHeadDTO {
     
     private String countryCode;
     
-    private String name;
-
-    private String email;
-    
+        
 }

@@ -1,14 +1,16 @@
 package com.project.course.subscription.service;
 
-import com.project.course.subscription.dto.PaxHeadDTO;
-import com.project.course.subscription.dto.PaxMemberDTO;
-import com.project.course.subscription.dto.PaxMemberPostDTO;
-import com.project.course.subscription.model.PaxUser;
-import jakarta.validation.Valid;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import com.project.course.subscription.dto.PaxHeadDTO;
+import com.project.course.subscription.dto.PaxMemberPostDTO;
+import com.project.course.subscription.dto.PaxUsersDTO;
+import com.project.course.subscription.model.PaxUser;
+
+import jakarta.validation.Valid;
 
 public interface PaxUserService {
 
@@ -22,7 +24,7 @@ public interface PaxUserService {
 
 	PaxUser getHeadUserByUuid(String uuid);
 
-	PaxUser getPaxHeadById(String uuid);
+	List<PaxUsersDTO> getPaxHeadById(String uuid);
 
 	PaxUser getPaxMemberById(String uuid);
 
@@ -31,5 +33,10 @@ public interface PaxUserService {
 	Page<PaxUser> getAllPaxMemberByHeadUuid(String uuid,Pageable pageable);
 	
 	Page<PaxHeadDTO> getAllHead(Pageable pageable);
+	
+	List<PaxUsersDTO> searchHead(String query);
+	
+	List<PaxUsersDTO> searchMemberByHeadUuid(String uuid,String query);
+
 
 }
