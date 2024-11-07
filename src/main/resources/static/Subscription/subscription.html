@@ -5,14 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subscription Management</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    #search {
+      width: 250px;
+      text-align: center;
+      color: black;
+    }
+  </style>
 </head>
 <body>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h2 class="text-center">Subscriptions</h2>
-    <a href="create.html" class="btn btn-success">Create Subscription</a>
+    <div class="d-flex align-items-center">
+      <input type="text" id="search" name="search" placeholder="Search" class="form-control mr-2">
+      <a href="create.html" class="btn btn-success">Create Subscription</a>
+    </div>
   </div>
-
   <!-- Table to display subscriptions -->
   <table id="subscriptionTable" class="table table-striped table-bordered">
     <thead class="table-dark">
@@ -39,72 +48,85 @@
 
 <script>
   let currentPage = 0;
-  const pageSize = 10;
+  const pageSize = 2;
 
-  // Function to fetch and display subscriptions with pagination
-  function fetchSubscriptions(page = 0) {
-      fetch(`/api/admin/subscription?page=${page}&size=${pageSize}`)
-          .then(response => response.json())
-          .then(data => {
-              const subscriptions = data.content;
-              const totalPages = data.totalPages;
-              const pageInfo = document.getElementById('pageInfo');
-              pageInfo.innerText = `Page ${page + 1} of ${totalPages}`;
+  // Function to fetch and display subscriptions with pagination and search
+  function fetchSubscriptions(page = 0, keyword = '') {
+    const apiUrl = keyword
+      ? `/api/admin/subscription/search?keyword=${keyword}`
+      : `/api/admin/subscription?page=${page}&size=${pageSize}`;
 
-              const subscriptionTableBody = document.getElementById('subscriptionTableBody');
-              subscriptionTableBody.innerHTML = ''; // Clear any existing rows
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        const subscriptions = keyword ? data : data.content;
+        const totalPages = keyword ? 1 : data.totalPages;
+        const pageInfo = document.getElementById('pageInfo');
+        pageInfo.innerText = `Page ${page + 1} of ${totalPages}`;
 
-              // Populate table with subscription data
-              subscriptions.forEach(subscription => {
-                  const row = document.createElement('tr');
-                  row.innerHTML = `
-                      <td>${subscription.planName}</td>
-                      <td>${subscription.description}</td>
-                      <td>${subscription.cost}</td>
-                      <td>${subscription.subscriptionType}</td>
-                      <td>
-                          <a href="update.html?uuid=${subscription.uuid}" class="btn btn-primary btn-sm">Edit</a>
-                          <button class="btn btn-danger btn-sm" onclick="deleteSubscription('${subscription.uuid}')">Delete</button>
-                      </td>
-                  `;
-                  subscriptionTableBody.appendChild(row);
-              });
+        const subscriptionTableBody = document.getElementById('subscriptionTableBody');
+        subscriptionTableBody.innerHTML = ''; // Clear any existing rows
 
-              // Enable/disable pagination buttons based on the current page
-              document.getElementById('prevPage').disabled = page <= 0;
-              document.getElementById('nextPage').disabled = page >= totalPages - 1;
-          })
-          .catch(error => console.error('Error fetching subscriptions:', error));
+        // Populate table with subscription data
+        subscriptions.forEach(subscription => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${subscription.planName}</td>
+            <td>${subscription.description}</td>
+            <td>${subscription.cost}</td>
+            <td>${subscription.subscriptionType}</td>
+            <td>
+              <a href="update.html?uuid=${subscription.uuid}" class="btn btn-primary btn-sm">Edit</a>
+              <button class="btn btn-danger btn-sm" onclick="deleteSubscription('${subscription.uuid}')">Delete</button>
+            </td>
+          `;
+          subscriptionTableBody.appendChild(row);
+        });
+
+        // Enable/disable pagination buttons based on the current page
+        document.getElementById('prevPage').disabled = page <= 0;
+        document.getElementById('nextPage').disabled = page >= totalPages - 1;
+      })
+      .catch(error => console.error('Error fetching subscriptions:', error));
   }
-
 
   // Function to delete a subscription
   function deleteSubscription(uuid) {
-      if (confirm("Are you sure you want to delete this subscription?")) {
-          fetch(`/api/admin/subscription/${uuid}`, { method: 'DELETE' })
-              .then(response => {
-                  if (response.ok) {
-                      alert("Subscription deleted successfully.");
-                      fetchSubscriptions(currentPage); // Refresh the table after deletion
-                  } else {
-                      alert("Failed to delete the subscription.");
-                  }
-              })
-              .catch(error => alert("An error occurred: " + error.message));
-      }
+    if (confirm("Are you sure you want to delete this subscription?")) {
+      fetch(`/api/admin/subscription/${uuid}`, { method: 'DELETE' })
+        .then(response => {
+          if (response.ok) {
+            alert("Subscription deleted successfully.");
+            fetchSubscriptions(currentPage); // Refresh the table after deletion
+          } else {
+            alert("Failed to delete the subscription.");
+          }
+        })
+        .catch(error => alert("An error occurred: " + error.message));
+    }
   }
 
   // Event listeners for pagination buttons
   document.getElementById('prevPage').addEventListener('click', () => {
-      if (currentPage > 0) {
-          currentPage--;
-          fetchSubscriptions(currentPage);
-      }
+    if (currentPage > 0) {
+      currentPage--;
+      fetchSubscriptions(currentPage);
+    }
   });
 
   document.getElementById('nextPage').addEventListener('click', () => {
-      currentPage++;
-      fetchSubscriptions(currentPage);
+    currentPage++;
+    fetchSubscriptions(currentPage);
+  });
+
+  // Event listener for search input
+  document.getElementById('search').addEventListener('input', function (e) {
+    const searchText = e.target.value.trim().toLowerCase();
+    if (searchText) {
+      fetchSubscriptions(0, searchText); // Trigger search when there's input
+    } else {
+      fetchSubscriptions(currentPage); // Reset to current page if search is cleared
+    }
   });
 
   // Initial fetch to populate the table on page load

@@ -57,6 +57,12 @@ public class SubscriptionController {
         return subscriptionService.getSubscriptionDTOByUuid(uuid);
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<SubscriptionDTO>> searchSubscription(@RequestParam String keyword){
+        List<SubscriptionDTO> subscriptions = subscriptionService.searchSubscription(keyword);
+        return ResponseEntity.ok(subscriptions);
+    }
+
     @PutMapping("/{uuid}")
     public Optional<Subscription> updateCategory(@PathVariable String uuid, @RequestBody Subscription Subscription) {
         return subscriptionService.updateSubscription(uuid, Subscription);

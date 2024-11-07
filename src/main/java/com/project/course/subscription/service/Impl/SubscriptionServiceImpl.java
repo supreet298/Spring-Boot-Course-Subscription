@@ -85,6 +85,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription not found"));
     }
 
+    @Override
+    public List<SubscriptionDTO> searchSubscription(String keyword) {
+        List<Subscription> subscriptions = subscriptionRepository.searchSubscription(keyword);
+        return subscriptions.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
     private SubscriptionDTO convertToDTO(Subscription subscription) {
         SubscriptionDTO dto = new SubscriptionDTO();
         dto.setUuid(subscription.getUuid());

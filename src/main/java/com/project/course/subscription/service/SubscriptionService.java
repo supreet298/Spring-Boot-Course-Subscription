@@ -23,4 +23,6 @@ public interface SubscriptionService {
     Subscription getSubscriptionByUuid(String uuid);
 
     List<SubscriptionDTO> getAllActiveSubscriptionList();
+
+    List<SubscriptionDTO> searchSubscription(String keyword);
 }
