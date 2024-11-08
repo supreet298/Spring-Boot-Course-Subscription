@@ -16,7 +16,7 @@ public interface SubscriptionService {
 
     Optional<SubscriptionDTO> getSubscriptionDTOByUuid(String uuid);
 
-    Optional<Subscription> updateSubscription(String uuid, Subscription subscription);
+    Subscription updateSubscription(String uuid, Subscription subscription);
 
     boolean deleteSubscription(String uuid);
 

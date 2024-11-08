@@ -2,6 +2,7 @@ package com.project.course.subscription.controller;
 
 import com.project.course.subscription.dto.CustomPageResponse;
 import com.project.course.subscription.dto.SubscriptionDTO;
+import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.service.SubscriptionService;
 import jakarta.validation.Valid;
@@ -68,8 +69,13 @@ public class SubscriptionController {
     }
 
     @PutMapping("/{uuid}")
-    public Optional<Subscription> updateCategory(@PathVariable String uuid, @RequestBody Subscription Subscription) {
-        return subscriptionService.updateSubscription(uuid, Subscription);
+    public ResponseEntity<?> updateCategory(@PathVariable String uuid, @RequestBody Subscription Subscription) {
+        try {
+            Subscription updateSubscription = subscriptionService.updateSubscription(uuid, Subscription);
+            return new ResponseEntity<>(updateSubscription, HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{uuid}")

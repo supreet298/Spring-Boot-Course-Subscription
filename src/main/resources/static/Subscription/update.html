@@ -10,6 +10,9 @@
 <div class="container mt-5">
   <a href="subscription.html" class="btn btn-primary">Back</a>
   <h2>Update Subscription</h2>
+
+  <div id="errorMessage" class="alert alert-danger d-none"></div> <!-- Error message container -->
+
   <form id="updateSubscriptionForm" class="mt-3">
     <div class="form-group">
       <label for="planName">Plan Name</label>
@@ -73,12 +76,32 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedSubscription)
       })
-      .then(response => response.json())
+      .then(response => {
+          const contentType = response.headers.get("content-type");
+          if (!response.ok) {
+            if (contentType && contentType.includes("application/json")) {
+              return response.json().then(json => { throw new Error(json.message || 'Failed to update Head'); });
+            } else {
+              return response.text().then(text => { throw new Error(text || 'Failed to update Head'); });
+            }
+          }
+          return response.json();
+      })
       .then(data => {
+          alert('Subscription updated successfully!');
           window.location.href = 'subscription.html'; // Redirect to subscription list
       })
-      .catch(error => console.error('Error updating subscription:', error));
+      .catch(error => {
+          console.error('Error updating member:', error);
+          showErrorMessage(error.message);
+      });
   });
+
+  function showErrorMessage(message) {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = message;
+    errorMessage.classList.remove('d-none');
+  }
 </script>
 </body>
 </html>

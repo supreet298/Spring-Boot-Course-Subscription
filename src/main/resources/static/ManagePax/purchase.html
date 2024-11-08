@@ -62,27 +62,56 @@
   // Retrieve the paxUserUuid from the URL
   const paxUserUuid = getQueryParam('paxUserUuid');
 
-  // Load subscription options from the API
-  function loadSubscriptionOptions() {
-    fetch('/api/admin/subscription/list')
+  // Load active purchases to filter out already purchased subscriptions
+  function loadActivePurchases() {
+    return fetch(`/api/admin/purchaseHistory/active/${paxUserUuid}`)
       .then(response => response.json())
       .then(data => {
-        const subscriptionSelect = document.getElementById('subscriptionId');
-        data.forEach(subscription => {
-          const option = document.createElement('option');
-          option.value = subscription.uuid;
-          option.textContent = `${subscription.planName} - ${subscription.cost} Cost - ${subscription.subscriptionType}`;
-          subscriptionSelect.appendChild(option);
-        });
+        // Extract the plan names of already purchased subscriptions
+        return data.map(purchase => purchase.planName);
       })
-      .catch(error => console.error('Error loading subscription options:', error));
+      .catch(error => {
+        console.error('Error loading active purchases:', error);
+        return [];
+      });
+  }
+
+  // Load subscription options from the API
+  function loadSubscriptionOptions() {
+    loadActivePurchases().then(purchasedPlans => {
+      fetch('/api/admin/subscription/list')
+        .then(response => response.json())
+        .then(subscriptionData => {
+          const subscriptionSelect = document.getElementById('subscriptionId');
+          const purchasedPlansLower = purchasedPlans.map(plan => plan.toLowerCase()); // Convert to lowercase for case-insensitive comparison
+
+          subscriptionData.forEach(subscription => {
+            // Only add the subscription if it has not been purchased yet
+            if (!purchasedPlansLower.includes(subscription.planName.toLowerCase())) {
+              const option = document.createElement('option');
+              option.value = subscription.uuid;
+              option.textContent = `${subscription.planName} - ${subscription.cost} Cost - ${subscription.subscriptionType}`;
+              subscriptionSelect.appendChild(option);
+            }
+          });
+
+          // If no subscriptions are available to display, show a fallback option
+          if (subscriptionSelect.options.length === 1) {
+            const option = document.createElement('option');
+            option.textContent = "No available subscriptions";
+            subscriptionSelect.appendChild(option);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading subscription options:', error);
+        });
+    });
   }
 
   // Call function to populate subscriptions on page load
   document.addEventListener('DOMContentLoaded', loadSubscriptionOptions);
 
-
- // Event listener for form submission
+  // Event listener for form submission
   document.getElementById('purchaseSubscriptionForm').addEventListener('submit', function(event) {
     event.preventDefault();
 

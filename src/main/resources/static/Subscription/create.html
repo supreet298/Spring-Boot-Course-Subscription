@@ -9,6 +9,9 @@
 <body>
 <div class="container mt-5">
   <h2>Create Subscription</h2>
+
+  <div id="errorMessage" class="alert alert-danger d-none"></div> <!-- Error message container -->
+
   <form id="createSubscriptionForm" class="mt-3">
     <div class="form-group">
       <label for="planName">Plan Name</label>
@@ -16,7 +19,7 @@
     </div>
     <div class="form-group">
       <label for="description">Description</label>
-      <textarea id="description" class="form-control" rows="3"></textarea>
+      <textarea id="description" class="form-control" rows="3" required></textarea>
     </div>
     <div class="form-group">
       <label for="cost">Cost</label>
@@ -25,13 +28,14 @@
     <div class="form-group">
       <label for="subscriptionType">Subscription Type</label>
       <select id="subscriptionType" class="form-control" required>
+        <option value="">Select Type</option>
         <option value="MONTHLY">Monthly</option>
         <option value="QUARTERLY">Quarterly</option>
         <option value="HALF_YEARLY">Half-Yearly</option>
         <option value="YEARLY">Yearly</option>
       </select>
     </div>
-    <button type="submit" class="btn btn-success">Create Subscription</button>
+    <button type="submit" class="btn btn-success mt-3">Create Subscription</button>
   </form>
 </div>
 
@@ -40,23 +44,40 @@
       event.preventDefault();
 
       const subscription = {
-          planName: document.getElementById('planName').value,
-          description: document.getElementById('description').value,
-          cost: document.getElementById('cost').value,
-          subscriptionType: document.getElementById('subscriptionType').value
+          planName : document.getElementById('planName').value,
+          description : document.getElementById('description').value,
+          cost : parseFloat(document.getElementById('cost').value),
+          subscriptionType : document.getElementById('subscriptionType').value
       };
 
-      fetch('/api/admin/subscription', {
+      fetch('http://localhost:8080/api/admin/subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(subscription)
       })
-      .then(response => response.json())
-      .then(data => {
-          window.location.href = 'subscription.html'; // Redirect to subscription list
+      .then(response => {
+          if (!response.ok) {
+              return response.text().then(text => {
+                  throw new Error(text); // Get error message from response
+              });
+          }
+          return response.json();
       })
-      .catch(error => console.error('Error creating subscription:', error));
+      .then(data => {
+          alert('Subscription created successfully!');
+          window.location.href = 'subscription.html'; // Redirect on success
+      })
+      .catch(error => {
+          console.error('Error Creating Subscription:', error);
+          showErrorMessage(error.message);
+      });
   });
+
+  function showErrorMessage(message) {
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.textContent = message;
+      errorMessage.classList.remove('d-none');
+  }
 </script>
 </body>
 </html>
