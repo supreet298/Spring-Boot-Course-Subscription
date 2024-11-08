@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subscription Management</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    #search {
+      width: 250px;
+      text-align: center;
+      color: black;
+    }
+  </style>
+</head>
+<body>
+<div class="container mt-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="../index.html" class="btn btn-primary">Home</a>
+    <h2>All PaxHeads</h2>
+    <div class="d-flex align-items-center">
+      <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-2">
+      <a href="createPaxHead.html" class="btn btn-success">Add Head</a>
+    </div>
+  </div>
+
+  <table id="paxTable" class="table table-striped table-bordered">
+    <thead class="table-dark">
+    <tr>
+      <th>Name</th>
+      <th>PhoneNumber</th>
+      <th>Email</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody id="paxTableBody">
+    </tbody>
+  </table>
+
+  <!-- Pagination Controls -->
+  <div class="d-flex justify-content-between align-items-center mt-3" id="paginationControls">
+    <button id="prevPage" class="btn btn-success">Previous</button>
+    <span id="pageInfo">Page 1</span>
+    <button id="nextPage" class="btn btn-success">Next</button>
+  </div>
+</div>
+
+<script>
+  let currentPage = 0;
+  const pageSize = 10;
+  let paxHeads = []; // To store fetched PaxHead data
+  let totalPages = 1; // Total number of pages
+
+  // Fetch and display PaxHeads dynamically
+  function loadPaxHeads(page = 0, query = '') {
+    const apiUrl = query ? `/api/admin/pax/searchHead?query=${query}` : `/api/admin/pax/head?page=${page}&size=${pageSize}`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        if (query) {
+          paxHeads = data; // In case of search, we get the data directly
+          totalPages = 1; // No pagination for search results
+        } else {
+          paxHeads = data.content;
+          totalPages = data.totalPages;
+        }
+        displayPaxHeads(paxHeads);
+        updatePagination();
+      })
+      .catch(error => console.error('Error fetching PaxHeads:', error));
+  }
+
+  // Display PaxHeads in the table
+  function displayPaxHeads(paxHeads) {
+    const paxTableBody = document.getElementById('paxTableBody');
+    paxTableBody.innerHTML = ''; // Clear any existing rows
+
+    paxHeads.forEach(paxuser => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td><a href="info.html?uuid=${paxuser.uuid}">${paxuser.name}</a></td>
+        <td>${(paxuser.countryCode || '') + (paxuser.phoneNumber || '')}</td>
+        <td>${paxuser.email}</td>
+        <td>
+          <a href="updateHead.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">Edit</a>
+          <button class="btn btn-danger btn-sm" onclick="deletePaxHead('${paxuser.uuid}')">Delete</button>
+          <a href="createPaxMember.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">Add Member</a>
+          <a href="managePaxMember.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">See Members</a>
+        </td>
+      `;
+      paxTableBody.appendChild(row);
+    });
+  }
+
+  // Function to delete PaxHead
+  function deletePaxHead(uuid) {
+    if (confirm("Are you sure you want to delete this PaxHead?")) {
+      fetch(`/api/admin/pax/dropPaxUser/${uuid}`, { method: 'DELETE' })
+        .then(response => {
+          if (response.ok) {
+            loadPaxHeads(currentPage); // Reload PaxHeads after deletion
+          } else {
+            alert("Failed to delete the PaxHead.");
+          }
+        });
+    }
+  }
+
+  // Update pagination controls
+  function updatePagination() {
+  const paginationControls = document.getElementById('paginationControls');
+  const paginationControlss = document.getElementById('nextPage');
+  const paginationControl = document.getElementById('prevPage');
+
+
+  // Hide pagination if total pages are less than or equal to 1 or the total number of records is less than or equal to the page size
+  if (totalPages <= 1 || (paxHeads.length <= pageSize && totalPages <= 1)) {
+    paginationControls.style.visibility= 'hidden'; // Hide pagination controls
+  } else {
+	  nextPage.style.visibility = 'visible'; // Show pagination controls
+  }
+
+  document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
+  document.getElementById('prevPage').disabled = currentPage <= 0;
+  document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
+}
+
+  // Event listeners for pagination buttons
+  document.getElementById('prevPage').addEventListener('click', () => {
+    if (currentPage > 0) {
+      currentPage--;
+      loadPaxHeads(currentPage);
+    }
+  });
+
+  document.getElementById('nextPage').addEventListener('click', () => {
+    if (currentPage < totalPages - 1) {
+      currentPage++;
+      loadPaxHeads(currentPage);
+    }
+  });
+
+  // Event listener for search input
+  document.getElementById('search').addEventListener('input', function (e) {
+    const searchText = e.target.value.trim().toLowerCase();
+    if (searchText) {
+      loadPaxHeads(0, searchText); // Trigger search when there's input
+    } else {
+      loadPaxHeads(currentPage); // Reset to current page if search is cleared
+    }
+  });
+
+  // Initialize by loading all PaxHeads for the first page
+  loadPaxHeads();
+</script>
+</body>
+</html>

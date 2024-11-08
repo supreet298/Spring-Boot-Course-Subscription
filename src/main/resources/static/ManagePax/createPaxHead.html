@@ -37,7 +37,11 @@
         <input type="tel" id="phone" name="phone" required placeholder="Enter phone number" class="form-control" pattern="[0-9]{10}" title="Enter a valid 10-digit phone number">
       </div>
     </div>
-    <button type="submit" class="btn btn-success mt-3">Create Head</button>
+    <div class="form-group mt-3">
+  <button type="submit" class="btn btn-success">Create Head</button>
+  <a href="managePaxUsers.html" class="btn btn-primary ml-2" id="cancelButton">Cancel</a>
+</div>
+
   </form>
 </div>
 
@@ -99,6 +103,14 @@
       })
       .catch(error => showErrorMessage('Error creating Pax Head: ' + error.message));
   });
+  document.getElementById('cancelButton').addEventListener('click', function(event) {
+	  event.preventDefault(); // Prevent the default behavior to add custom logic
+
+	  const confirmCancel = confirm('Are you sure you want to cancel and go back?');
+	  if (confirmCancel) {
+	    window.location.href = 'managePaxUsers.html'; // Redirect to the desired page
+	  }
+	});
 
   function showErrorMessage(message) {
       const errorMessage = document.getElementById('errorMessage');

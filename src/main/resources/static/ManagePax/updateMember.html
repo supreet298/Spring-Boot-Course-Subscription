@@ -46,6 +46,8 @@
 			</select>
 		</div>
 		<button type="submit" class="btn btn-success">Update Member</button>
+		<a href="managePaxMember.html" class="btn btn-primary" id="cancelButton">Cancel</a>
+		
 	</form>
 </div>
 
@@ -126,13 +128,18 @@
         })
         .then(data => {
             console.log('Update successful:', data);
-            window.location.href = 'managePaxUsers.html';
+            window.location.href = 'managePaxMember.html';
         })
         .catch(error => {
             console.error('Error updating member:', error);
             showErrorMessage(error.message);
         });
     });
+    document.getElementById('cancelButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        window.history.back(); // Navigate back to the previous page
+    });
+
 
     function showErrorMessage(message) {
         const errorMessage = document.getElementById('errorMessage');

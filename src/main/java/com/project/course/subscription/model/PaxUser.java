@@ -34,7 +34,7 @@ public class PaxUser {
     @NotBlank(message = "Username is mandatory and cannot be blank.")
     @Column(name = "name")
     private String name;
-
+    
     @NotBlank(message = "Email is mandatory and cannot be blank.")
     @Email(message = "Email must be in a valid format.")
     private String email;

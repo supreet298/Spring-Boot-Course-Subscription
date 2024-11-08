@@ -102,22 +102,30 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/getMemberByHeadId/{uuid}")
-	public ResponseEntity<?> getPaxAllMemberByHeadId(@PathVariable String uuid,
-													 @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+	public ResponseEntity<?> getPaginatedAndSortedMemberss(@PathVariable String uuid,@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortBy,
+			@RequestParam(defaultValue = "asc") String direction) {
 		try {
 			Pageable pageable = PageRequest.of(page, size);
-			Page<PaxUsersDTO> AllMember = paxUserService.getAllPaxMemberByHeadUuid(uuid, pageable);
+			Page<PaxUsersDTO> AllMember = paxUserService.getAllPaginatedAndSortedPaxMembersByHeadUuid(uuid, page, size, sortBy, direction);
 			return new ResponseEntity<>(AllMember, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
+//	@GetMapping("/head")
+//	public Page<PaxHeadDTO> getPaxHeads(@RequestParam(defaultValue = "0") int page,
+//										@RequestParam(defaultValue = "10") int size) {
+//		Pageable pageable = PageRequest.of(page, size);
+//		return paxUserService.getAllHead(pageable);
+//	}
+
 	@GetMapping("/head")
-	public Page<PaxHeadDTO> getPaxHeads(@RequestParam(defaultValue = "0") int page,
-										@RequestParam(defaultValue = "10") int size) {
-		Pageable pageable = PageRequest.of(page, size);
-		return paxUserService.getAllHead(pageable);
+	public Page<PaxHeadDTO> getPaginatedAndSortedHeads(@RequestParam(defaultValue = "0") int page,
+			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortBy,
+			@RequestParam(defaultValue = "asc") String direction) {
+		return paxUserService.getAllPaginatedAndSortedHeads(page, size, sortBy, direction);
 	}
 
 	@GetMapping("/searchHead")
@@ -127,8 +135,9 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/searchMember/{uuid}")
-	public ResponseEntity<List<PaxUsersDTO>> searchByMemberItems(@PathVariable String uuid,@RequestParam String query) {
-		List<PaxUsersDTO> results = paxUserService.searchMemberByHeadUuid(uuid,query);
+	public ResponseEntity<List<PaxUsersDTO>> searchByMemberItems(@PathVariable String uuid,
+			@RequestParam String query) {
+		List<PaxUsersDTO> results = paxUserService.searchMemberByHeadUuid(uuid, query);
 		return ResponseEntity.ok(results);
 	}
 }

@@ -30,13 +30,18 @@ public interface PaxUserService {
 
 	PaxUser addPaxMembers(String uuid, PaxMemberPostDTO paxMemberDTO);
 
-	Page<PaxUsersDTO> getAllPaxMemberByHeadUuid(String uuid,Pageable pageable);
+	//Page<PaxUsersDTO> getAllPaxMemberByHeadUuid(String uuid,Pageable pageable);
 
-	Page<PaxHeadDTO> getAllHead(Pageable pageable);
+	//Page<PaxHeadDTO> getAllHead(Pageable pageable);
 
 	List<PaxHeadResponseDTO> searchHead(String query);
 
 	List<PaxUsersDTO> searchMemberByHeadUuid(String uuid,String query);
+
+	Page<PaxHeadDTO> getAllPaginatedAndSortedHeads(int page, int size, String sortBy, String direction);
+
+	Page<PaxUsersDTO> getAllPaginatedAndSortedPaxMembersByHeadUuid(String uuid, int page, int size, String sortBy,
+			String direction);
 
 
 }

@@ -6,7 +6,9 @@ import com.project.course.subscription.dto.PaxHeadResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import com.project.course.subscription.dto.PaxUsersDTO;
 import com.project.course.subscription.exception.ResourceNotFoundException;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.model.PaxUser.Type;
+import com.project.course.subscription.notification.EmailValidator;
 import com.project.course.subscription.repository.PaxUserRepository;
 import com.project.course.subscription.service.PaxUserService;
 
@@ -33,6 +36,10 @@ public class PaxUserServiceImpl implements PaxUserService {
     public PaxUser addPaxHead(PaxUser paxUser) {
         PaxUser head = new PaxUser();
         head.setName(paxUser.getName());
+        if(!EmailValidator.isValid(paxUser.getEmail()))
+        {
+        	throw new RuntimeException("Invalid Email .");
+        }
         if (paxUserRepository.existsByEmailAndIsActiveTrue(paxUser.getEmail())) {
             throw new RuntimeException("Email id already exists, try another.");
         }
@@ -103,30 +110,62 @@ public class PaxUserServiceImpl implements PaxUserService {
         return paxUserRepository.save(member);
     }
 
+//    @Override
+//    public Page<PaxUsersDTO> getAllPaxMemberByHeadUuid(String uuid, Pageable pageable) {
+//        Page<PaxUser> allMembers = paxUserRepository.findAllActiveMembersByHeadUuid(uuid, pageable);
+//
+//        if (!allMembers.isEmpty()) {
+//            return allMembers
+//                    .map(paxUser -> {
+//                        PaxUsersDTO dto = new PaxUsersDTO();
+//                        dto.setUuid(paxUser.getUuid());
+//                        dto.setName(paxUser.getName());
+//                        dto.setEmail(paxUser.getEmail());
+//                        dto.setHeadUuid(paxUser.getHeadUuid());
+//                        dto.setAddress(paxUser.getAddress());
+//                        dto.setCountry(paxUser.getCountry());
+//                        dto.setPhoneNumber(paxUser.getCountryCode() + paxUser.getPhoneNumber());
+//                        dto.setType(paxUser.getType().toString());
+//                        dto.setRelation(paxUser.getRelation().toString());
+//                        // Exclude relation
+//                        return dto;
+//                    });
+//        } else {
+//            throw new ResourceNotFoundException("No members are found under this head");
+//        }  
+//    }   
+    
+    
     @Override
-    public Page<PaxUsersDTO> getAllPaxMemberByHeadUuid(String uuid, Pageable pageable) {
+    public Page<PaxUsersDTO> getAllPaginatedAndSortedPaxMembersByHeadUuid(String uuid,int page, int size, String sortBy, String direction) {
+        Sort.Order order = direction.equalsIgnoreCase("desc") 
+                ? Sort.Order.desc(sortBy)
+                : Sort.Order.asc(sortBy);
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by(order));
         Page<PaxUser> allMembers = paxUserRepository.findAllActiveMembersByHeadUuid(uuid, pageable);
-
-        if (!allMembers.isEmpty()) {
-            return allMembers
-                    .map(paxUser -> {
-                        PaxUsersDTO dto = new PaxUsersDTO();
-                        dto.setUuid(paxUser.getUuid());
-                        dto.setName(paxUser.getName());
-                        dto.setEmail(paxUser.getEmail());
-                        dto.setHeadUuid(paxUser.getHeadUuid());
-                        dto.setAddress(paxUser.getAddress());
-                        dto.setCountry(paxUser.getCountry());
-                        dto.setPhoneNumber(paxUser.getCountryCode() + paxUser.getPhoneNumber());
-                        dto.setType(paxUser.getType().toString());
-                        dto.setRelation(paxUser.getRelation().toString());
-                        // Exclude relation
-                        return dto;
-                    });
-        } else {
-            throw new ResourceNotFoundException("No members are found under this head");
-        }
+  
+                if (!allMembers.isEmpty()) {
+                    return allMembers
+                            .map(paxUser -> {
+                                PaxUsersDTO dto = new PaxUsersDTO();
+                                dto.setUuid(paxUser.getUuid());
+                                dto.setName(paxUser.getName());
+                                dto.setEmail(paxUser.getEmail());
+                                dto.setHeadUuid(paxUser.getHeadUuid());
+                                dto.setAddress(paxUser.getAddress());
+                                dto.setCountry(paxUser.getCountry());
+                                dto.setPhoneNumber(paxUser.getCountryCode() + paxUser.getPhoneNumber());
+                                dto.setType(paxUser.getType().toString());
+                                dto.setRelation(paxUser.getRelation().toString());
+                                // Exclude relation
+                                return dto;
+                            });
+                } else {
+                  throw new ResourceNotFoundException("No members are found under this head");
+              }  
     }
+    
 
     @Override
     public PaxUser updatePaxMember(String uuid, PaxUser paxMember) {
@@ -158,10 +197,22 @@ public class PaxUserServiceImpl implements PaxUserService {
 
     }
 
+//    @Override
+//    public Page<PaxHeadDTO> getAllHead(Pageable pageable) {
+//        return paxUserRepository.findByIsActiveTrue(pageable).map(this::convertToHeadDTO);
+//    }
     @Override
-    public Page<PaxHeadDTO> getAllHead(Pageable pageable) {
+    public Page<PaxHeadDTO> getAllPaginatedAndSortedHeads(int page, int size, String sortBy, String direction) {
+        Sort.Order order = direction.equalsIgnoreCase("desc") 
+                ? Sort.Order.desc(sortBy)
+                : Sort.Order.asc(sortBy);
+        
+        Pageable pageable = PageRequest.of(page, size, Sort.by(order));
         return paxUserRepository.findByIsActiveTrue(pageable).map(this::convertToHeadDTO);
     }
+    
+	
+
 
     @Override
     public PaxUser getHeadUserByUuid(String uuid) {
@@ -259,4 +310,7 @@ public class PaxUserServiceImpl implements PaxUserService {
                 .collect(Collectors.toList());
     }
 
+	
+
+	
 }

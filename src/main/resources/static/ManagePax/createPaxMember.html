@@ -48,6 +48,8 @@
       </select>
     </div>
     <button type="submit" class="btn btn-success">Create Member</button>
+    <a href="managePaxUsers.html" class="btn btn-primary" id="cancelButton">Cancel</a>
+    
   </form>
 </div>
 
@@ -131,6 +133,7 @@
     });
   });
 
+ 
   function showErrorMessage(message) {
     const errorMessage = document.getElementById('errorMessage');
     errorMessage.textContent = message;

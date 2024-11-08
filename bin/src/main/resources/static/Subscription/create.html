@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Subscription</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+  <h2>Create Subscription</h2>
+  <form id="createSubscriptionForm" class="mt-3">
+    <div class="form-group">
+      <label for="planName">Plan Name</label>
+      <input type="text" id="planName" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea id="description" class="form-control" rows="3"></textarea>
+    </div>
+    <div class="form-group">
+      <label for="cost">Cost</label>
+      <input type="number" id="cost" class="form-control" required>
+    </div>
+    <div class="form-group">
+      <label for="subscriptionType">Subscription Type</label>
+      <select id="subscriptionType" class="form-control" required>
+        <option value="MONTHLY">Monthly</option>
+        <option value="QUARTERLY">Quarterly</option>
+        <option value="HALF_YEARLY">Half-Yearly</option>
+        <option value="YEARLY">Yearly</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-success">Create Subscription</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('createSubscriptionForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const subscription = {
+          planName: document.getElementById('planName').value,
+          description: document.getElementById('description').value,
+          cost: document.getElementById('cost').value,
+          subscriptionType: document.getElementById('subscriptionType').value
+      };
+
+      fetch('/api/admin/subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(subscription)
+      })
+      .then(response => response.json())
+      .then(data => {
+          window.location.href = 'subscription.html'; // Redirect to subscription list
+      })
+      .catch(error => console.error('Error creating subscription:', error));
+  });
+</script>
+</body>
+</html>
