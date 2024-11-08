@@ -140,7 +140,7 @@
 
     async function fetchSubscriptions() {
         try {
-            const response = await fetch(`/api/admin/purchaseHistory/active/${uuid}`);
+            const response = await fetch(`/api/admin/purchaseSubscription/active/${uuid}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -157,11 +157,13 @@
         data.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.planName}</td>
+                <td>${item.subscriptionName}</td>
                 <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
                 <td>${new Date(item.expiryDate).toLocaleDateString()}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="disableRecurring('${item.purchaseSubscriptionUuid}')">Cancel</button>
+                <!-- Conditionally disable button if recurring is false -->
+                <button class="btn btn-danger btn-sm" onclick="disableRecurring('${item.uuid}')"
+                    ${item.recurring ? '' : 'disabled'}>Cancel</button>
                 </td>
             `;
             tableBody.appendChild(row);
@@ -169,17 +171,20 @@
     }
 
     function disableRecurring(uuid) {
-        if (confirm("Are you sure you want to off recurring the subscription?")) {
-            fetch(`/api/admin/purchaseSubscription/${uuid}/disable`, { method: 'DELETE' })
-                .then(response => {
-                    if (response.ok) {
-                        fetchSubscriptions();
-                    } else {
-                        alert("Failed to off recurring the subscription.");
-                    }
-                });
-        }
+    if (confirm("Are you sure you want to off recurring the subscription?")) {
+        fetch(`/api/admin/purchaseSubscription/${uuid}/disable`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    fetchSubscriptions();
+                } else {
+                    response.text().then(text => alert("Failed to off recurring the subscription: " + text));
+                }
+            })
+            .catch(error => {
+                alert("Error: " + error);
+            });
     }
+}
 
     document.getElementById('purchaseButton').addEventListener('click', () => {
         window.location.href = `purchase.html?paxUserUuid=${uuid}`;
