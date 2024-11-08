@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.project.course.subscription.dto.PurchaseSubscriptionResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -189,6 +190,14 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 		}
 	}
 
+	@Override
+	public List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(String paxUserUuid) {
+		List<PurchaseSubscription> subscriptions = purchaseSubscriptionRepository.findActiveSubscriptionsByPaxUserUuid(paxUserUuid, LocalDateTime.now());
+		return subscriptions.stream()
+				.map(this::convertToResponseDTO)
+				.collect(Collectors.toList());
+	}
+
 	private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {
 		PurchaseSubscriptionDTO dto = new PurchaseSubscriptionDTO();
 		dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
@@ -196,6 +205,17 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 		dto.setRecurring(purchaseSubscription.isRecurring());
 		dto.setNotificationType(purchaseSubscription.getNotificationType());
 		dto.setPaid(purchaseSubscription.getPaid());
+		dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
+		dto.setExpiryDate(purchaseSubscription.getExpiryDate());
+		return dto;
+	}
+
+	private PurchaseSubscriptionResponseDTO convertToResponseDTO(PurchaseSubscription purchaseSubscription) {
+		PurchaseSubscriptionResponseDTO dto = new PurchaseSubscriptionResponseDTO();
+		dto.setUuid(purchaseSubscription.getUuid());
+		dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
+		dto.setSubscriptionName(purchaseSubscription.getSubscription().getPlanName());
+		dto.setRecurring(purchaseSubscription.isRecurring());
 		dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
 		dto.setExpiryDate(purchaseSubscription.getExpiryDate());
 		return dto;

@@ -1,6 +1,7 @@
 package com.project.course.subscription.controller;
 
 import com.project.course.subscription.dto.PurchaseSubscriptionDTO;
+import com.project.course.subscription.dto.PurchaseSubscriptionResponseDTO;
 import com.project.course.subscription.service.PurchaseSubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,5 +44,10 @@ public class PurchaseSubscriptionController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subscription not found.");
         }
+    }
+
+    @GetMapping("/active/{uuid}")
+    public List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(@PathVariable String uuid) {
+        return purchaseSubscriptionService.getActiveSubscriptionsByPaxUserUuid(uuid);
     }
 }
