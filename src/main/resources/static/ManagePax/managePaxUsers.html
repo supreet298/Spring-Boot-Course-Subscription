@@ -16,6 +16,7 @@
 <body>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
+    <a href="../index.html" class="btn btn-primary">Home</a>
     <h2>All PaxHeads</h2>
     <div class="d-flex align-items-center">
       <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-2">
@@ -37,7 +38,7 @@
   </table>
 
   <!-- Pagination Controls -->
-  <div class="d-flex justify-content-between align-items-center mt-3">
+  <div class="d-flex justify-content-between align-items-center mt-3" id="paginationControls">
     <button id="prevPage" class="btn btn-success">Previous</button>
     <span id="pageInfo">Page 1</span>
     <button id="nextPage" class="btn btn-success">Next</button>
@@ -46,7 +47,7 @@
 
 <script>
   let currentPage = 0;
-  const pageSize = 2;
+  const pageSize = 10;
   let paxHeads = []; // To store fetched PaxHead data
   let totalPages = 1; // Total number of pages
 
@@ -108,10 +109,22 @@
 
   // Update pagination controls
   function updatePagination() {
-    document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
-    document.getElementById('prevPage').disabled = currentPage <= 0;
-    document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
+  const paginationControls = document.getElementById('paginationControls');
+  const paginationControlss = document.getElementById('nextPage');
+  const paginationControl = document.getElementById('prevPage');
+
+
+  // Hide pagination if total pages are less than or equal to 1 or the total number of records is less than or equal to the page size
+  if (totalPages <= 1 || (paxHeads.length <= pageSize && totalPages <= 1)) {
+    paginationControls.style.visibility= 'hidden'; // Hide pagination controls
+  } else {
+	  nextPage.style.visibility = 'visible'; // Show pagination controls
   }
+
+  document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
+  document.getElementById('prevPage').disabled = currentPage <= 0;
+  document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
+}
 
   // Event listeners for pagination buttons
   document.getElementById('prevPage').addEventListener('click', () => {

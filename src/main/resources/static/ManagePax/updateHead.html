@@ -61,10 +61,12 @@
   // Fetch existing user details
   fetch(`/api/admin/pax/${uuid}`)
       .then(response => {
-          if (!response.ok) {
-              throw new Error('Failed to fetch user details');
-          }
-          return response.json();
+        if (response.status === 404) {
+            alert('PaxHead not found or deleted');
+            window.location.href = 'managePaxUsers.html'; // Redirect to the PaxUsers list
+            return;
+        }
+        return response.json();
       })
       .then(paxUser => {
           console.log('Fetched user details:', paxUser);

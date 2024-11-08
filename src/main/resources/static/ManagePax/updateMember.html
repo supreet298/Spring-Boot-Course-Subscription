@@ -71,10 +71,11 @@
     // Fetch existing member details
     fetch(`/api/admin/pax/getMember/${uuid}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error("Failed to fetch member details");
-            }
-            return response.json();
+        if (response.status === 404) {
+            window.location.href = 'managePaxMember.html'; // Redirect to the PaxMember list
+            return;
+        }
+        return response.json();
         })
         .then(paxUser => {
             console.log("Fetched data:", paxUser);

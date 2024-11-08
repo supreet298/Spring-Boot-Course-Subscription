@@ -25,7 +25,7 @@ public interface PaxUserRepository extends JpaRepository<PaxUser, Long> {
 
 	Optional<PaxUser> findByUuid(String uuid);
 
-	Optional<PaxUser> findByUuidAndType(String uuid, PaxUser.Type type);
+	Optional<PaxUser> findByUuidAndTypeAndIsActiveTrue(String uuid, PaxUser.Type type);
 
 	@Query("SELECT u FROM PaxUser u WHERE u.type = 'HEAD' AND u.isActive = true")
 	Page<PaxUser> findByIsActiveTrue(Pageable pageable);
@@ -41,7 +41,7 @@ public interface PaxUserRepository extends JpaRepository<PaxUser, Long> {
 		       "LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
 		       "LOWER(i.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
 		       "LOWER(i.phoneNumber) LIKE LOWER(CONCAT('%', :query, '%')) )" +
-		       "AND i.type = 'HEAD'AND i.isActive = true")
+		       "AND i.type = 'HEAD' AND i.isActive = true")
 		List<PaxUser> searchByMultipleFieldsAndHeadType(@Param("query") String query);
 
 	@Query("SELECT i FROM PaxUser i WHERE i.headUuid = :headUuid " +

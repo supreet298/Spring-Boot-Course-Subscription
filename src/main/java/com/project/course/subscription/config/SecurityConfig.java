@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -33,7 +34,12 @@ public class SecurityConfig {
                 })
                 .formLogin(AbstractAuthenticationFilterConfigurer::permitAll)
                 .httpBasic(Customizer.withDefaults())
-                .logout(LogoutConfigurer::permitAll)
+                .logout(logout -> logout
+                        .logoutSuccessHandler(new SimpleUrlLogoutSuccessHandler() {{
+                            setDefaultTargetUrl("/"); // Redirect to home page after logout
+                        }})
+                        .permitAll()
+                )
                 .build();
     }
 

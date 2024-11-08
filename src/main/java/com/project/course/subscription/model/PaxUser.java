@@ -38,8 +38,7 @@ public class PaxUser {
     @NotBlank(message = "Email is mandatory and cannot be blank.")
     @Email(message = "Email must be in a valid format.")
     private String email;
-    
-        
+
     @NotBlank(message = "Country code is required")
     @Pattern(regexp = "\\+\\d{1,3}", message = "Invalid country code format (e.g., +1, +91)")
     private String countryCode;
@@ -54,6 +53,7 @@ public class PaxUser {
     
     @NotNull(message = "Country is mandatory and cannot be null.")
     private String country;
+
     @Enumerated(EnumType.STRING)
     private Type type;
 

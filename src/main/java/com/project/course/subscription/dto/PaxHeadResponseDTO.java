@@ -3,7 +3,7 @@ package com.project.course.subscription.dto;
 import lombok.Data;
 
 @Data
-public class PaxMemberDTO {
+public class PaxHeadResponseDTO {
 
     private String uuid;
 
@@ -11,7 +11,11 @@ public class PaxMemberDTO {
 
     private String email;
 
-    private String relation;
+    private String phoneNumber;
 
-    private String headName;
+    private String address;
+
+    private String country;
+
+    private String type;
 }

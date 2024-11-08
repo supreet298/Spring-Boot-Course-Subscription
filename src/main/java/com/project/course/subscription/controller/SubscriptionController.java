@@ -23,9 +23,13 @@ public class SubscriptionController {
     private SubscriptionService subscriptionService;
 
     @PostMapping
-    public ResponseEntity<Subscription> createSubscription(@Valid @RequestBody Subscription subscription) {
-        Subscription createdSubscription = subscriptionService.createSubscription(subscription);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdSubscription);
+    public ResponseEntity<Object> createSubscription(@Valid @RequestBody Subscription subscription) {
+        try {
+            Subscription createdSubscription = subscriptionService.createSubscription(subscription);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdSubscription);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
     @GetMapping("/list")

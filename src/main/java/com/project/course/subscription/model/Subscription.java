@@ -31,7 +31,7 @@ public class Subscription {
     private String uuid = UUID.randomUUID().toString();
 
     @NotBlank(message = "PlanName is mandatory and cannot be blank.")
-    @Column(unique = true)
+    @Column(name = "plan_Name")
     private String planName;
 
     @Column(columnDefinition = "Text")

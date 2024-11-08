@@ -24,11 +24,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Override
     public Subscription createSubscription(Subscription subscription) {
-        try {
-            return subscriptionRepository.save(subscription);
-        } catch (DataIntegrityViolationException e) {
-            throw new IllegalArgumentException("Subscription already exist");
-        }
+            Subscription sub = new Subscription();
+            if (subscriptionRepository.existsByPlanNameAndIsActiveTrue(sub.getPlanName())){
+                throw new RuntimeException("PlanName id already exists, try another.");
+            }
+            sub.setPlanName(subscription.getPlanName());
+            sub.setDescription(subscription.getDescription());
+            if (sub.getCost() < 1){
+            throw new RuntimeException("Minimum Value Should be 1,");
+            }
+            sub.setCost(subscription.getCost());
+            sub.setSubscriptionType(subscription.getSubscriptionType());
+            return subscriptionRepository.save(sub);
     }
 
     @Override

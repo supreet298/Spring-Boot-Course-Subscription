@@ -8,6 +8,7 @@
 </head>
 <body>
 <div class="container mt-5">
+  <a href="subscription.html" class="btn btn-primary">Back</a>
   <h2>Update Subscription</h2>
   <form id="updateSubscriptionForm" class="mt-3">
     <div class="form-group">
@@ -41,7 +42,14 @@
 
   // Fetch existing subscription details
   fetch(`/api/admin/subscription/${uuid}`)
-      .then(response => response.json())
+      .then(response => {
+        if (response.status === 404) {
+            alert('Subscription not found or deleted');
+            window.location.href = 'subscription.html'; // Redirect to the subscription list
+            return;
+        }
+        return response.json();
+      })
       .then(subscription => {
           document.getElementById('planName').value = subscription.planName;
           document.getElementById('description').value = subscription.description;

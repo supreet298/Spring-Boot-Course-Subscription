@@ -79,8 +79,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 		String file = "SubscriptionConfirmation.html";
 		emailservice.sendConfirmEmail(
 				paxUser.getEmail(), paxUser.getName(),
-				subscription.getPlanName(), now,
-				purchaseSubscription.getExpiryDate(),
+				subscription.getPlanName(), now.toLocalDate(),
+				purchaseSubscription.getExpiryDate().toLocalDate(),
 				subscription.getSubscriptionType(), file
 		);
 

@@ -20,9 +20,12 @@ public interface SubscriptionRepository extends JpaRepository<Subscription,Long>
     Optional<Subscription> findByUuidAndIsActiveTrue(String uuid);
 
     @Query("SELECT s FROM Subscription s WHERE " +
+            "s.isActive = true AND (" +
             "LOWER(s.planName) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(s.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "(STR(s.cost) LIKE CONCAT('%', :keyword, '%')) OR " +
-            "LOWER(s.subscriptionType) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+            "LOWER(s.subscriptionType) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     List<Subscription> searchSubscription(@Param("keyword") String keyword);
+
+    boolean existsByPlanNameAndIsActiveTrue(String planName);
 }
