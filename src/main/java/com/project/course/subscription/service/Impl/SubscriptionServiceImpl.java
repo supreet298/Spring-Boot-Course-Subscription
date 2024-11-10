@@ -6,7 +6,9 @@ import com.project.course.subscription.repository.SubscriptionRepository;
 import com.project.course.subscription.service.SubscriptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -103,6 +105,15 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         return subscriptions.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Page<SubscriptionDTO> getAllPaginatedAndSortedSubscription(int page, int size, String sortBy, String direction) {
+        Sort.Order order = direction.equalsIgnoreCase("desc")
+                ? Sort.Order.desc(sortBy)
+                : Sort.Order.asc(sortBy);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(order));
+        return subscriptionRepository.findByIsActiveTrue(pageable).map(this::convertToDTO);
     }
 
     private SubscriptionDTO convertToDTO(Subscription subscription) {

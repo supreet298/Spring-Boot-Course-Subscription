@@ -25,4 +25,6 @@ public interface SubscriptionService {
     List<SubscriptionDTO> getAllActiveSubscriptionList();
 
     List<SubscriptionDTO> searchSubscription(String keyword);
+
+    Page<SubscriptionDTO> getAllPaginatedAndSortedSubscription(int page, int size, String sortBy, String direction);
 }

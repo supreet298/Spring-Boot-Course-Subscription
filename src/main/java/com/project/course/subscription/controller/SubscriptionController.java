@@ -1,8 +1,8 @@
 package com.project.course.subscription.controller;
 
 import com.project.course.subscription.dto.CustomPageResponse;
+import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.SubscriptionDTO;
-import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.service.SubscriptionService;
 import jakarta.validation.Valid;
@@ -39,22 +39,28 @@ public class SubscriptionController {
         return ResponseEntity.ok(subscriptions);
     }
 
+//    @GetMapping
+//    public ResponseEntity<CustomPageResponse<SubscriptionDTO>> getAllActiveSubscriptions(
+//            @RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        Page<SubscriptionDTO> subscriptionsPage = subscriptionService.getAllActiveSubscriptions(pageable);
+//        // Map the Page to CustomPageResponse
+//        CustomPageResponse<SubscriptionDTO> response = new CustomPageResponse<>(
+//                subscriptionsPage.getContent(),
+//                subscriptionsPage.getNumber(),
+//                subscriptionsPage.getSize(),
+//                subscriptionsPage.getTotalElements(),
+//                subscriptionsPage.getTotalPages(),
+//                subscriptionsPage.isFirst(),
+//                subscriptionsPage.isLast()
+//        );
+//        return ResponseEntity.ok(response);
+//    }
+
     @GetMapping
-    public ResponseEntity<CustomPageResponse<SubscriptionDTO>> getAllActiveSubscriptions(
-            @RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<SubscriptionDTO> subscriptionsPage = subscriptionService.getAllActiveSubscriptions(pageable);
-        // Map the Page to CustomPageResponse
-        CustomPageResponse<SubscriptionDTO> response = new CustomPageResponse<>(
-                subscriptionsPage.getContent(),
-                subscriptionsPage.getNumber(),
-                subscriptionsPage.getSize(),
-                subscriptionsPage.getTotalElements(),
-                subscriptionsPage.getTotalPages(),
-                subscriptionsPage.isFirst(),
-                subscriptionsPage.isLast()
-        );
-        return ResponseEntity.ok(response);
+    public Page<SubscriptionDTO> getPaginatedAndSortedHeads(@RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "planName") String sortBy, @RequestParam(defaultValue = "asc") String direction) {
+        return subscriptionService.getAllPaginatedAndSortedSubscription(page, size, sortBy, direction);
     }
 
     @GetMapping("/{uuid}")

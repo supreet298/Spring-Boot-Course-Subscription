@@ -9,6 +9,12 @@
 <body>
 <div class="container mt-5">
 
+  <!-- Back Button -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <button id="backButton" class="btn btn-primary">Back</button>
+  </div>
+
+
   <div class="d-flex justify-content-between align-items-center">
     <h2>Purchase Subscription</h2>
   </div>
@@ -146,6 +152,11 @@
       console.error('Error:', error);
       alert('Error purchasing subscription');
     });
+  });
+
+  // Event listener for "Back" button
+  document.getElementById('backButton').addEventListener('click', function() {
+    window.location.href = `info.html?uuid=${paxUserUuid}`;
   });
 </script>
 </body>
