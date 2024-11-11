@@ -3,6 +3,7 @@ package com.project.course.subscription.notification;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import com.project.course.subscription.email.EmailRepository;
 import com.project.course.subscription.email.EmailService;
@@ -30,8 +31,10 @@ public class NotificationService {
 	@Autowired WhatsappRepository whatsappRepository;
 	
 	// Schedule the job to run every two minutes (for testing purposes)
+
+	//@Scheduled(cron = "0 0 12 * * ?")
 	// @Scheduled(cron = "0 0 8 * * ?") // Runs every day at 8 AM
-    //	 @Scheduled(cron = "0 */2 * * * ?") // Runs every 2 minutes
+   	// @Scheduled(cron = "0 */2 * * * ?") // Runs every 2 minutes
 	public void sendNotification() {
 		LocalDateTime now = LocalDateTime.now(); // Get the current time
 
@@ -48,7 +51,7 @@ public class NotificationService {
 		List<PurchaseHistory> expiringPlans = purchaseHistoryRepository.findExpiringPlansBetween(expiryThresholdStart,
 				expiryThresholdEnd);
 		// Template for email notification
-		String notificationFile = "expiry-notification.html";
+		String notificationFile = "PlanExpiryAlert.html";
 
 		for (PurchaseHistory history : expiringPlans) {
 			
@@ -59,17 +62,17 @@ public class NotificationService {
 						history.getClientEmail(),
 						history.getClientName(),
 						history.getPlanName(),
-						history.getPurchaseDate(),
-						history.getExpiryDate(),
+						history.getPurchaseDate().toLocalDate(),
+						history.getExpiryDate().toLocalDate(),
 						notificationFile);
 			System.out.println("Email sent to: " + history.getClientEmail());
 			
-			if(type.equals("WHATSAPP")||type.equals("BOTH"))
-				whatsappService.sendWhatsAppMessage(
-					history.getPaxUser().getCountryCode()+history.getPaxUser().getPhoneNumber(),
-						history.getPlanName()+" Your plan Will expiring soon please renewal to enjoy uninterrupted services");
+//			if(type.equals("WHATSAPP")||type.equals("BOTH"))
+//				whatsappService.sendWhatsAppMessage(
+//					history.getPaxUser().getCountryCode()+history.getPaxUser().getPhoneNumber(),
+//						history.getPlanName()+" Your plan Will expiring soon please renewal to enjoy uninterrupted services");
 			
-			System.out.println("MessageSent sent Successfully: " + history.getPaxUser().getPhoneNumber().toString());
+			System.out.println("MessageSent sent Successfully: " + history.getPaxUser().getCountryCode()+history.getPaxUser().getPhoneNumber().toString());
 		}
 		}
 	

@@ -47,7 +47,6 @@
 		</div>
 		<button type="submit" class="btn btn-success">Update Member</button>
 		<a href="managePaxMember.html" class="btn btn-primary" id="cancelButton">Cancel</a>
-		
 	</form>
 </div>
 
@@ -89,7 +88,6 @@
                 document.getElementById('relationType').value = paxUser.relation || "FATHER";
                 document.getElementById('countryCode').value = paxUser.countryCode || "";
 
-
                 // Handle phone and country code
                 const phoneParts = paxUser.phoneNumber ? paxUser.phoneNumber.split(' ') : [];
                 document.getElementById('phone').value = phoneParts.slice(1).join(' ') || paxUser.phoneNumber || "";
@@ -128,18 +126,18 @@
         })
         .then(data => {
             console.log('Update successful:', data);
-            window.location.href = 'managePaxMember.html';
+            window.history.back(); // Navigate back to the previous page after update
         })
         .catch(error => {
             console.error('Error updating member:', error);
             showErrorMessage(error.message);
         });
     });
+
     document.getElementById('cancelButton').addEventListener('click', function(event) {
         event.preventDefault(); // Prevent the default link behavior
         window.history.back(); // Navigate back to the previous page
     });
-
 
     function showErrorMessage(message) {
         const errorMessage = document.getElementById('errorMessage');

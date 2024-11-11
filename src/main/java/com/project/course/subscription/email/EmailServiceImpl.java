@@ -25,6 +25,7 @@ public class EmailServiceImpl implements EmailService {
     private TemplateEngine templateEngine;
 
     // Method to send an email
+    @Override
     public void sendEmail(String to, String subject, String text) {
         // Get email configuration from the database
         EmailSetting emailConfig = emailRepository.findById(1L)
@@ -45,35 +46,9 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-    public void sendSubscriptionConfirmation(String to, String userName, String planName, Object object, LocalDateTime expiryDate, SubscriptionType subscriptionType) throws MessagingException {
-        String subject = "Your Subscription Has Been Activated!";
-
-        String htmlTemplate = "SubscriptionConfirmation.html";
-
-        String htmlContent = htmlTemplate
-
-                .replace("{{userName}}", userName)
-                .replace("{{planName}}", planName)
-                .replace("{{purchaseDate}}", object.toString())
-                .replace("{{expiryDate}}", expiryDate.toString())
-                .replace("{{subscriptionType}}", subscriptionType.toString());
-
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-        try {
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            // Handle the exception
-            e.printStackTrace(); // Log the exception or handle it as per your requirement
-        }
-    }
-
+       
     @Override
-    public void sendConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
+    public void sendPurchaseConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
 								 LocalDate ExpiryTime, SubscriptionType subscriptionType, String htmlfile) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -106,10 +81,9 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
-
     @Override
-    public void sendExpiryNotification(String to, String clientName, String PlanName, Object setPurchaseDate,
-                                       LocalDateTime ExpiryDate, String htmlfile) {
+    public void sendExpiryNotification(String to, String clientName, String PlanName, LocalDate setPurchaseDate,
+                                       LocalDate setExpiryDate, String htmlfile) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -122,7 +96,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("clientName", clientName);
             context.setVariable("planName", PlanName);
             context.setVariable("purchaseDate", setPurchaseDate);
-            context.setVariable("expiryDate", ExpiryDate);
+            context.setVariable("expiryDate", setExpiryDate);
 
             // Process the HTML template with Thymeleaf
             String htmlContent = templateEngine.process(htmlfile, context);
@@ -132,7 +106,7 @@ public class EmailServiceImpl implements EmailService {
 
             // Send the email
             mailSender.send(message);
-            System.out.println("Registration email sent successfully!");
+            System.out.println("Expiry Notification email sent successfully!");
 
         } catch (MessagingException e) {
             e.printStackTrace();
@@ -140,6 +114,72 @@ public class EmailServiceImpl implements EmailService {
         }
 
     }
+
+	public void sendRenewalEmail(String to, String userName, String planName, LocalDate setPurchaseDate,
+			LocalDate setExpirayDate, SubscriptionType subscriptionType, String htmlfile) {
+		
+		try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            // helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("Your Subscription Has Been Successfully Renewed!");
+
+            // Create the email body with user details and a custom message
+            Context context = new Context();
+            context.setVariable("userName", userName);
+            context.setVariable("planName", planName);
+            context.setVariable("setPurchaseDate", setPurchaseDate);
+            context.setVariable("setExpirayDate", setExpirayDate);
+            context.setVariable("subscriptionType", subscriptionType);
+
+            // Process the HTML template with Thymeleaf
+            String htmlContent = templateEngine.process(htmlfile, context);
+
+            // Set the HTML content in the email body
+            helper.setText(htmlContent, true); // true to indicate that it is HTML
+
+            // Send the email
+            mailSender.send(message);
+            System.out.println("Renewal Email Sent Successfully !");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while sending email: " + e.getMessage());
+        }
+
+	}
+
+
+	@Override
+	public void sendAutoRenewalCancellationEmail(String to, String userName, String planName,LocalDate setExpirayDate,String htmlfile) {
+		
+		try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            // helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("Your Subscription Auto-Renewal Has Been Cancelled");
+            
+            // Create the email body with user details and a custom message
+            Context context = new Context();
+            context.setVariable("userName", userName);
+            context.setVariable("planName", planName);
+            context.setVariable("setExpirayDate", setExpirayDate);
+            String htmlContent = templateEngine.process(htmlfile, context);
+
+            // Set the HTML content in the email body
+            helper.setText(htmlContent, true); // true to indicate that it is HTML
+
+            // Send the email
+            mailSender.send(message);
+            System.out.println("AutoRenewal Cancellation Email Sent Successfully !");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while sending email: " + e.getMessage());
+        }
+	}
 
 }
 

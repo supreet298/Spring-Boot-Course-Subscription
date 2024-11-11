@@ -121,7 +121,9 @@
     })
     .then(data => {
       alert('Member created successfully!');
-      window.location.href = 'managePaxUsers.html';
+      window.location.href = `managePaxMember.html?uuid=${uuid}`;
+   
+
     })
     .catch(error => {
       console.error('Error creating member:', error);

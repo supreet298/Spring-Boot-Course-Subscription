@@ -2,6 +2,7 @@ package com.project.course.subscription.service.Impl;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +79,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
 		// Send confirmation email
 		String file = "SubscriptionConfirmation.html";
-		emailservice.sendConfirmEmail(
+		emailservice.sendPurchaseConfirmEmail(
 				paxUser.getEmail(), paxUser.getName(),
 				subscription.getPlanName(), now.toLocalDate(),
 				purchaseSubscription.getExpiryDate().toLocalDate(),
@@ -92,7 +93,9 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
 	}
 
-	@Scheduled(cron = "0 0 12 * * ?")
+	//@Scheduled(cron = "0 0 12 * * ?")
+  	//@Scheduled(cron = "0 */2 * * * ?") // Runs every 2 minutes
+
 	public void renewExpiredRecurringSubscriptions() {
 		// Fetch expired recurring subscriptions
 		List<PurchaseSubscription> expiredSubscriptions = purchaseSubscriptionRepository
@@ -115,6 +118,11 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 				// Create a new PurchaseHistory entry for the renewal
 				createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(),
 						newExpiryDate, newRenewalCount, subscription);
+				
+				//	void sendRenewalEmail( to, userName, planName, setPurchaseDate,  setExpiryDate, subscriptionType, htmlfile);
+				String file = "RenewalAlert.html";
+				emailservice.sendRenewalEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), LocalDate.now(), newExpiryDate.toLocalDate(), subscription.getSubscription().getSubscriptionType(), file);
+				
 			}
 			// Else, skip the renewal if either condition is not met
 		}
@@ -130,7 +138,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
 	private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
 		return switch (subscriptionType) {
-		case MONTHLY -> startDate.plusMonths(1);
+		case MONTHLY -> startDate.plusMinutes(2);
 		case QUARTERLY -> startDate.plusMonths(3);
 		case HALF_YEARLY -> startDate.plusMonths(6);
 		case YEARLY -> startDate.plusYears(1);
@@ -184,6 +192,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 			// Set recurring to false and save
 			subscription.setRecurring(false);
 			purchaseSubscriptionRepository.save(subscription);
+			String file = "RenewalCancellation.html";
+			emailservice.sendAutoRenewalCancellationEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), subscription.getExpiryDate().toLocalDate(),file);
 			return true;
 		} else {
 			throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
