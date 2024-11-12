@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
 import com.project.course.subscription.dto.PurchaseSubscriptionDTO;
 import com.project.course.subscription.email.EmailService;
 import com.project.course.subscription.model.PaxUser;
@@ -29,205 +28,195 @@ import com.project.course.subscription.service.SubscriptionService;
 @Service
 public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionService {
 
-	@Autowired
-	private PurchaseSubscriptionRepository purchaseSubscriptionRepository;
+    @Autowired
+    private PurchaseSubscriptionRepository purchaseSubscriptionRepository;
 
-	@Autowired
-	private PaxUserService paxUserService;
+    @Autowired
+    private PaxUserService paxUserService;
 
-	@Autowired
-	private SubscriptionService subscriptionService;
+    @Autowired
+    private SubscriptionService subscriptionService;
 
-	@Autowired
-	private PurchaseHistoryService purchaseHistoryService;
+    @Autowired
+    private PurchaseHistoryService purchaseHistoryService;
 
-	@Autowired 
-	private EmailService emailservice;
+    @Autowired
+    private EmailService emailservice;
 
-	@Override
-	public PurchaseSubscriptionDTO createPurchaseSubscription(PurchaseSubscriptionDTO purchaseSubscriptionDTO) {
+    @Override
+    public PurchaseSubscriptionDTO createPurchaseSubscription(PurchaseSubscriptionDTO purchaseSubscriptionDTO) {
 
-		// Fetch PaxUser by ID
-		PaxUser paxUser = paxUserService.getHeadUserByUuid(purchaseSubscriptionDTO.getPaxUserUuid());
-		// Fetch Subscription by ID
-		Subscription subscription = subscriptionService.getSubscriptionByUuid(purchaseSubscriptionDTO.getSubscriptionUuid());
+        // Fetch PaxUser by ID
+        PaxUser paxUser = paxUserService.getHeadUserByUuid(purchaseSubscriptionDTO.getPaxUserUuid());
+        // Fetch Subscription by ID
+        Subscription subscription = subscriptionService.getSubscriptionByUuid(purchaseSubscriptionDTO.getSubscriptionUuid());
 
-		// Initialize PurchaseSubscription from DTO
-		PurchaseSubscription purchaseSubscription = new PurchaseSubscription();
-		purchaseSubscription.setPaxUser(paxUser);
-		purchaseSubscription.setSubscription(subscription);
-		purchaseSubscription.setNotificationType(purchaseSubscriptionDTO.getNotificationType());
-		purchaseSubscription.setPaid(purchaseSubscriptionDTO.getPaid());
-		purchaseSubscription.setRecurring(purchaseSubscriptionDTO.isRecurring());
+        // Initialize PurchaseSubscription from DTO
+        PurchaseSubscription purchaseSubscription = new PurchaseSubscription();
+        purchaseSubscription.setPaxUser(paxUser);
+        purchaseSubscription.setSubscription(subscription);
+        purchaseSubscription.setNotificationType(purchaseSubscriptionDTO.getNotificationType());
+        purchaseSubscription.setPaid(purchaseSubscriptionDTO.getPaid());
+        purchaseSubscription.setRecurring(purchaseSubscriptionDTO.isRecurring());
 
-		LocalDateTime now = LocalDateTime.now();
-		purchaseSubscription.setPurchaseDate(now);
-		purchaseSubscription.setExpiryDate(calculateExpiryDate(now, subscription.getSubscriptionType()));
+        LocalDateTime now = LocalDateTime.now();
+        purchaseSubscription.setPurchaseDate(now);
+        purchaseSubscription.setExpiryDate(calculateExpiryDate(now, subscription.getSubscriptionType()));
 
-		// Validate if the purchase should proceed
-		if (purchaseSubscription.getPaid() == null || !purchaseSubscription.getPaid()) {
-			throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made.");
-		}
+        // Validate if the purchase should proceed
+        if (purchaseSubscription.getPaid() == null || !purchaseSubscription.getPaid()) {
+            throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made.");
+        }
 
-		// Check if the user has an active subscription for the same plan
-		if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
-			throw new IllegalArgumentException("PaxUser cannot purchase the same subscription until the previous one expires.");
-		}
+        // Check if the user has an active subscription for the same plan
+        if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
+            throw new IllegalArgumentException("PaxUser cannot purchase the same subscription until the previous one expires.");
+        }
 
-		// Save PurchaseSubscription
-		PurchaseSubscription savedSubscription = purchaseSubscriptionRepository.save(purchaseSubscription);
+        // Save PurchaseSubscription
+        PurchaseSubscription savedSubscription = purchaseSubscriptionRepository.save(purchaseSubscription);
 
-		// Send confirmation email
-		String file = "SubscriptionConfirmation.html";
-		emailservice.sendPurchaseConfirmEmail(
-				paxUser.getEmail(), paxUser.getName(),
-				subscription.getPlanName(), now.toLocalDate(),
-				purchaseSubscription.getExpiryDate().toLocalDate(),
-				subscription.getSubscriptionType(), file
-		);
+        // Send confirmation email
+        String file = "SubscriptionConfirmation.html";
+        emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(), file);
 
-		// Create purchase history entry
-		createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription);
+        // Create purchase history entry
+        createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription);
 
-		return convertToDTO(savedSubscription);
+        return convertToDTO(savedSubscription);
 
-	}
+    }
 
-	//@Scheduled(cron = "0 0 12 * * ?")
-  	//@Scheduled(cron = "0 */2 * * * ?") // Runs every 2 minutes
+    @Scheduled(cron = "0 0 12 * * ?")
+    //@Scheduled(cron = "0 */2 * * * ?") // Runs every 2 minutes
 
-	public void renewExpiredRecurringSubscriptions() {
-		// Fetch expired recurring subscriptions
-		List<PurchaseSubscription> expiredSubscriptions = purchaseSubscriptionRepository
-				.findExpiredRecurringSubscriptions(LocalDateTime.now());
+    public void renewExpiredRecurringSubscriptions() {
+        // Fetch expired recurring subscriptions
+        List<PurchaseSubscription> expiredSubscriptions = purchaseSubscriptionRepository.findExpiredRecurringSubscriptions(LocalDateTime.now());
 
-		for (PurchaseSubscription subscription : expiredSubscriptions) {
-			// Check if the subscription is recurring and paid
-			boolean isRecurring = subscription.isRecurring();
-			Boolean getPaid = subscription.getPaid();
+        for (PurchaseSubscription subscription : expiredSubscriptions) {
+            // Check if the subscription is recurring and paid
+            boolean isRecurring = subscription.isRecurring();
+            Boolean getPaid = subscription.getPaid();
 
-			// If the subscription is recurring and paid is true, proceed with renewal
-			if (isRecurring && Boolean.TRUE.equals(getPaid)) {
-				// Increment the renewal count
-				int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
+            // If the subscription is recurring and paid is true, proceed with renewal
+            if (isRecurring && Boolean.TRUE.equals(getPaid)) {
+                // Calculate the new expiry date based on the subscription type
+                LocalDateTime newExpiryDate = calculateExpiryDate(subscription.getExpiryDate(), subscription.getSubscription().getSubscriptionType());
 
-				// Calculate new expiry date based on the subscription type
-				LocalDateTime newExpiryDate = calculateExpiryDate(subscription.getExpiryDate(),
-						subscription.getSubscription().getSubscriptionType());
+                // Update the expiry date to the current time (hours, minutes, seconds) during renewal
+                newExpiryDate = newExpiryDate.withHour(LocalDateTime.now().getHour()).withMinute(LocalDateTime.now().getMinute()).withSecond(LocalDateTime.now().getSecond());
 
-				// Create a new PurchaseHistory entry for the renewal
-				createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(),
-						newExpiryDate, newRenewalCount, subscription);
-				
-				//	void sendRenewalEmail( to, userName, planName, setPurchaseDate,  setExpiryDate, subscriptionType, htmlfile);
-				String file = "RenewalAlert.html";
-				emailservice.sendRenewalEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), LocalDate.now(), newExpiryDate.toLocalDate(), subscription.getSubscription().getSubscriptionType(), file);
-				
-			}
-			// Else, skip the renewal if either condition is not met
-		}
-	}
+                // Update the expiry date of the existing PurchaseSubscription
+                subscription.setExpiryDate(newExpiryDate);
+                purchaseSubscriptionRepository.save(subscription);
 
-	private boolean hasActiveSubscriptionForSamePlan(PaxUser paxUser, Subscription subscription) {
-		List<PurchaseSubscription> activeSubscriptions = purchaseSubscriptionRepository
-				.findActiveSubscriptionsByUserId(paxUser.getId());
+                // Send renewal email
+                String file = "RenewalAlert.html";
+                emailservice.sendRenewalEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), LocalDate.now(), newExpiryDate.toLocalDate(), subscription.getSubscription().getSubscriptionType(), file);
 
-		// Check if any active subscription matches the subscription being purchased
-		return activeSubscriptions.stream().anyMatch(ps -> ps.getSubscription().getId().equals(subscription.getId()));
-	}
-
-	private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
-		return switch (subscriptionType) {
-		case MONTHLY -> startDate.plusMinutes(2);
-		case QUARTERLY -> startDate.plusMonths(3);
-		case HALF_YEARLY -> startDate.plusMonths(6);
-		case YEARLY -> startDate.plusYears(1);
-		default -> throw new IllegalArgumentException("Unknown SubscriptionType: " + subscriptionType);
-		};
-	}
-
-	private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate,
-			LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription) {
-		PurchaseHistory purchaseHistory = new PurchaseHistory();
-		purchaseHistory.setPaxUser(paxUser);
-		purchaseHistory.setSubscription(subscription);
-		purchaseHistory.setClientName(paxUser.getName());
-		purchaseHistory.setClientEmail(paxUser.getEmail());
-		purchaseHistory.setPlanName(subscription.getPlanName());
-		purchaseHistory.setRenewalCount(renewalCount);
-		purchaseHistory.setPurchaseSubscriptionUuid(purchaseSubscription.getUuid());
-		purchaseHistory.setPurchaseDate(purchaseDate);
-		purchaseHistory.setExpiryDate(expiryDate);
-		purchaseHistory.setNotificationType(purchaseSubscription.getNotificationType().toString());
-
-		purchaseHistoryService.createPurchaseHistory(purchaseHistory); // Save purchase history
-	}
-
-	private int getRenewalCount(PaxUser paxUser, Subscription subscription) {
-		List<PurchaseHistory> historyList = purchaseHistoryService
-				.findPurchaseHistoryByUserAndSubscription(paxUser.getId(), subscription.getId());
-		return historyList.size();
-	}
-
-	@Override
-	public List<PurchaseSubscriptionDTO> getAllPurchaseSubscriptions() {
-		List<PurchaseSubscription> purchaseSubscriptions = purchaseSubscriptionRepository.findAll();
-		return purchaseSubscriptions.stream().map(this::convertToDTO).collect(Collectors.toList());
-	}
-
-	@Override
-	public Optional<PurchaseSubscriptionDTO> getPurchaseSubscriptionByUuid(String uuid) {
-		return Optional.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid).filter(PurchaseSubscription::isActive)
-				.map(this::convertToDTO).orElseThrow(() -> new ResponseStatusException(NOT_FOUND,"Purchase Subscription not found with UUID: " + uuid)));
-	}
+                // Optionally, you can still create a new PurchaseHistory entry for tracking purposes
+                int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
+                createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(), newExpiryDate, newRenewalCount, subscription);
+            }
+        }
+    }
 
 
-	@Override
-	public boolean disableRecurringForSubscription(String uuid) {
-		Optional<PurchaseSubscription> subscriptionOpt = purchaseSubscriptionRepository.findByUuid(uuid);
+    private boolean hasActiveSubscriptionForSamePlan(PaxUser paxUser, Subscription subscription) {
+        List<PurchaseSubscription> activeSubscriptions = purchaseSubscriptionRepository.findActiveSubscriptionsByUserId(paxUser.getId());
 
-		if (subscriptionOpt.isPresent()) {
-			PurchaseSubscription subscription = subscriptionOpt.get();
+        // Check if any active subscription matches the subscription being purchased
+        return activeSubscriptions.stream().anyMatch(ps -> ps.getSubscription().getId().equals(subscription.getId()));
+    }
 
-			// Set recurring to false and save
-			subscription.setRecurring(false);
-			purchaseSubscriptionRepository.save(subscription);
-			String file = "RenewalCancellation.html";
-			emailservice.sendAutoRenewalCancellationEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), subscription.getExpiryDate().toLocalDate(),file);
-			return true;
-		} else {
-			throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
-		}
-	}
+    private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
+        return switch (subscriptionType) {
+            case MONTHLY -> startDate.plusMonths(1);
+            case QUARTERLY -> startDate.plusMonths(3);
+            case HALF_YEARLY -> startDate.plusMonths(6);
+            case YEARLY -> startDate.plusYears(1);
+            default -> throw new IllegalArgumentException("Unknown SubscriptionType: " + subscriptionType);
+        };
+    }
 
-	@Override
-	public List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(String paxUserUuid) {
-		List<PurchaseSubscription> subscriptions = purchaseSubscriptionRepository.findActiveSubscriptionsByPaxUserUuid(paxUserUuid, LocalDateTime.now());
-		return subscriptions.stream()
-				.map(this::convertToResponseDTO)
-				.collect(Collectors.toList());
-	}
+    private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription) {
+        PurchaseHistory purchaseHistory = new PurchaseHistory();
+        purchaseHistory.setPaxUser(paxUser);
+        purchaseHistory.setSubscription(subscription);
+        purchaseHistory.setClientName(paxUser.getName());
+        purchaseHistory.setClientEmail(paxUser.getEmail());
+        purchaseHistory.setPlanName(subscription.getPlanName());
+        purchaseHistory.setRenewalCount(renewalCount);
+        purchaseHistory.setPurchaseSubscriptionUuid(purchaseSubscription.getUuid());
+        purchaseHistory.setPurchaseDate(purchaseDate);
+        purchaseHistory.setExpiryDate(expiryDate);
+        purchaseHistory.setNotificationType(purchaseSubscription.getNotificationType().toString());
 
-	private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {
-		PurchaseSubscriptionDTO dto = new PurchaseSubscriptionDTO();
-		dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
-		dto.setSubscriptionUuid(purchaseSubscription.getSubscription().getUuid());
-		dto.setRecurring(purchaseSubscription.isRecurring());
-		dto.setNotificationType(purchaseSubscription.getNotificationType());
-		dto.setPaid(purchaseSubscription.getPaid());
-		dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
-		dto.setExpiryDate(purchaseSubscription.getExpiryDate());
-		return dto;
-	}
+        purchaseHistoryService.createPurchaseHistory(purchaseHistory); // Save purchase history
+    }
 
-	private PurchaseSubscriptionResponseDTO convertToResponseDTO(PurchaseSubscription purchaseSubscription) {
-		PurchaseSubscriptionResponseDTO dto = new PurchaseSubscriptionResponseDTO();
-		dto.setUuid(purchaseSubscription.getUuid());
-		dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
-		dto.setSubscriptionName(purchaseSubscription.getSubscription().getPlanName());
-		dto.setRecurring(purchaseSubscription.isRecurring());
-		dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
-		dto.setExpiryDate(purchaseSubscription.getExpiryDate());
-		return dto;
-	}
+    private int getRenewalCount(PaxUser paxUser, Subscription subscription) {
+        List<PurchaseHistory> historyList = purchaseHistoryService.findPurchaseHistoryByUserAndSubscription(paxUser.getId(), subscription.getId());
+        return historyList.size();
+    }
+
+    @Override
+    public List<PurchaseSubscriptionDTO> getAllPurchaseSubscriptions() {
+        List<PurchaseSubscription> purchaseSubscriptions = purchaseSubscriptionRepository.findAll();
+        return purchaseSubscriptions.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<PurchaseSubscriptionDTO> getPurchaseSubscriptionByUuid(String uuid) {
+        return Optional.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid).filter(PurchaseSubscription::isActive).map(this::convertToDTO).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid)));
+    }
+
+
+    @Override
+    public boolean disableRecurringForSubscription(String uuid) {
+        Optional<PurchaseSubscription> subscriptionOpt = purchaseSubscriptionRepository.findByUuid(uuid);
+
+        if (subscriptionOpt.isPresent()) {
+            PurchaseSubscription subscription = subscriptionOpt.get();
+
+            // Set recurring to false and save
+            subscription.setRecurring(false);
+            purchaseSubscriptionRepository.save(subscription);
+            String file = "RenewalCancellation.html";
+            emailservice.sendAutoRenewalCancellationEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), subscription.getExpiryDate().toLocalDate(), file);
+            return true;
+        } else {
+            throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
+        }
+    }
+
+    @Override
+    public List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(String paxUserUuid) {
+        List<PurchaseSubscription> subscriptions = purchaseSubscriptionRepository.findActiveSubscriptionsByPaxUserUuid(paxUserUuid, LocalDateTime.now());
+        return subscriptions.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+    }
+
+    private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {
+        PurchaseSubscriptionDTO dto = new PurchaseSubscriptionDTO();
+        dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
+        dto.setSubscriptionUuid(purchaseSubscription.getSubscription().getUuid());
+        dto.setRecurring(purchaseSubscription.isRecurring());
+        dto.setNotificationType(purchaseSubscription.getNotificationType());
+        dto.setPaid(purchaseSubscription.getPaid());
+        dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
+        dto.setExpiryDate(purchaseSubscription.getExpiryDate());
+        return dto;
+    }
+
+    private PurchaseSubscriptionResponseDTO convertToResponseDTO(PurchaseSubscription purchaseSubscription) {
+        PurchaseSubscriptionResponseDTO dto = new PurchaseSubscriptionResponseDTO();
+        dto.setUuid(purchaseSubscription.getUuid());
+        dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
+        dto.setSubscriptionName(purchaseSubscription.getSubscription().getPlanName());
+        dto.setRecurring(purchaseSubscription.isRecurring());
+        dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
+        dto.setExpiryDate(purchaseSubscription.getExpiryDate());
+        return dto;
+    }
 }

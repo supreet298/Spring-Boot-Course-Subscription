@@ -1,10 +1,8 @@
 package com.project.course.subscription.service;
 
 import java.util.List;
-
 import com.project.course.subscription.dto.PaxHeadResponseDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.PaxMemberPostDTO;
 import com.project.course.subscription.dto.PaxUsersDTO;

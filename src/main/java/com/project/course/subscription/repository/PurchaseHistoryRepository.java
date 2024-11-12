@@ -10,7 +10,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Repository
 public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory, Long> {
 
@@ -26,5 +25,4 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
 
     Page<PurchaseHistory> findByPaxUser_Uuid(String uuid, Pageable pageable);
 
-    List<PurchaseHistory> findByPaxUser_UuidAndPurchaseDateLessThanEqualAndExpiryDateGreaterThanEqual(String userUuid, LocalDateTime now, LocalDateTime now1);
 }

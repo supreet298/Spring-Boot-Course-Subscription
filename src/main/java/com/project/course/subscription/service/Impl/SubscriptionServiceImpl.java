@@ -41,12 +41,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public Page<SubscriptionDTO> getAllActiveSubscriptions(Pageable pageable) {
-        return subscriptionRepository.findByIsActiveTrue(pageable)
-                .map(this::convertToDTO);
-    }
-
-    @Override
     public List<SubscriptionDTO> getAllActiveSubscriptionList() {
         List<Subscription> categories = subscriptionRepository.findByIsActiveTrue();
         return categories.stream()

@@ -70,11 +70,11 @@
 
   // Load active purchases to filter out already purchased subscriptions
   function loadActivePurchases() {
-    return fetch(`/api/admin/purchaseHistory/active/${paxUserUuid}`)
+    return fetch(`/api/admin/purchaseSubscription/active/${paxUserUuid}`)
       .then(response => response.json())
       .then(data => {
         // Extract the plan names of already purchased subscriptions
-        return data.map(purchase => purchase.planName);
+        return data.map(purchase => purchase.subscriptionName);
       })
       .catch(error => {
         console.error('Error loading active purchases:', error);

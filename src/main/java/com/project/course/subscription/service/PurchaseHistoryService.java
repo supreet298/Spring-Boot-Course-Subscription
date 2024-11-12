@@ -16,5 +16,4 @@ public interface PurchaseHistoryService {
 
     Page<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid,Pageable pageable);
 
-    List<PurchaseHistoryDTO> getActivePurchaseHistories(String uuid);
 }
