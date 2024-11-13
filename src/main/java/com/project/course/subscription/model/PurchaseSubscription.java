@@ -68,6 +68,15 @@ public class PurchaseSubscription {
     @Version
     private int version;
 
+    private String planName;
+
+    private Double cost;
+
+    private String subscriptionType;
+
+    @Column(name = "purchased_subscription_type")
+    private String purchasedSubscriptionType;
+
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;
     

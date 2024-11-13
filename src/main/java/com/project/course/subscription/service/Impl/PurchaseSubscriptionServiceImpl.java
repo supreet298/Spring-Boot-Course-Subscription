@@ -1,13 +1,11 @@
 package com.project.course.subscription.service.Impl;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import com.project.course.subscription.dto.PurchaseSubscriptionResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -63,10 +61,14 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         purchaseSubscription.setPurchaseDate(now);
         purchaseSubscription.setExpiryDate(calculateExpiryDate(now, subscription.getSubscriptionType()));
 
-        // Validate if the purchase should proceed
-        if (purchaseSubscription.getPaid() == null || !purchaseSubscription.getPaid()) {
-            throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made.");
-        }
+        purchaseSubscription.setPlanName(subscription.getPlanName());
+        purchaseSubscription.setCost(subscription.getCost());
+        purchaseSubscription.setSubscriptionType(subscription.getSubscriptionType().toString());
+
+//        // Validate if the purchase should proceed
+//        if (purchaseSubscription.getPaid() == null || !purchaseSubscription.getPaid()) {
+//            throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made.");
+//        }
 
         // Check if the user has an active subscription for the same plan
         if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
@@ -102,7 +104,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
             // If the subscription is recurring and paid is true, proceed with renewal
             if (isRecurring && Boolean.TRUE.equals(getPaid)) {
                 // Calculate the new expiry date based on the subscription type
-                LocalDateTime newExpiryDate = calculateExpiryDate(subscription.getExpiryDate(), subscription.getSubscription().getSubscriptionType());
+                LocalDateTime newExpiryDate = calculateExpiryDate(subscription.getExpiryDate(),Subscription.SubscriptionType.valueOf(subscription.getSubscriptionType()));
 
                 // Update the expiry date to the current time (hours, minutes, seconds) during renewal
                 newExpiryDate = newExpiryDate.withHour(LocalDateTime.now().getHour()).withMinute(LocalDateTime.now().getMinute()).withSecond(LocalDateTime.now().getSecond());
@@ -113,7 +115,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
                 // Send renewal email
                 String file = "RenewalAlert.html";
-                emailservice.sendRenewalEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), LocalDate.now(), newExpiryDate.toLocalDate(), subscription.getSubscription().getSubscriptionType(), file);
+                emailservice.sendRenewalEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), LocalDate.now(), newExpiryDate.toLocalDate(), Subscription.SubscriptionType.valueOf(subscription.getSubscriptionType()), file);
 
                 // Optionally, you can still create a new PurchaseHistory entry for tracking purposes
                 int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
@@ -146,12 +148,14 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         purchaseHistory.setSubscription(subscription);
         purchaseHistory.setClientName(paxUser.getName());
         purchaseHistory.setClientEmail(paxUser.getEmail());
-        purchaseHistory.setPlanName(subscription.getPlanName());
+        purchaseHistory.setPlanName(purchaseSubscription.getPlanName());
+        purchaseHistory.setSubscriptionType(purchaseSubscription.getSubscriptionType());
         purchaseHistory.setRenewalCount(renewalCount);
         purchaseHistory.setPurchaseSubscriptionUuid(purchaseSubscription.getUuid());
         purchaseHistory.setPurchaseDate(purchaseDate);
         purchaseHistory.setExpiryDate(expiryDate);
         purchaseHistory.setNotificationType(purchaseSubscription.getNotificationType().toString());
+        purchaseHistory.setCost(purchaseSubscription.getCost());
 
         purchaseHistoryService.createPurchaseHistory(purchaseHistory); // Save purchase history
     }
@@ -213,7 +217,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         PurchaseSubscriptionResponseDTO dto = new PurchaseSubscriptionResponseDTO();
         dto.setUuid(purchaseSubscription.getUuid());
         dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
-        dto.setSubscriptionName(purchaseSubscription.getSubscription().getPlanName());
+        dto.setSubscriptionName(purchaseSubscription.getPlanName());
+        dto.setSubscriptionType(purchaseSubscription.getSubscriptionType());
         dto.setRecurring(purchaseSubscription.isRecurring());
         dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
         dto.setExpiryDate(purchaseSubscription.getExpiryDate());

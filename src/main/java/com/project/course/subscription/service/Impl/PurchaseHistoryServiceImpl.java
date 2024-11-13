@@ -6,7 +6,9 @@ import com.project.course.subscription.repository.PurchaseHistoryRepository;
 import com.project.course.subscription.service.PurchaseHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +36,11 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         return purchaseHistoryRepository.findPurchaseHistoryByUserAndSubscription(userId, subscriptionId);
     }
 
-    public Page<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid,Pageable pageable) {
+    public Page<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid,int page, int size, String sortBy, String direction) {
+        Sort.Order order = direction.equalsIgnoreCase("desc")
+                ? Sort.Order.desc(sortBy)
+                : Sort.Order.asc(sortBy);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(order));
         return purchaseHistoryRepository.findByPaxUser_Uuid(uuid,pageable)
                 .map(this::convertToDTO);
     }
@@ -46,10 +52,12 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         dto.setClientName(history.getClientName());
         dto.setClientEmail(history.getClientEmail());
         dto.setPlanName(history.getPlanName());
+        dto.setSubscriptionType(history.getSubscriptionType());
         dto.setRenewalCount(history.getRenewalCount());
         dto.setPurchaseDate(history.getPurchaseDate());
         dto.setExpiryDate(history.getExpiryDate());
         dto.setNotificationType(history.getNotificationType());
+        dto.setCost(history.getCost());
         return dto;
     }
 }

@@ -33,6 +33,9 @@ public class PurchaseHistory {
     
     @Column(name = "plan_name", nullable = false)
     private String planName;
+
+    @Column(name = "subscription_type", nullable = false)
+    private String SubscriptionType;
     
     @Column(name = "renewal_count", nullable = false)
     private int renewalCount;
@@ -48,4 +51,7 @@ public class PurchaseHistory {
     
     @Column(name = "notification_type", nullable = false)
     private  String notificationType;
+
+    @Column(name = "cost", nullable = false)
+    private Double cost;
 }

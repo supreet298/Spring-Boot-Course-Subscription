@@ -1,5 +1,6 @@
 package com.project.course.subscription.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -15,6 +16,11 @@ public class PurchaseHistoryDTO {
     private String clientEmail;
 
     private String planName;
+
+    private String subscriptionType;
+
+    @JsonSerialize(using = INRFormatterSerializer.class)
+    private Double cost;
 
     private int renewalCount;
 

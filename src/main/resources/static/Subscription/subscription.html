@@ -5,27 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subscription Management</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    #search {
-      width: 250px;
-      text-align: center;
-      color: black;
-    }
-  </style>
 </head>
 <body>
 <div class="container mt-5">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <a href="../index.html" class="btn btn-primary">Home</a>
-    <h2 class="text-center">Subscriptions</h2>
-    <div class="d-flex align-items-center">
-      <input type="text" id="search" name="search" placeholder="Search" class="form-control mr-2">
-      <a href="create.html" class="btn btn-success">Create Subscription</a>
+  <!-- Header Row with Home Button and Centered Title -->
+  <div class="row mb-3">
+    <div class="col-12 text-center">
+      <a href="../index.html" class="btn btn-primary float-left">Home</a>
+      <h2>Subscriptions</h2>
     </div>
   </div>
 
-  <!-- Display total number of subscriptions inside a box with primary color -->
-  <div id="totalElements" class="alert alert-primary text-center d-inline-block p-2" role="alert" style="font-weight: bold;"></div>
+  <!-- Total, Search, and Create Button Row -->
+  <div class="row justify-content-between align-items-center mb-3">
+    <div class="col-auto">
+      <div id="totalElements" class="alert alert-primary text-center p-2 mb-0" role="alert" style="font-weight: bold;"></div>
+    </div>
+    <div class="col-auto d-flex align-items-center">
+      <input type="text" id="search" name="search" placeholder="Search" class="form-control mr-2">
+      <a href="create.html" class="btn btn-success">Create</a>
+    </div>
+  </div>
 
   <!-- Table to display subscriptions -->
   <table id="subscriptionTable" class="table table-striped table-bordered">
@@ -85,13 +85,22 @@
         const subscriptionTableBody = document.getElementById('subscriptionTableBody');
         subscriptionTableBody.innerHTML = ''; // Clear any existing rows
 
+        // Function to format cost in INR
+        function formatToINR(amount) {
+          return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 2
+          }).format(amount);
+        }
+
         // Populate table with subscription data
         subscriptions.forEach(subscription => {
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${subscription.planName}</td>
             <td>${subscription.description}</td>
-            <td>${subscription.cost}</td>
+            <td>${formatToINR(subscription.cost)}</td> <!-- Format cost as INR -->
             <td>${subscription.subscriptionType}</td>
             <td>
               <a href="update.html?uuid=${subscription.uuid}" class="btn btn-primary btn-sm">Edit</a>

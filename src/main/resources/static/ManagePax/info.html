@@ -43,10 +43,12 @@
                 <h4>Subscription</h4>
                 <button id="purchaseButton" class="btn btn-success">Purchase</button>
             </div>
+            <p>Notes : ∞ Auto-Renewal</p>
             <table class="table table-striped table-bordered">
                 <thead class="table-dark">
                 <tr>
                     <th>Plan Name</th>
+                    <th>Subscription Type</th>
                     <th>Purchase Date</th>
                     <th>Expiry Date</th>
                     <th>Action</th>
@@ -66,10 +68,9 @@
             <table class="table table-striped table-bordered">
                 <thead class="table-dark">
                 <tr>
-                    <th>Client Name</th>
-                    <th>Client Email</th>
-                    <th>Plan Name</th>
-                    <th>Renewal Count</th>
+                    <th id="sortByPlanName" style="cursor: pointer;">Plan Name <span id="planNameSortArrow" class="sort-arrow"></span></th>
+                    <th>Subscription Type</th>
+                    <th>Cost</th>
                     <th>Purchase Date</th>
                     <th>Expiry Date</th>
                 </tr>
@@ -92,10 +93,12 @@
 
     let currentPage = 0; // Keep track of the current page for purchase history
     const pageSize = 10; // Set the number of items per page
+    let sortDirection = 'asc';
+    let sortBy = 'planName';
 
-    async function fetchPurchaseHistory(page) {
+    async function fetchPurchaseHistory(page = 0, sortBy = 'planName', direction = 'asc') {
         try {
-            const response = await fetch(`/api/admin/purchaseHistory/${uuid}?page=${page}&size=${pageSize}`);
+            const response = await fetch(`/api/admin/purchaseHistory/${uuid}?page=${page}&size=${pageSize}&sortBy=${sortBy}&direction=${direction}`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -113,10 +116,9 @@
         data.content.forEach(item => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${item.clientName}</td>
-                <td>${item.clientEmail}</td>
                 <td>${item.planName}</td>
-                <td>${item.renewalCount}</td>
+                <td>${item.subscriptionType}</td>
+                <td>${item.cost}</td>
                 <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
                 <td>${new Date(item.expiryDate).toLocaleDateString()}</td>
             `;
@@ -186,6 +188,7 @@
             const expiryDate = item.recurring ? '∞' : new Date(item.expiryDate).toLocaleDateString();
             row.innerHTML = `
                 <td>${item.subscriptionName}</td>
+                <td>${item.subscriptionType}</td>
                 <td>${new Date(item.purchaseDate).toLocaleDateString()}</td>
                 <td>${expiryDate}</td>
                 <td>
@@ -213,10 +216,23 @@
             });
     }
 }
-
     document.getElementById('purchaseButton').addEventListener('click', () => {
         window.location.href = `purchase.html?paxUserUuid=${uuid}`;
     });
+
+    // Toggle sorting direction when clicking the column headers
+    document.getElementById('sortByPlanName').addEventListener('click', function () {
+      sortBy = 'planName';
+      sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+      updateSortArrow('planNameSortArrow', sortDirection); // Update the arrow direction
+      fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+    });
+
+    // Update the sort arrow next to the column header
+    function updateSortArrow(arrowId, direction) {
+      const arrow = document.getElementById(arrowId);
+      arrow.innerHTML = (direction === 'asc') ? '▲' : '▼';
+    }
 
     // Fetch data when the page loads
     fetchPurchaseHistory(currentPage);
