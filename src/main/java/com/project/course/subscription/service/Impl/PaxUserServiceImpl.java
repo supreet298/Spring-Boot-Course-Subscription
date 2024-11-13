@@ -297,11 +297,13 @@ public class PaxUserServiceImpl implements PaxUserService {
         return paxUsers.stream()
                 .map(paxUser -> {
                     PaxUsersDTO dto = new PaxUsersDTO();
+                    dto.setUuid(paxUser.getUuid());
                     dto.setName(paxUser.getName());
                     dto.setEmail(paxUser.getEmail());
                     dto.setAddress(paxUser.getAddress());
                     dto.setCountry(paxUser.getCountry());
                     dto.setPhoneNumber(paxUser.getCountryCode() + paxUser.getPhoneNumber());
+                    dto.setHeadUuid(paxUser.getHeadUuid());
                     dto.setType(paxUser.getType().toString());
                     dto.setRelation(paxUser.getRelation().toString());
                     // Exclude relation

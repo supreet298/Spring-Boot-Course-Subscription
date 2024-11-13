@@ -38,16 +38,17 @@ public interface PaxUserRepository extends JpaRepository<PaxUser, Long> {
 	@Query("SELECT i FROM PaxUser i WHERE (" +
 		       "LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
 		       "LOWER(i.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+			   "LOWER(i.countryCode) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
 		       "LOWER(i.phoneNumber) LIKE LOWER(CONCAT('%', :query, '%')) )" +
 		       "AND i.type = 'HEAD' AND i.isActive = true")
 		List<PaxUser> searchByMultipleFieldsAndHeadType(@Param("query") String query);
 
-	@Query("SELECT i FROM PaxUser i WHERE i.headUuid = :headUuid " +
+	@Query("SELECT i FROM PaxUser i WHERE i.headUuid = :uuid " +
 		       "AND (LOWER(i.name) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
 		       "LOWER(i.email) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
+			   "LOWER(i.countryCode) LIKE LOWER(CONCAT('%', :query, '%')) OR " +
 		       "LOWER(i.phoneNumber) LIKE LOWER(CONCAT('%', :query, '%'))) " +
 		       "AND i.type = 'MEMBER' AND i.isActive = true")
-		List<PaxUser> searchByMultipleFieldsAndMemberTypeByHeadUuid(@Param("headUuid") String uuid, @Param("query") String query);
-
+		List<PaxUser> searchByMultipleFieldsAndMemberTypeByHeadUuid(@Param("uuid") String uuid, @Param("query") String query);
 
 }
