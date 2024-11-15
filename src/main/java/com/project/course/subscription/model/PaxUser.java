@@ -40,7 +40,7 @@ public class PaxUser {
     private String email;
 
     @NotBlank(message = "Country code is required")
-    @Pattern(regexp = "\\+\\d{1,3}", message = "Invalid country code format (e.g., +1, +91)")
+    @Pattern(regexp = "\\+\\d{1,4}", message = "Invalid country code format (e.g., +1, +91)")
     private String countryCode;
 
     @NotBlank(message = "Phone number is required")

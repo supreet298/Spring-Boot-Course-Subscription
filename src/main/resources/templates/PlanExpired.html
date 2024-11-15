@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Expired Notification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+        }
+
+        h1 {
+            color: #D32F2F; /* Red color to indicate an alert */
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #f9f9f9;
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        strong {
+            color: #333;
+        }
+
+        .highlight {
+            background-color: #ffcccc; /* Light red background for urgent messages */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Notice: Your Subscription Has Expired</h1>
+        <p>Dear <span th:text="${userName}"></span>,</p>
+        <p>We wanted to inform you that your subscription plan has expired. Below are the details of your most recent subscription:</p>
+
+        <h2>Expired Subscription Details:</h2>
+        <ul>
+            <li><strong>User Name:</strong> <span th:text="${userName}"></span></li>
+            <li><strong>Plan Name:</strong> <span th:text="${planName}"></span></li>
+            <li><strong>Start Date:</strong> <span th:text="${setPurchaseDate}"></span></li>
+            <li><strong>Expiry Date:</strong> <span th:text="${ExpiryTime}"></span></li>
+            <li><strong>Subscription Type:</strong> <span th:text="${subscriptionType}"></span></li>
+        </ul>
+
+        <p class="highlight">To avoid disruption and continue enjoying our services, please renew your subscription as soon as possible.</p>
+
+        <p>If you would like to renew your plan or if you have any questions, please contact our support team or visit your account page to renew directly.</p>
+        <p>We value you as a client and look forward to serving you again.</p>
+
+        <p>Best Regards,<br>The [AssistanZ Networks PVT] Team</p>
+
+        <div class="footer">
+            <p>This email was sent to you as a courtesy reminder regarding your expired subscription. If you have already renewed your plan, please disregard this message.</p>
+        </div>
+    </div>
+</body>
+
+</html>

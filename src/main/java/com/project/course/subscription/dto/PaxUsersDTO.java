@@ -11,6 +11,7 @@ public class PaxUsersDTO {
 	private String phoneNumber;
 	private String headUuid;
 	private String address;
+	private String countryCode;
 	private String country;
 	private String type;
 	private String relation;

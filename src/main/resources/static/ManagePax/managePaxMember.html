@@ -20,26 +20,27 @@
 <body>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
-    <a class="btn btn-primary" href="managePaxUsers.html">Back</a>
-    <h2 id="paxHeadHeading">All PaxMembers  <span id="paxHeadName"></span></h2>
-    <div class="d-flex align-items-center">
-      <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-2">
+    <a href="#" class="btn btn-primary" id="backButton">Back</a>
+    <h2 id="paxHeadHeading">Members of <span id="paxHeadName"></span></h2>
+    <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-0">
+  </div>
+  <!-- Total count and Add Member button -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div id="totalElements" class="alert alert-primary text-center d-inline-block p-2" role="alert" style="font-weight: bold;">
+      <!-- Total count will be displayed here -->
     </div>
+    <a id="addMemberButton" class="btn btn-success" href="#">Add Member</a>
   </div>
-  <!-- Display total number of subscriptions inside a box with primary color -->
-  <div class="d-flex justify-content-end mb-2">
-    <div id="totalElements" class="alert alert-primary text-center d-inline-block p-2" role="alert" style="font-weight: bold;"></div>
-  </div>
-
+  
   <table id="paxMemberTable" class="table table-striped table-bordered">
     <thead class="table-dark">
-    <tr>
-      <th id="sortByName" style="cursor: pointer;">Name <span id="nameSortArrow" class="sort-arrow"></span></th>
-      <th id="sortByPhone" style="cursor: pointer;">Phone Number<span id="phoneSortArrow" class="sort-arrow"></span></th>
-      <th id="sortByEmail" style="cursor: pointer;">Email<span id="emailSortArrow" class="sort-arrow"></span></th>
-      <th>Relation</th>
-      <th>Action</th>
-    </tr>
+      <tr>
+        <th onclick="sortTable('name')">Name <span class="sort-indicator" id="sort-name"></span></th>
+        <th onclick="sortTable('phoneNumber')">PhoneNumber <span class="sort-indicator" id="sort-phoneNumber"></span></th>
+        <th onclick="sortTable('email')">Email <span class="sort-indicator" id="sort-email"></span></th>
+        <th>Relation</th>
+        <th>Action</th>
+      </tr>
     </thead>
     <tbody id="paxMemberTableBody">
     </tbody>
@@ -55,42 +56,96 @@
 
 <script>
   const urlParams = new URLSearchParams(window.location.search);
-  const uuid = urlParams.get('uuid'); // Extract PaxHead UUID from URL
-
+  const uuid = urlParams.get('uuid');
+  
   let currentPage = 0;
-  const pageSize = 10;
-  let paxMembers = [];
-  let totalPages = 1;
-  let sortDirection = 'asc';
-  let sortBy = 'name';
+  const pageSize = 3;
+  let paxMembers = []; // Store fetched PaxMember data
+  let totalPages = 1; // Total number of pages
+  let paxHeadName = ''; // Variable to store PaxHead's name
+  let sortDirection = 'asc'; // Default sorting direction
 
-  // Fetch and display PaxMembers under the selected PaxHead
-  function loadPaxMembers(page = 0, query = '', sortBy = 'name', direction = 'asc') {
+  // Dynamically set the href of the Add Member button with the correct UUID
+  const addMemberButton = document.getElementById('addMemberButton');
+  addMemberButton.href = `createPaxMember.html?uuid=${uuid}`; // Inject the UUID into the href
+  
+  document.getElementById('backButton').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default link behavior
+    window.history.back(); // Navigate back to the previous page
+  });
+
+  // Fetch PaxHead details using the uuid from URL
+  fetch(`/api/admin/pax/${uuid}`)
+    .then(response => {
+      if (response.status === 404) {
+        paxHeadName = 'Unknown PaxHead'; // If PaxHead not found, use fallback
+        document.getElementById('paxHeadName').textContent = paxHeadName; // Display fallback name
+        return;
+      }
+      return response.json();
+    })
+    .then(paxHead => {
+      if (paxHead) {
+        paxHeadName = paxHead.name; // Set the PaxHead's name if found
+        document.getElementById('paxHeadName').textContent = paxHeadName; // Update the heading with PaxHead's name
+        loadPaxMembers(currentPage); // Load PaxMembers under the current PaxHead
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching PaxHead details:', error);
+      paxHeadName = 'Unknown PaxHead'; // Ensure we have a fallback name
+      document.getElementById('paxHeadName').textContent = paxHeadName; // Update the heading with PaxHead's name
+      window.location.href = 'managePaxUsers.html'; // Redirect to the main page if error occurs
+    });
+
+  // Fetch and display PaxMembers dynamically
+  function loadPaxMembers(page = 0, query = '') {
     const apiUrl = query
       ? `/api/admin/pax/searchMember/${uuid}?query=${query}`
-      : `/api/admin/pax/getMemberByHeadId/${uuid}?page=${page}&size=${pageSize}&sortBy=${sortBy}&direction=${direction}`;
+      : `/api/admin/pax/getMemberByHeadId/${uuid}?page=${page}&size=${pageSize}`;
 
     fetch(apiUrl)
       .then(response => response.json())
       .then(data => {
-      if (query) {
-         paxMembers = data; // For search results
-         totalPages = 1;  // Assume one page for search
-         document.getElementById('totalElements').innerText = `Total: ${paxMembers.length}`; // Display total search results
-      }  else {
-         paxMembers = data.content;
-         totalPages = data.totalPages;
-         document.getElementById('totalElements').innerText = `Total: ${data.totalElements}`; // Display total items from response
-      }
+        if (query) {
+          paxMembers = data;
+          totalPages = 1;
+          document.getElementById('totalElements').innerText = `Total: ${paxMembers.length}`; // Display total search results
+        } else {
+          paxMembers = data.content;
+          totalPages = data.totalPages;
+          document.getElementById('totalElements').innerText = `Total: ${data.totalElements}`; // Display total items from response
+        }
 
-      displayPaxMembers(paxMembers); // Display the fetched members
-      updatePagination();
+        displayPaxMembers(paxMembers);
+        updatePagination();
       })
       .catch(error => {
-        console.error('Error fetching PaxMembers:', error);
-        alert(`Error fetching members under PaxHead. Redirecting to the main page.`);
-        window.location.href = 'managePaxUsers.html'; // Redirect back to the main page on error
-      });
+    	  console.error('Error fetching PaxMembers:', error);
+    	  
+    	  // Add logging to see when this block runs
+    	  console.log('Executing the .catch() block for fetching PaxMembers');
+
+    	  // Ensure the name is populated correctly before showing the alert
+    	  const displayName = paxHeadName || 'this PaxHead';
+
+    	  // Check if the confirmation dialog is shown more than once
+    	  if (!window.alertShown) {
+    	    window.alertShown = true; // Use a flag to ensure this runs only once
+
+    	    const userConfirmed = window.confirm(`No members found under ${displayName}. Do you want to add a member?`);
+    	    if (userConfirmed) {
+    	      window.location.href = `createPaxMember.html?uuid=${uuid}`;
+    	    } else {
+    	      console.log("User canceled the action.");
+    	      window.history.back();
+    	    }
+    	  } else {
+    	    console.log('Alert already shown.');
+    	  }
+    	});
+
+
   }
 
   // Display PaxMembers in the table
@@ -101,17 +156,31 @@
     paxMembers.forEach(member => {
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${member.name}</td>
-        <td>${(member.countryCode || '') + (member.phoneNumber || '')}</td>
-        <td>${member.email}</td>
-        <td>${member.relation}</td>
-        <td>
-          <a href="updateMember.html?uuid=${member.uuid}" class="btn btn-primary btn-sm">Edit</a>
-          <button class="btn btn-danger btn-sm" onclick="deletePaxMember('${member.uuid}')">Delete</button>
-        </td>
-      `;
+          <td>${member.name}</td>
+          <td>${(member.countryCode || '') + (member.phoneNumber || '')}</td>
+          <td>${member.email}</td>
+          <td>${member.relation}</td>
+          <td>
+            <a href="updateMember.html?uuid=${member.uuid}" class="btn btn-primary btn-sm">Edit</a>
+            <button class="btn btn-danger btn-sm" onclick="deletePaxMember('${member.uuid}')">Delete</button>
+          </td>
+        `;
       paxMemberTableBody.appendChild(row);
     });
+  }
+
+  // Function to delete PaxMember
+  function deletePaxMember(uuid) {
+    if (confirm("Are you sure you want to delete this PaxMember?")) {
+      fetch(`/api/admin/pax/dropPaxUser/${uuid}`, { method: 'DELETE' })
+        .then(response => {
+          if (response.ok) {
+            loadPaxMembers(currentPage); // Reload PaxMembers after deletion
+          } else {
+            alert("Failed to delete the PaxMember.");
+          }
+        });
+    }
   }
 
   // Update pagination controls
@@ -120,10 +189,11 @@
     const nextPage = document.getElementById('nextPage');
     const prevPage = document.getElementById('prevPage');
 
-    if (totalPages <= 1) {
-      paginationControls.style.visibility = 'hidden'; // Hide pagination if no multiple pages
+    // Hide pagination if total pages are less than or equal to 1 or the total number of records is less than or equal to the page size
+    if (totalPages <= 1 || (paxMembers.length <= pageSize && totalPages <= 1)) {
+      paginationControls.style.visibility = 'hidden'; // Hide pagination controls
     } else {
-      paginationControls.style.visibility = 'visible'; // Show pagination if there are multiple pages
+      paginationControls.style.visibility = 'visible'; // Show pagination controls
     }
 
     document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
@@ -146,61 +216,37 @@
     }
   });
 
-  // Function to delete PaxMember
-  function deletePaxMember(uuid) {
-    if (confirm("Are you sure you want to delete this PaxMember?")) {
-      fetch(`/api/admin/pax/dropPaxUser/${uuid}`, { method: 'DELETE' })
-        .then(response => {
-          if (response.ok) {
-            loadPaxMembers(currentPage); // Reload PaxMembers after deletion
-          } else {
-            alert("Failed to delete the PaxMember.");
-          }
-        });
+  // Sort table columns by header click
+  function sortTable(column) {
+    paxMembers.sort((a, b) => {
+      if (a[column] < b[column]) return sortDirection === 'asc' ? -1 : 1;
+      if (a[column] > b[column]) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+    displayPaxMembers(paxMembers);
+    updateSortIndicator(column);
+  }
+
+  // Update sort indicators
+  function updateSortIndicator(column) {
+    const sortIndicators = document.querySelectorAll('.sort-indicator');
+    sortIndicators.forEach(indicator => indicator.textContent = '');
+
+    const indicator = document.getElementById(`sort-${column}`);
+    if (indicator) {
+      indicator.textContent = sortDirection === 'asc' ? '▲' : '▼';
     }
   }
 
-  // Event listener for search input
-  document.getElementById('search').addEventListener('input', function (e) {
-    const searchText = e.target.value.trim().toLowerCase();
-    if (searchText) {
-      loadPaxMembers(0, searchText); // Trigger search when there's input
-    } else {
-      loadPaxMembers(currentPage); // Reset to current page if search is cleared
-    }
+  // Search functionality
+  document.getElementById('search').addEventListener('input', function () {
+    const query = this.value;
+    loadPaxMembers(currentPage, query);
   });
 
-  // Toggle sorting direction when clicking the column headers
-  document.getElementById('sortByName').addEventListener('click', function () {
-  sortBy = 'name';
-  sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
-  updateSortArrow('nameSortArrow', sortDirection); // Update the arrow direction
-  loadPaxMembers(currentPage, '', sortBy, sortDirection); // Pass the updated sort parameters
-});
-
-  document.getElementById('sortByPhone').addEventListener('click', function () {
-  sortBy = 'phoneNumber';
-  sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
-  updateSortArrow('phoneSortArrow', sortDirection);
-  loadPaxMembers(currentPage, '', sortBy, sortDirection); // Pass the updated sort parameters
-});
-
-  document.getElementById('sortByEmail').addEventListener('click', function () {
-  sortBy = 'email';
-  sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
-  updateSortArrow('emailSortArrow', sortDirection);
-  loadPaxMembers(currentPage, '', sortBy, sortDirection); // Pass the updated sort parameters
-});
-
-  // Update the sort arrow next to the column header
-  function updateSortArrow(arrowId, direction) {
-    const arrow = document.getElementById(arrowId);
-    arrow.innerHTML = (direction === 'asc') ? '▲' : '▼';
-  }
-
-  // Initialize by loading all PaxMembers for the first page
-  loadPaxMembers();
-
+  // Initialize page load
+  loadPaxMembers(currentPage);
 </script>
 </body>
 </html>

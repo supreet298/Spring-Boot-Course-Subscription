@@ -1,7 +1,7 @@
 package com.project.course.subscription.email;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import com.project.course.subscription.model.Subscription.SubscriptionType;
 
 public interface EmailService {
