@@ -1,5 +1,6 @@
 package com.project.course.subscription.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -22,10 +23,14 @@ public class PurchaseHistoryDTO {
     @JsonSerialize(using = INRFormatterSerializer.class)
     private Double cost;
 
+    private Boolean paid;
+
     private int renewalCount;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime purchaseDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime expiryDate;
 
     private String notificationType;

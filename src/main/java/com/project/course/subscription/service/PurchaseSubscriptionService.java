@@ -17,4 +17,6 @@ public interface PurchaseSubscriptionService {
     boolean disableRecurringForSubscription(String uuid);
 
     List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(String paxUserUuid);
+
+    boolean paySubscription(String uuid);
 }

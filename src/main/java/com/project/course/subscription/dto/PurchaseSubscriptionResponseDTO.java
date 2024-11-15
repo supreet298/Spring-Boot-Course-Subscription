@@ -1,5 +1,6 @@
 package com.project.course.subscription.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -16,8 +17,12 @@ public class PurchaseSubscriptionResponseDTO {
 
     private Boolean recurring;
 
+    private Boolean paid;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime purchaseDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime expiryDate;
 
 }

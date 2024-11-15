@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Purchase Subscription</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Custom styles to increase the size of the radio buttons */
+    .form-check-input {
+      width: 15px; /* Adjust the width of the radio button */
+      height: 15px; /* Adjust the height of the radio button */
+    }
+
+    .form-check-label {
+      font-size: 18px; /* Optional: Increase label font size */
+    }
+  </style>
 </head>
 <body>
 <div class="container mt-5">
@@ -34,12 +45,12 @@
       <label>Recurring <span class="text-danger">*</span></label>
       <div class="ml-3" >
         <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="recurring" id="recurring" value="true" required>
-          <label class="form-check-label" for="recurring">Yes</label>
+          <input class="form-check-input" type="radio" name="recurring" id="recurringYes" value="true" required>
+          <label class="form-check-label" for="recurringYes">Yes</label>
         </div>
         <div class="form-check form-check-inline ml-4"> <!-- Added ml-4 for spacing -->
-          <input class="form-check-input" type="radio" name="recurring" id="recurring" value="false" required>
-          <label class="form-check-label" for="recurring">No</label>
+          <input class="form-check-input" type="radio" name="recurring" id="recurringNo" value="false" required>
+          <label class="form-check-label" for="recurringNo">No</label>
         </div>
       </div>
     </div>
@@ -57,14 +68,14 @@
     <!-- Paid Radio Buttons (Inline) -->
     <div class="form-group" style="display:flex">
       <label>Paid <span class="text-danger">*</span></label>
-      <div class="ml-3">
+      <div class="ml-5">
         <div class="form-check form-check-inline">
-          <input class="form-check-input" type="radio" name="paid" id="paid" value="true" required>
-          <label class="form-check-label" for="paid">Yes</label>
+          <input class="form-check-input" type="radio" name="paid" id="paidYes" value="true" required>
+          <label class="form-check-label" for="paidYes">Yes</label>
         </div>
         <div class="form-check form-check-inline ml-4"> <!-- Added ml-4 for spacing -->
-          <input class="form-check-input" type="radio" name="paid" id="paid" value="false" required>
-          <label class="form-check-label" for="paid">No</label>
+          <input class="form-check-input" type="radio" name="paid" id="paidNo" value="false" required>
+          <label class="form-check-label" for="paidNo">No</label>
         </div>
       </div>
     </div>
@@ -133,6 +144,12 @@
   // Call function to populate subscriptions on page load
   document.addEventListener('DOMContentLoaded', loadSubscriptionOptions);
 
+  // Get the selected value of a radio button group
+  function getRadioValue(name) {
+  const selectedRadio = document.querySelector(`input[name="${name}"]:checked`);
+  return selectedRadio ? selectedRadio.value === 'true' : null; // Return boolean value (true/false)
+}
+
   // Event listener for form submission
   document.getElementById('purchaseSubscriptionForm').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -140,8 +157,8 @@
     const purchaseData = {
       paxUserUuid: paxUserUuid, // Use paxUserUuid from the URL
       subscriptionUuid: document.getElementById('subscriptionId').value || null,
-      recurring: document.getElementById('recurring').value === 'true',
-      paid: document.getElementById('paid').value === 'true',
+      recurring: getRadioValue('recurring'),
+      paid: getRadioValue('paid'),
       notificationType: document.getElementById('notificationType').value
     };
 

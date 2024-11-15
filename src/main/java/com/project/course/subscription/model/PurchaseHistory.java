@@ -54,4 +54,7 @@ public class PurchaseHistory {
 
     @Column(name = "cost", nullable = false)
     private Double cost;
+
+    @Column(name = "paid", nullable = false)
+    private Boolean paid;
 }

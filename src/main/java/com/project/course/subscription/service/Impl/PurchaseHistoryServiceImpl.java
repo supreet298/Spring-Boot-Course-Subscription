@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,12 +37,18 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         return purchaseHistoryRepository.findPurchaseHistoryByUserAndSubscription(userId, subscriptionId);
     }
 
-    public Page<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(String uuid,int page, int size, String sortBy, String direction) {
+    public Page<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(
+            String uuid, int page, int size, String sortBy, String direction,
+            LocalDateTime purchaseDate, LocalDateTime expiryDate) {
+
         Sort.Order order = direction.equalsIgnoreCase("desc")
                 ? Sort.Order.desc(sortBy)
                 : Sort.Order.asc(sortBy);
         Pageable pageable = PageRequest.of(page, size, Sort.by(order));
-        return purchaseHistoryRepository.findByPaxUser_Uuid(uuid,pageable)
+
+        // Call the repository method to fetch the filtered records
+        return purchaseHistoryRepository.findByPaxUserUuidAndOptionalDates(
+                        uuid,purchaseDate, expiryDate, pageable)
                 .map(this::convertToDTO);
     }
 
@@ -58,6 +65,7 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         dto.setExpiryDate(history.getExpiryDate());
         dto.setNotificationType(history.getNotificationType());
         dto.setCost(history.getCost());
+        dto.setPaid(history.getPaid());
         return dto;
     }
 }

@@ -46,6 +46,16 @@ public class PurchaseSubscriptionController {
         }
     }
 
+    @PutMapping("/{uuid}/pay")
+    public ResponseEntity<String> paySubscription(@PathVariable String uuid) {
+        boolean success = purchaseSubscriptionService.paySubscription(uuid);
+        if (success) {
+            return ResponseEntity.ok("Paid the subscription.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subscription not found.");
+        }
+    }
+
     @GetMapping("/active/{uuid}")
     public List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(@PathVariable String uuid) {
         return purchaseSubscriptionService.getActiveSubscriptionsByPaxUserUuid(uuid);

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,8 +23,10 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
     @Query("SELECT p FROM PurchaseHistory p WHERE p.expiryDate BETWEEN :start AND :end")
     List<PurchaseHistory> findExpiringPlansBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    Page<PurchaseHistory> findByPaxUser_Uuid(String uuid, Pageable pageable);
-
-    Page<PurchaseHistory> findByPaxUser_UuidAndPurchaseDateBetween(String uuid, LocalDate startDate, LocalDate endDate, Pageable pageable);
+    @Query("SELECT p FROM PurchaseHistory p WHERE p.paxUser.uuid = :uuid AND " +
+            "(:startDate IS NULL OR p.purchaseDate BETWEEN :startDate AND :endDate) AND " +
+            "(:endDate IS NULL OR p.expiryDate <= :endDate)")
+    Page<PurchaseHistory> findByPaxUserUuidAndOptionalDates(@Param("uuid") String uuid,
+            @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
 
 }

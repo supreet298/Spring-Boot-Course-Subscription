@@ -156,6 +156,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         purchaseHistory.setExpiryDate(expiryDate);
         purchaseHistory.setNotificationType(purchaseSubscription.getNotificationType().toString());
         purchaseHistory.setCost(purchaseSubscription.getCost());
+        purchaseHistory.setPaid(purchaseSubscription.getPaid());
 
         purchaseHistoryService.createPurchaseHistory(purchaseHistory); // Save purchase history
     }
@@ -201,6 +202,22 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         return subscriptions.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
     }
 
+    @Override
+    public boolean paySubscription(String uuid) {
+        Optional<PurchaseSubscription> subscriptionOpt = purchaseSubscriptionRepository.findByUuid(uuid);
+
+        if (subscriptionOpt.isPresent()) {
+            PurchaseSubscription subscription = subscriptionOpt.get();
+
+            // Set paid to true and save
+            subscription.setPaid(true);
+            purchaseSubscriptionRepository.save(subscription);
+            return true;
+        } else {
+            throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
+        }
+    }
+
     private PurchaseSubscriptionDTO convertToDTO(PurchaseSubscription purchaseSubscription) {
         PurchaseSubscriptionDTO dto = new PurchaseSubscriptionDTO();
         dto.setPaxUserUuid(purchaseSubscription.getPaxUser().getUuid());
@@ -220,6 +237,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         dto.setSubscriptionName(purchaseSubscription.getPlanName());
         dto.setSubscriptionType(purchaseSubscription.getSubscriptionType());
         dto.setRecurring(purchaseSubscription.isRecurring());
+        dto.setPaid(purchaseSubscription.getPaid());
         dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
         dto.setExpiryDate(purchaseSubscription.getExpiryDate());
         return dto;
