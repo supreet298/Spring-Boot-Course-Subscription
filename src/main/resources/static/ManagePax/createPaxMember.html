@@ -45,13 +45,13 @@
     <div class="form-group">
       <label for="relationType">Relation Type</label>
       <select id="relationType" class="form-control" required>
-        <option value="FATHER">Father</option>
-        <option value="DAUGHTER">Daughter</option>
+        <option value="FATHER">Daughter</option>
+        <option value="DAUGHTER">Father</option>
         <option value="SON">Son</option>
         <option value="WIFE">Wife</option>
       </select>
     </div>
-    <button type="submit" class="btn btn-success">Create Member</button> 
+    <button type="submit" class="btn btn-success">Create </button> 
     <div id="toast" class="toast">Member created successfully!</div>
   </form>
 </div>
@@ -159,7 +159,7 @@ document.getElementById('countries').addEventListener('change', function() {
     	  // Remove the toast after 3 seconds
     	  setTimeout(() => {
     	    toast.className = toast.className.replace('show', '');
-    	    window.location.href = 'managePaxUsers.html'; // Redirect after showing the toast
+    	    window.history.back(); // Redirect after showing the toast
     	  }, 3000);
     	})
     	.catch(error => {
