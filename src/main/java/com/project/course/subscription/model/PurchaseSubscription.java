@@ -72,10 +72,8 @@ public class PurchaseSubscription {
 
     private Double cost;
 
+    @Column(name = "subscription_type")
     private String subscriptionType;
-
-    @Column(name = "purchased_subscription_type")
-    private String purchasedSubscriptionType;
 
     @Enumerated(EnumType.STRING)
     private NotificationType notificationType;

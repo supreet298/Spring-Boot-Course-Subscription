@@ -212,6 +212,16 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
             // Set paid to true and save
             subscription.setPaid(true);
             purchaseSubscriptionRepository.save(subscription);
+            // Create a new PurchaseHistory entry to track this payment
+            LocalDateTime now = LocalDateTime.now();
+            createPurchaseHistory(
+                    subscription.getPaxUser(),
+                    subscription.getSubscription(),
+                    now,
+                    subscription.getExpiryDate(),
+                    getRenewalCount(subscription.getPaxUser(), subscription.getSubscription()),
+                    subscription
+            );
             return true;
         } else {
             throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);

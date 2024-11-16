@@ -104,7 +104,7 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/getMemberByHeadId/{uuid}")
-	public ResponseEntity<?> getPaginatedAndSortedMemberss(@PathVariable String uuid,@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<?> getPaginatedAndSortedMembers(@PathVariable String uuid,@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortBy,
 			@RequestParam(defaultValue = "asc") String direction) {
 		try {
