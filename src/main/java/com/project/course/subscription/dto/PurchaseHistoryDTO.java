@@ -33,5 +33,8 @@ public class PurchaseHistoryDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime expiryDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDateTime paidDate;
+
     private String notificationType;
 }

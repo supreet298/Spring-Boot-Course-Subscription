@@ -65,11 +65,6 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         purchaseSubscription.setCost(subscription.getCost());
         purchaseSubscription.setSubscriptionType(subscription.getSubscriptionType().toString());
 
-//        // Validate if the purchase should proceed
-//        if (purchaseSubscription.getPaid() == null || !purchaseSubscription.getPaid()) {
-//            throw new IllegalArgumentException("The subscription cannot be created as the payment has not been made.");
-//        }
-
         // Check if the user has an active subscription for the same plan
         if (hasActiveSubscriptionForSamePlan(paxUser, subscription)) {
             throw new IllegalArgumentException("PaxUser cannot purchase the same subscription until the previous one expires.");
@@ -83,7 +78,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(), file);
 
         // Create purchase history entry
-        createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription);
+        createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription,now);
 
         return convertToDTO(savedSubscription);
 
@@ -119,7 +114,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
                 // Optionally, you can still create a new PurchaseHistory entry for tracking purposes
                 int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
-                createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(), newExpiryDate, newRenewalCount, subscription);
+                createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(), newExpiryDate, newRenewalCount, subscription,LocalDateTime.now());
             }
         }
     }
@@ -142,7 +137,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         };
     }
 
-    private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription) {
+    private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription,LocalDateTime paidDate) {
         PurchaseHistory purchaseHistory = new PurchaseHistory();
         purchaseHistory.setPaxUser(paxUser);
         purchaseHistory.setSubscription(subscription);
@@ -157,6 +152,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         purchaseHistory.setNotificationType(purchaseSubscription.getNotificationType().toString());
         purchaseHistory.setCost(purchaseSubscription.getCost());
         purchaseHistory.setPaid(purchaseSubscription.getPaid());
+        purchaseHistory.setPaidDate(purchaseSubscription.getPaid() ? paidDate : null);
 
         purchaseHistoryService.createPurchaseHistory(purchaseHistory); // Save purchase history
     }
@@ -213,14 +209,16 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
             subscription.setPaid(true);
             purchaseSubscriptionRepository.save(subscription);
             // Create a new PurchaseHistory entry to track this payment
+            LocalDateTime purchaseDate = subscription.getPurchaseDate();
             LocalDateTime now = LocalDateTime.now();
             createPurchaseHistory(
                     subscription.getPaxUser(),
                     subscription.getSubscription(),
-                    now,
+                    purchaseDate,
                     subscription.getExpiryDate(),
                     getRenewalCount(subscription.getPaxUser(), subscription.getSubscription()),
-                    subscription
+                    subscription,
+                    now
             );
             return true;
         } else {

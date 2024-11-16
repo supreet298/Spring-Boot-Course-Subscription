@@ -66,6 +66,7 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         dto.setNotificationType(history.getNotificationType());
         dto.setCost(history.getCost());
         dto.setPaid(history.getPaid());
+        dto.setPaidDate(history.getPaidDate());
         return dto;
     }
 }

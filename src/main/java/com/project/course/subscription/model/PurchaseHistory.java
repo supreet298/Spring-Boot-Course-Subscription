@@ -57,4 +57,7 @@ public class PurchaseHistory {
 
     @Column(name = "paid", nullable = false)
     private Boolean paid;
+
+    @Column(name = "paid_date")
+    private LocalDateTime paidDate;
 }
