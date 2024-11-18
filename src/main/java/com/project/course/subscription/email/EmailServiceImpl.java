@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.project.course.subscription.exception.ResourceNotFoundException;
 import com.project.course.subscription.model.Subscription.SubscriptionType;
 
 import jakarta.mail.MessagingException;
@@ -255,7 +256,42 @@ public class EmailServiceImpl implements EmailService {
         }
 		
 	}
+
+
+	@Override
+	public EmailSettingResponseDTO getEmailProperties() {
+		EmailSetting emailProperties=emailRepository.findById(1L).orElseThrow(() -> new ResourceNotFoundException("Email settings not found"));
+		 EmailSettingResponseDTO response = new EmailSettingResponseDTO();
+				 response.setHost(emailProperties.getHost());
+				 response.setPort(emailProperties.getPort());
+				 response.setUserName(emailProperties.getUserName());
+				 response.setPassword(emailProperties.getPassword());
+				 response.setProtocol(emailProperties.getProtocol());
+				 response.setSmtpAuth(emailProperties.isSmtpAuth());
+				 response.setStarttlsEnable(emailProperties.isStarttlsEnable());
+				 response.setRenewalDayAlert(emailProperties.getRenewalDayAlert());
+		        return response;
+		 	}
 	
+
+	
+	public EmailSetting updateEmailProperties(EmailSetting request)
+	{
+		EmailSetting setting=emailRepository.findById(1L).orElseThrow(()->new ResourceNotFoundException("Email id not found"));	
+		setting.setUserName(request.getUserName());
+		setting.setPassword(request.getPassword());
+		setting.setHost(request.getHost());
+		setting.setPort(request.getPort());
+		setting.setRenewalDayAlert(request.getRenewalDayAlert());
+		//setting.setSmtpAuth(false);
+		//setting.setStarttlsEnable(false);
+		emailRepository.save(setting);
+		return setting;
+	}
+
+
+	
+
 
 
 }

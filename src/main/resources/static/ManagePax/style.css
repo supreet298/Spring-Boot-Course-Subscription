@@ -21,3 +21,30 @@
 	left: 50%; /* Center horizontally */
 	font-size: 17px;
 }
+
+#search {
+	width: 250px;
+	text-align: center;
+	color: black;
+}
+
+.sort-arrow {
+	font-size: 12px;
+	margin-left: 5px;
+}
+
+th {
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+th .header-content {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+#filterBy {
+	width: 150px; /* Adjust the width as needed */
+}

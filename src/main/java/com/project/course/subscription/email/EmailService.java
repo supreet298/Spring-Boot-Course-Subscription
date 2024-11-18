@@ -24,5 +24,7 @@ public interface EmailService {
 	
 	void sendPlanExpiredEmail(String to,String userName,String planName,String subscriptionType,LocalDate purchaseDate,LocalDate expirayDate,String htmlfile);
 
+	EmailSettingResponseDTO getEmailProperties();
 	
+	EmailSetting updateEmailProperties(EmailSetting request);
 }

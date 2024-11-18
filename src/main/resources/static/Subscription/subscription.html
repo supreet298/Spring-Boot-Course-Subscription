@@ -5,19 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Subscription Management</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    #search {
-      width: 250px;
-      text-align: center;
-      color: black;
-    }
-
-    .sort-arrow {
-      font-size: 12px;
-      margin-left: 5px;
-    }
-  </style>
-</head>
+    <link rel="stylesheet" href="style.css">
+  </head>
 <body>
 <div class="container mt-5">
 
@@ -38,9 +27,9 @@
   <table id="subscriptionTable" class="table table-striped table-bordered">
     <thead class="table-dark">
     <tr>
-      <th id="sortByPlanName" style="cursor: pointer;">Plan Name <span id="planNameSortArrow" class="sort-arrow">▲</span></th>
+      <th id="sortByPlanName" style="cursor: pointer;"><div class="header-content">Plan Name <span id="planNameSortArrow" class="sort-arrow">▲</span></div></th>
       <th>Description</th>
-      <th id="sortByCost" style="cursor: pointer;">Cost<span id="costSortArrow" class="sort-arrow">▲</span></th>
+      <th id="sortByCost" style="cursor: pointer;"><div class="header-content">Cost<span id="costSortArrow" class="sort-arrow">▲</span></div></th>
       <th>Subscription Type</th>
       <th>Action</th> <!-- Action column for buttons -->
     </tr>

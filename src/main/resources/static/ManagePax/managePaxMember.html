@@ -5,29 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PaxMember Management</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    #search {
-      width: 250px;
-      text-align: center;
-      color: black;
-    }
-    .sort-indicator {
-      font-size: 12px;
-    margin-left: 5px;
-    }
-    th {
-    cursor: pointer;
-    white-space: nowrap;
-  }
-
-  th .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-  </style>
-</head>
+   <link rel="stylesheet" href="/ManagePax/style.css?v=1.0">
+   </head>
 <body>
 <div class="container mt-5">
   <div class="d-flex justify-content-between align-items-center mb-3">
@@ -47,8 +26,8 @@
     <thead class="table-dark">
       <tr>
         <th onclick="sortTable('name')"><div class="header-content">Name <span class="sort-indicator" id="sort-name">▲</span></div></th>
-        <th onclick="sortTable('phoneNumber')">PhoneNumber <span class="sort-indicator" id="sort-phoneNumber">▲</span></th>
-        <th onclick="sortTable('email')">Email <span class="sort-indicator" id="sort-email">▲</span></th>
+        <th onclick="sortTable('phoneNumber')"><div class="header-content">PhoneNumber <span class="sort-indicator" id="sort-phoneNumber">▲</span></div></th>
+        <th onclick="sortTable('email')"><div class="header-content">Email <span class="sort-indicator" id="sort-email">▲</span></div></th>
         <th>Relation</th>
         <th>Action</th>
       </tr>
