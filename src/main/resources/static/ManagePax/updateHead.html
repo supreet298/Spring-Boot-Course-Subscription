@@ -169,6 +169,10 @@
               toast.className = toast.className.replace('show', '');
               window.location.href = 'managePaxUsers.html'; // Redirect after showing the toast
           }, 3000);
+      })
+      .catch(error => {
+          console.error('Error Updating Head:', error);
+          showErrorMessage(error.message);
       });
   });
 

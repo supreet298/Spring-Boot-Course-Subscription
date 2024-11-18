@@ -82,9 +82,9 @@
           const contentType = response.headers.get("content-type");
           if (!response.ok) {
             if (contentType && contentType.includes("application/json")) {
-              return response.json().then(json => { throw new Error(json.message || 'Failed to update Head'); });
+              return response.json().then(json => { throw new Error(json.message || 'Failed to update Subscription'); });
             } else {
-              return response.text().then(text => { throw new Error(text || 'Failed to update Head'); });
+              return response.text().then(text => { throw new Error(text || 'Failed to update Subscription'); });
             }
           }
           return response.json();
