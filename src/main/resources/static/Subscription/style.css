@@ -11,8 +11,8 @@
 	top: 50px; /* Slide down slightly when shown */
 	min-width: 250px;
 	margin-left: -125px; /* Center horizontally */
-	background-color: #ffff !important;
-	color: #004040;
+	background-color: rgb(102, 162, 97);
+	color: rgb(255, 255, 255);
 	text-align: center;
 	border-radius: 5px;
 	padding: 16px;

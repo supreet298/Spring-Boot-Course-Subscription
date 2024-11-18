@@ -51,7 +51,7 @@ public class EmailServiceImpl implements EmailService {
        
     @Override
     public void sendPurchaseConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
-								 LocalDate ExpiryTime, SubscriptionType subscriptionType, String htmlfile) {
+								 LocalDate ExpiryTime, SubscriptionType subscriptionType,String paymentStatus, String htmlfile) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -66,6 +66,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("setPurchaseDate", setPurchaseDate);
             context.setVariable("ExpiryTime", ExpiryTime);
             context.setVariable("subscriptionType", subscriptionType);
+            context.setVariable("paymentStatus", paymentStatus);
 
             // Process the HTML template with Thymeleaf
             String htmlContent = templateEngine.process(htmlfile, context);
@@ -182,6 +183,80 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Error while sending email: " + e.getMessage());
         }
 	}
+	
+	@Override
+	public void sendPlanExpiredEmail(String to, String userName, String planName, String subscriptionType,
+			LocalDate purchaseDate, LocalDate expiryDate, String htmlfile) {
+		String Expiredfile="PlanExpired.html";
+		try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            // helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("Your Subscription Expired!");
+            
+            // Create the email body with user details and a custom message
+            Context context = new Context();
+            context.setVariable("userName", userName);
+            context.setVariable("planName", planName);
+            context.setVariable("subscriptionType", subscriptionType);
+            context.setVariable("purchaseDate", purchaseDate);
+            context.setVariable("expiryDate", expiryDate);
+            String htmlContent = templateEngine.process(Expiredfile, context);
+
+            // Set the HTML content in the email body
+            helper.setText(htmlContent, true); // true to indicate that it is HTML
+
+            // Send the email
+            mailSender.send(message);
+            //System.out.println(" Plan Expired Email Sent Successfully !");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while sending email: " + e.getMessage());
+        }
+	}
+
+
+	@Override
+	public void sendpaymentConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
+			LocalDate setExpirayDate, SubscriptionType subscriptionType, String paymentStatus, LocalDate paymentDate,
+			String htmlfile) {
+		try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            // helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("Your Subscription Has Been Activated!");
+
+            // Create the email body with user details and a custom message
+            Context context = new Context();
+            context.setVariable("userName", userName);
+            context.setVariable("planName", planName);
+            context.setVariable("setPurchaseDate", setPurchaseDate);
+            context.setVariable("ExpiryTime", setExpirayDate);
+            context.setVariable("subscriptionType", subscriptionType);
+            context.setVariable("paymentStatus", paymentStatus);
+            context.setVariable("paymentDate",paymentDate);
+
+            // Process the HTML template with Thymeleaf
+            String htmlContent = templateEngine.process(htmlfile, context);
+
+            // Set the HTML content in the email body
+            helper.setText(htmlContent, true); // true to indicate that it is HTML
+
+            // Send the email
+            mailSender.send(message);
+            System.out.println("Purchase Email Sent Successfully !");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while sending email: " + e.getMessage());
+        }
+		
+	}
+	
+
 
 }
 

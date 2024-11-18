@@ -15,6 +15,17 @@
       font-size: 12px;
     margin-left: 5px;
     }
+    th {
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  th .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
   </style>
 </head>
 <body>
@@ -35,7 +46,7 @@
   <table id="paxMemberTable" class="table table-striped table-bordered">
     <thead class="table-dark">
       <tr>
-        <th onclick="sortTable('name')">Name <span class="sort-indicator" id="sort-name">▲</span></th>
+        <th onclick="sortTable('name')"><div class="header-content">Name <span class="sort-indicator" id="sort-name">▲</span></div></th>
         <th onclick="sortTable('phoneNumber')">PhoneNumber <span class="sort-indicator" id="sort-phoneNumber">▲</span></th>
         <th onclick="sortTable('email')">Email <span class="sort-indicator" id="sort-email">▲</span></th>
         <th>Relation</th>

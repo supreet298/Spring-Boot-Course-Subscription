@@ -15,6 +15,12 @@
   .sort-arrow {
     font-size: 12px;
     margin-left: 5px;
+
+  }
+  
+  th {
+    cursor: pointer;
+    white-space: nowrap;
   }
 </style>
 </head>
@@ -54,7 +60,7 @@
 
   <script>
     let currentPage = 0;
-    const pageSize = 3;
+    const pageSize = 10;
     let totalPages = 1; // Total number of pages
     let paxHeads = []; // To store fetched PaxHead data
     let sortDirection = 'asc'; // Default sort direction for Name column

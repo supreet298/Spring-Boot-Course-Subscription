@@ -76,4 +76,19 @@ public class NotificationService {
 		}
 		}
 	
+	// @Scheduled(cron = "0 0 0 * * ?") // Runs daily at midnight
+	 @Scheduled(cron = "0 */5 * * * ?") // 
+	    public void checkAndNotifyExpiredPlans() {
+	        LocalDateTime currentDate = LocalDateTime.now();
+	        List<PurchaseHistory> expiredPlans = purchaseHistoryRepository.findAllByExpiryDateBeforeAndNotificationSentFalse(currentDate);
+	        String Expiredfile="PlanExpired.html";
+	        for (PurchaseHistory plan : expiredPlans) {
+	            emailService.sendPlanExpiredEmail(plan.getClientEmail(), plan.getClientName(),plan.getPlanName(), plan.getSubscriptionType(), plan.getPurchaseDate().toLocalDate(), plan.getExpiryDate().toLocalDate(), Expiredfile); // Implement this method in your email service
+	            plan.setNotificationSent(true);// Mark as notified
+	            purchaseHistoryRepository.save(plan); // Update the record in the database
+				System.out.println("Expiray Email sent Successfully: ");
+
+	        }
+	    }
+	
 }

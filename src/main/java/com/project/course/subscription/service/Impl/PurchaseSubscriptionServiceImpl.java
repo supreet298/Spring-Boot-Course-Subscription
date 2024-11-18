@@ -74,9 +74,15 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         PurchaseSubscription savedSubscription = purchaseSubscriptionRepository.save(purchaseSubscription);
 
         // Send confirmation email
+        if(purchaseSubscriptionDTO.getPaid())
+        {
         String file = "SubscriptionConfirmation.html";
-        emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(), file);
-
+        emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(),"Sucess", file);
+        }else
+        {
+        	String file = "SubscriptionConfirmation.html";
+            emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(),"Pending", file);
+        }
         // Create purchase history entry
         createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription,now);
 
@@ -208,6 +214,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
             // Set paid to true and save
             subscription.setPaid(true);
             purchaseSubscriptionRepository.save(subscription);
+            
             // Create a new PurchaseHistory entry to track this payment
             LocalDateTime purchaseDate = subscription.getPurchaseDate();
             LocalDateTime now = LocalDateTime.now();
@@ -220,6 +227,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
                     subscription,
                     now
             );
+            String file1="PaymentConfirmation.html";
+            emailservice.sendpaymentConfirmEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getPlanName(), purchaseDate.toLocalDate(), subscription.getExpiryDate().toLocalDate(),  subscription.getSubscription().getSubscriptionType(), "Sucess", now.toLocalDate(), file1);
             return true;
         } else {
             throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);

@@ -28,5 +28,6 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
             "(:endDate IS NULL OR p.expiryDate <= :endDate)")
     Page<PurchaseHistory> findByPaxUserUuidAndOptionalDates(@Param("uuid") String uuid,
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
-
+    
+    List<PurchaseHistory> findAllByExpiryDateBeforeAndNotificationSentFalse(LocalDateTime currentDate);
 }

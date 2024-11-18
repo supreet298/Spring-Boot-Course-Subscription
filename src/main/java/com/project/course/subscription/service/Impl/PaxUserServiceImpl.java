@@ -37,7 +37,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 			throw new RuntimeException("Invalid Email .");
 		}
 		if (paxUserRepository.existsByEmailAndIsActiveTrue(paxUser.getEmail())) {
-			throw new RuntimeException("Email id already exists, try another.");
+			throw new RuntimeException("Email already exists, try another.");
 		}
 		head.setEmail(paxUser.getEmail());
 		head.setAddress(paxUser.getAddress());
@@ -61,7 +61,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 			// Step 3: If email is different, check if any other active user has the same
 			// email
 			if (paxUserRepository.existsByEmailAndIsActiveTrue(request.getEmail())) {
-				throw new RuntimeException("Email id already exists, try another.");
+				throw new RuntimeException("Email already exists, try another.");
 			}
 		}
 		existingHead.setEmail(request.getEmail());
@@ -87,7 +87,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 		member.setName(paxMemberDTO.getUserName());
 
 		if (paxUserRepository.existsByEmailAndIsActiveTrue(paxMemberDTO.getEmail())) {
-			throw new RuntimeException("Email id already exists, try another.");
+			throw new RuntimeException("Email already exists, try another.");
 		}
 		member.setEmail(paxMemberDTO.getEmail());
 
@@ -131,7 +131,7 @@ public class PaxUserServiceImpl implements PaxUserService {
 			// Step 3: If email is different, check if any other active user has the same
 			// email
 			if (paxUserRepository.existsByEmailAndIsActiveTrue(paxMember.getEmail())) {
-				throw new RuntimeException("Email id already exists, try another.");
+				throw new RuntimeException("Email already exists, try another.");
 			}
 		}
 

@@ -60,4 +60,6 @@ public class PurchaseHistory {
 
     @Column(name = "paid_date")
     private LocalDateTime paidDate;
+    
+    private boolean notificationSent=false;
 }

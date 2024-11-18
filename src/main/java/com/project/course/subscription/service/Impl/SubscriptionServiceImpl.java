@@ -28,7 +28,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     public Subscription createSubscription(Subscription subscription) {
         Subscription sub = new Subscription();
         if (subscriptionRepository.existsByPlanNameAndIsActiveTrue(subscription.getPlanName())) {
-            throw new RuntimeException("PlanName id already exists, try another.");
+            throw new RuntimeException("PlanName already exists, try another.");
         }
         sub.setPlanName(subscription.getPlanName());
         sub.setDescription(subscription.getDescription());
