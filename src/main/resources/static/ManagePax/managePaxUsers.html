@@ -43,7 +43,7 @@
 
   <script>
     let currentPage = 0;
-    const pageSize = 10;
+    const pageSize = 4;
     let totalPages = 1; // Total number of pages
     let paxHeads = []; // To store fetched PaxHead data
     let sortDirection = 'asc'; // Default sort direction for Name column
@@ -52,7 +52,7 @@
     // Fetch and display PaxHeads dynamically
     function loadPaxHeads(page = 0, query = '', sortBy = 'name', direction = 'asc') {
       const apiUrl = query
-        ? `/api/admin/pax/searchHead?query=${query}`
+        ? `/api/admin/pax/searchHead?query=${query}&sortBy=${sortBy}&direction=${direction}`
         : `/api/admin/pax/head?page=${page}&size=${pageSize}&sortBy=${sortBy}&direction=${direction}`;
 
       fetch(apiUrl)
@@ -131,14 +131,14 @@
     document.getElementById('prevPage').addEventListener('click', () => {
       if (currentPage > 0) {
         currentPage--;
-        loadPaxHeads(currentPage);
+        loadPaxHeads(currentPage, '',sortBy,sortDirection);
       }
     });
 
     document.getElementById('nextPage').addEventListener('click', () => {
       if (currentPage < totalPages - 1) {
         currentPage++;
-        loadPaxHeads(currentPage);
+        loadPaxHeads(currentPage, '',sortBy,sortDirection);
       }
     });
 
@@ -146,34 +146,36 @@
     document.getElementById('search').addEventListener('input', function (e) {
       const searchText = e.target.value.trim().toLowerCase();
       if (searchText) {
-        loadPaxHeads(0, searchText); // Trigger search when there's input
+        loadPaxHeads(0, searchText,sortBy,sortDirection); // Trigger search when there's input
       } else {
-        loadPaxHeads(currentPage); // Reset to current page if search is cleared
+        loadPaxHeads(currentPage, '',sortBy,sortDirection); // Reset to current page if search is cleared
       }
     });
 
-    // Toggle sorting direction when clicking the column headers
+ // Toggle sorting direction when clicking the column headers
     document.getElementById('sortByName').addEventListener('click', function () {
       sortBy = 'name';
       sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
       updateSortArrow('nameSortArrow', sortDirection); // Update the arrow direction
-      loadPaxHeads(currentPage, '', sortBy, sortDirection);
+      const searchText = document.getElementById('search').value.trim().toLowerCase();
+      loadPaxHeads(currentPage, searchText, sortBy, sortDirection);
     });
 
     document.getElementById('sortByPhone').addEventListener('click', function () {
       sortBy = 'phoneNumber';
       sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
       updateSortArrow('phoneSortArrow', sortDirection);
-      loadPaxHeads(currentPage, '', sortBy, sortDirection);
+      const searchText = document.getElementById('search').value.trim().toLowerCase();
+      loadPaxHeads(currentPage, searchText, sortBy, sortDirection);
     });
 
     document.getElementById('sortByEmail').addEventListener('click', function () {
       sortBy = 'email';
       sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
       updateSortArrow('emailSortArrow', sortDirection);
-      loadPaxHeads(currentPage, '', sortBy, sortDirection);
+      const searchText = document.getElementById('search').value.trim().toLowerCase();
+      loadPaxHeads(currentPage, searchText, sortBy, sortDirection);
     });
-    
 
     // Update the sort arrow next to the column header
     function updateSortArrow(arrowId, direction) {

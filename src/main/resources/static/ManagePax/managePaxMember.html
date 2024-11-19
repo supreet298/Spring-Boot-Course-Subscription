@@ -25,10 +25,9 @@
   <table id="paxMemberTable" class="table table-striped table-bordered">
     <thead class="table-dark">
       <tr>
-        <th onclick="sortTable('name')"><div class="header-content">Name <span class="sort-indicator" id="sort-name">▲</span></div></th>
-        <th onclick="sortTable('phoneNumber')"><div class="header-content">PhoneNumber <span class="sort-indicator" id="sort-phoneNumber">▲</span></div></th>
-        <th onclick="sortTable('email')"><div class="header-content">Email <span class="sort-indicator" id="sort-email">▲</span></div></th>
-        <th>Relation</th>
+        <th id="sortByName" style="cursor: pointer;"><div class="header-content">Name <span id="nameSortArrow" class="sort-arrow">▲</span></div></th>
+          <th id="sortByPhone" style="cursor: pointer;"><div class="header-content">Phone Number<span id="phoneSortArrow" class="sort-arrow">▲</span></div></th>
+          <th id="sortByEmail" style="cursor: pointer;"><div class="header-content">Email<span id="emailSortArrow" class="sort-arrow">▲</span></div></th>        <th>Relation</th>
         <th>Action</th>
       </tr>
     </thead>
@@ -49,10 +48,11 @@
   const uuid = urlParams.get('uuid');
   
   let currentPage = 0;
-  const pageSize = 10;
+  const pageSize = 4;
   let paxMembers = []; // Store fetched PaxMember data
   let totalPages = 1; // Total number of pages
   let paxHeadName = ''; // Variable to store PaxHead's name
+  let sortBy = 'name'; // Default sorting field
   let sortDirection = 'asc'; // Default sorting direction
 
   // Dynamically set the href of the Add Member button with the correct UUID
@@ -64,13 +64,15 @@
     window.history.back(); // Navigate back to the previous page
   });
 
-  // Fetch PaxHead details using the uuid from URL
+//Fetch PaxHead details using the uuid from URL
   fetch(`/api/admin/pax/${uuid}`)
     .then(response => {
       if (response.status === 404) {
         paxHeadName = 'Unknown PaxHead'; // If PaxHead not found, use fallback
         document.getElementById('paxHeadName').textContent = paxHeadName; // Display fallback name
-        return;
+        alert('PaxHead not found'); // Alert the user that PaxHead is not found
+        window.location.href = 'managePaxUsers.html'; // Redirect to the main page (managePaxUsers.html)
+        return; // Stop further execution
       }
       return response.json();
     })
@@ -85,14 +87,14 @@
       console.error('Error fetching PaxHead details:', error);
       paxHeadName = 'Unknown PaxHead'; // Ensure we have a fallback name
       document.getElementById('paxHeadName').textContent = paxHeadName; // Update the heading with PaxHead's name
-      window.location.href = 'managePaxUsers.html'; // Redirect to the main page if error occurs
+      alert('PaxHead not found'); // Alert the user that an error occurred
+      window.location.href = 'managePaxUsers.html'; // Redirect to the main page
     });
-
-  // Fetch and display PaxMembers dynamically
-  function loadPaxMembers(page = 0, query = '') {
+//Fetch and display PaxMembers dynamically
+  function loadPaxMembers(page = 0, query = '', sortBy = 'name', sortDirection = 'asc') {
     const apiUrl = query
-      ? `/api/admin/pax/searchMember/${uuid}?query=${query}`
-      : `/api/admin/pax/getMemberByHeadId/${uuid}?page=${page}&size=${pageSize}`;
+      ? `/api/admin/pax/searchMember/${uuid}?query=${query}&sortBy=${sortBy}&direction=${sortDirection}`
+      : `/api/admin/pax/getMemberByHeadId/${uuid}?page=${page}&size=${pageSize}&sortBy=${sortBy}&direction=${sortDirection}`;
 
     fetch(apiUrl)
       .then(response => response.json())
@@ -100,44 +102,31 @@
         if (query) {
           paxMembers = data;
           totalPages = 1;
-          document.getElementById('totalElements').innerText = `Total: ${paxMembers.length}`; // Display total search results
+          document.getElementById('totalElements').innerText = `Total: ${paxMembers.length}`;
         } else {
           paxMembers = data.content;
           totalPages = data.totalPages;
-          document.getElementById('totalElements').innerText = `Total: ${data.totalElements}`; // Display total items from response
+          document.getElementById('totalElements').innerText = `Total: ${data.totalElements}`;
         }
 
         displayPaxMembers(paxMembers);
         updatePagination();
       })
       .catch(error => {
-    	  console.error('Error fetching PaxMembers:', error);
-    	  
-    	  // Add logging to see when this block runs
-    	  console.log('Executing the .catch() block for fetching PaxMembers');
-
-    	  // Ensure the name is populated correctly before showing the alert
-    	  const displayName = paxHeadName || 'this PaxHead';
-
-    	  // Check if the confirmation dialog is shown more than once
-    	  if (!window.alertShown) {
-    	    window.alertShown = true; // Use a flag to ensure this runs only once
-
-    	    const userConfirmed = window.confirm(`No members found under ${displayName}. Do you want to add a member?`);
-    	    if (userConfirmed) {
-    	      window.location.href = `createPaxMember.html?uuid=${uuid}`;
-    	    } else {
-    	      console.log("User canceled the action.");
-    	      window.history.back();
-    	    }
-    	  } else {
-    	    console.log('Alert already shown.');
-    	  }
-    	});
-
-
+        console.error('Error fetching PaxMembers:', error);
+        // Handling the case where no members are found
+        const displayName = paxHeadName || 'this PaxHead';
+        if (!window.alertShown) {
+          window.alertShown = true;
+          const userConfirmed = window.confirm(`No members found under ${displayName}. Do you want to add a member?`);
+          if (userConfirmed) {
+            window.location.href = `createPaxMember.html?uuid=${uuid}`;
+          } else {
+            window.history.back();
+          }
+        }
+      });
   }
-
   // Display PaxMembers in the table
   function displayPaxMembers(paxMembers) {
     const paxMemberTableBody = document.getElementById('paxMemberTableBody');
@@ -195,46 +184,59 @@
   document.getElementById('prevPage').addEventListener('click', () => {
     if (currentPage > 0) {
       currentPage--;
-      loadPaxMembers(currentPage);
+      loadPaxMembers(currentPage,'',sortBy,sortDirection);
     }
   });
 
   document.getElementById('nextPage').addEventListener('click', () => {
     if (currentPage < totalPages - 1) {
       currentPage++;
-      loadPaxMembers(currentPage);
+      loadPaxMembers(currentPage, '',sortBy,sortDirection);
     }
   });
 
-  // Sort table columns by header click
-  function sortTable(column) {
-    paxMembers.sort((a, b) => {
-      if (a[column] < b[column]) return sortDirection === 'asc' ? -1 : 1;
-      if (a[column] > b[column]) return sortDirection === 'asc' ? 1 : -1;
-      return 0;
-    });
-    sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-    displayPaxMembers(paxMembers);
-    updateSortIndicator(column);
-  }
-
-  // Update sort indicators
-  function updateSortIndicator(column) {
-    const sortIndicators = document.querySelectorAll('.sort-indicator');
-    sortIndicators.forEach(indicator => indicator.textContent = '');
-
-    const indicator = document.getElementById(`sort-${column}`);
-    if (indicator) {
-      indicator.textContent = sortDirection === 'asc' ? '▲' : '▼';
+  // Event listener for search input
+  document.getElementById('search').addEventListener('input', function (e) {
+    const searchText = e.target.value.trim().toLowerCase();
+    if (searchText) {
+    	loadPaxMembers(0, searchText,sortBy,sortDirection); // Trigger search when there's input
+    } else {
+    	loadPaxMembers(currentPage, '',sortBy,sortDirection); // Reset to current page if search is cleared
     }
-  }
-
-  // Search functionality
-  document.getElementById('search').addEventListener('input', function () {
-    const query = this.value;
-    loadPaxMembers(currentPage, query);
   });
 
+//Sort by Name
+  document.getElementById('sortByName').addEventListener('click', function () {
+    sortBy = 'name';
+    sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+    updateSortArrow('nameSortArrow', sortDirection);
+    const searchText = document.getElementById('search').value.trim().toLowerCase();
+    loadPaxMembers(currentPage, searchText, sortBy, sortDirection);
+  });
+
+  // Sort by Phone Number
+  document.getElementById('sortByPhone').addEventListener('click', function () {
+    sortBy = 'phoneNumber';
+    sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+    updateSortArrow('phoneSortArrow', sortDirection);
+    const searchText = document.getElementById('search').value.trim().toLowerCase();
+    loadPaxMembers(currentPage, searchText, sortBy, sortDirection);
+  });
+
+  // Sort by Email
+  document.getElementById('sortByEmail').addEventListener('click', function () {
+    sortBy = 'email';
+    sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+    updateSortArrow('emailSortArrow', sortDirection);
+    const searchText = document.getElementById('search').value.trim().toLowerCase();
+    loadPaxMembers(currentPage, searchText, sortBy, sortDirection);
+  });
+
+  // Update the sort arrow next to the column header
+  function updateSortArrow(arrowId, direction) {
+    const arrow = document.getElementById(arrowId);
+    arrow.innerHTML = (direction === 'asc') ? '▲' : '▼';
+  }
   // Initialize page load
   loadPaxMembers(currentPage);
 </script>

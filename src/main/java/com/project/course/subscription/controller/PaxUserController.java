@@ -125,15 +125,17 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/searchHead")
-	public ResponseEntity<List<PaxHeadDTO>> searchByHeadItems(@RequestParam String query) {
-		List<PaxHeadDTO> results = paxUserService.searchHead(query);
+	public ResponseEntity<List<PaxHeadDTO>> searchByHeadItems(@RequestParam String query,@RequestParam(defaultValue = "name") String sortBy,
+			@RequestParam(defaultValue = "asc") String direction) {
+		List<PaxHeadDTO> results = paxUserService.searchHead(query,sortBy, direction);
 		return ResponseEntity.ok(results);
 	}
 
 	@GetMapping("/searchMember/{uuid}")
 	public ResponseEntity<List<PaxUsersDTO>> searchByMemberItems(@PathVariable String uuid,
-			@RequestParam String query) {
-		List<PaxUsersDTO> results = paxUserService.searchMemberByHeadUuid(uuid, query);
+			@RequestParam String query,@RequestParam(defaultValue = "name") String sortBy,
+			@RequestParam(defaultValue = "asc") String direction) {
+		List<PaxUsersDTO> results = paxUserService.searchMemberByHeadUuid(uuid, query,sortBy, direction);
 		return ResponseEntity.ok(results);
 	}
 }

@@ -177,15 +177,19 @@ public class PaxUserServiceImpl implements PaxUserService {
 	public PaxUser dropPaxUser(String uuid) {
 		PaxUser existingHead = paxUserRepository.findByUuid(uuid)
 				.orElseThrow(() -> new UsernameNotFoundException("No PaxUser found for this UUID: " + uuid));
+		List<PaxUser> existingPaxMember = paxUserRepository.findAllActiveMembersByHeadUuid(uuid);
+
 		if (existingHead.isActive()) {
 			existingHead.setActive(false);
-			paxUserRepository.save(existingHead);
-		}
-
-		return existingHead;
-
+	        for (PaxUser member : existingPaxMember) {
+	            member.setActive(false);
+	        }
+	        paxUserRepository.save(existingHead);
+	        paxUserRepository.saveAll(existingPaxMember);
+	    }
+	    return existingHead;
 	}
-
+	
 	@Override
 	public PaxHeadDTO getPaxHeadById(String uuid) {
 		PaxUser paxHead = paxUserRepository.findByUuidAndTypeAndIsActiveTrue(uuid, Type.HEAD)
@@ -203,9 +207,17 @@ public class PaxUserServiceImpl implements PaxUserService {
 	}
 
 	@Override
-	public List<PaxHeadDTO> searchHead(String query) {
-		// Fetch the list of PaxUser entities
-		List<PaxUser> paxUsers = paxUserRepository.searchByMultipleFieldsAndHeadType(query);
+	public List<PaxHeadDTO> searchHead(String query,String sortBy, String direction) {
+		Sort sort =Sort.by(Sort.Order.by(sortBy));
+		if("desc".equalsIgnoreCase(direction)) 
+		{
+			sort = sort.descending();
+		}else
+		{
+			sort = sort.ascending();
+		}
+		
+		List<PaxUser> paxUsers = paxUserRepository.searchByMultipleFieldsAndHeadType(query,sort);
 
 		// Manually map the fields, excluding the 'relation' field
 		return paxUsers.stream().map(this::convertToHeadDTO)
@@ -213,8 +225,17 @@ public class PaxUserServiceImpl implements PaxUserService {
 	}
 
 	@Override
-	public List<PaxUsersDTO> searchMemberByHeadUuid(String uuid, String query) {
-		List<PaxUser> paxUsers = paxUserRepository.searchByMultipleFieldsAndMemberTypeByHeadUuid(uuid, query);
+	public List<PaxUsersDTO> searchMemberByHeadUuid(String uuid, String query,String sortBy, String direction) {
+		Sort sort =Sort.by(Sort.Order.by(sortBy));
+		if("desc".equalsIgnoreCase(direction)) 
+		{
+			sort = sort.descending();
+		}else
+		{
+			sort = sort.ascending();
+		}
+		
+		List<PaxUser> paxUsers = paxUserRepository.searchByMultipleFieldsAndMemberTypeByHeadUuid(uuid, query,sort);
 		return paxUsers.stream().map(this::convertToUsersDTO).collect(Collectors.toList());
 	}
 
@@ -245,5 +266,6 @@ public class PaxUserServiceImpl implements PaxUserService {
 		dto.setRelation(paxUser.getRelation().toString());
 		return dto;
 	}
+
 
 }

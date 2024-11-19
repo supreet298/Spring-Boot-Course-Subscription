@@ -51,5 +51,4 @@ public class PurchaseHistoryController {
 
         return ResponseEntity.ok(purchaseHistoriesPages);
     }
-
 }

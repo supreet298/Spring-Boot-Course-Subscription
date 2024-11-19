@@ -180,7 +180,6 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         return Optional.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid).filter(PurchaseSubscription::isActive).map(this::convertToDTO).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid)));
     }
 
-
     @Override
     public boolean disableRecurringForSubscription(String uuid) {
         Optional<PurchaseSubscription> subscriptionOpt = purchaseSubscriptionRepository.findByUuid(uuid);
