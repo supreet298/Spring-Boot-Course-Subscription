@@ -81,6 +81,7 @@
                     <th>Subscription Type</th>
                     <th>Cost</th>
                     <th>Paid</th>
+                    <th>Recurring</th>
                     <th>Purchase Date</th>
                     <th>Expiry Date</th>
                 </tr>
@@ -171,6 +172,7 @@
                 <td>${item.subscriptionType}</td>
                 <td>${item.cost}</td>
                 <td>${item.paid}</td>
+                <td>${item.recurring}</td>
                 <td>${formatCustomDate(item.purchaseDate)}</td>
                 <td>${formatCustomDate(item.expiryDate)}</td>
             `;
@@ -210,13 +212,13 @@
     document.getElementById('prevPage').addEventListener('click', () => {
         if (currentPage > 0) {
             currentPage--;
-            fetchPurchaseHistory(currentPage);
+            fetchPurchaseHistory(currentPage, sortBy, sortDirection);
         }
     });
 
     document.getElementById('nextPage').addEventListener('click', () => {
         currentPage++;
-        fetchPurchaseHistory(currentPage);
+        fetchPurchaseHistory(currentPage, sortBy, sortDirection);
     });
 
     async function fetchSubscriptions() {
@@ -321,6 +323,20 @@
     document.getElementById('member-tab').addEventListener('click', () => {
         window.location.href = `managePaxMember.html?uuid=${uuid}`;
     });
+
+    // Refresh or reload data when the History tab is clicked
+    document.getElementById('history-tab').addEventListener('click', () => {
+    // Reset filters and pagination if needed
+    startDate = null;
+    endDate = null;
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    currentPage = 0; // Reset to the first page
+
+    // Fetch the latest data for the History tab
+    fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+});
+
     // Fetch data when the page loads
     fetchPurchaseHistory(currentPage);
     fetchSubscriptions();

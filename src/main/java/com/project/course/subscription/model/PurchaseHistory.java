@@ -60,6 +60,8 @@ public class PurchaseHistory {
 
     @Column(name = "paid_date")
     private LocalDateTime paidDate;
+
+    private Boolean recurring;
     
     private boolean notificationSent=false;
 }

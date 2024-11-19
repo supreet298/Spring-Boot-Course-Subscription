@@ -159,6 +159,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         purchaseHistory.setCost(purchaseSubscription.getCost());
         purchaseHistory.setPaid(purchaseSubscription.getPaid());
         purchaseHistory.setPaidDate(purchaseSubscription.getPaid() ? paidDate : null);
+        purchaseHistory.setRecurring(purchaseSubscription.isRecurring());
 
         purchaseHistoryService.createPurchaseHistory(purchaseHistory); // Save purchase history
     }
@@ -190,6 +191,18 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
             // Set recurring to false and save
             subscription.setRecurring(false);
             purchaseSubscriptionRepository.save(subscription);
+            // Create a new PurchaseHistory entry to track this payment
+            LocalDateTime purchaseDate = subscription.getPurchaseDate();
+            LocalDateTime now = LocalDateTime.now();
+            createPurchaseHistory(
+                    subscription.getPaxUser(),
+                    subscription.getSubscription(),
+                    purchaseDate,
+                    subscription.getExpiryDate(),
+                    getRenewalCount(subscription.getPaxUser(), subscription.getSubscription()),
+                    subscription,
+                    now
+            );
             String file = "RenewalCancellation.html";
             emailservice.sendAutoRenewalCancellationEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), subscription.getExpiryDate().toLocalDate(), file);
             return true;

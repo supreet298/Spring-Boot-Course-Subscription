@@ -56,7 +56,7 @@
   // Function to fetch and display subscriptions with pagination and search
   function fetchSubscriptions(page = 0, keyword = '', sortBy = 'planName', direction = 'asc') {
     const apiUrl = keyword
-      ? `/api/admin/subscription/search?keyword=${keyword}`
+      ? `/api/admin/subscription/search?keyword=${keyword}&sortBy=${sortBy}&direction=${direction}`
       : `/api/admin/subscription?page=${page}&size=${pageSize}&sortBy=${sortBy}&direction=${direction}`;
 
     fetch(apiUrl)
@@ -95,7 +95,7 @@
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${subscription.planName}</td>
-            <td>${subscription.description}</td>
+            <td title="${subscription.description}">${subscription.description}</td> <!-- Tooltip on hover -->
             <td>${formatToINR(subscription.cost)}</td> <!-- Format cost as INR -->
             <td>${subscription.subscriptionType}</td>
             <td>
@@ -141,22 +141,22 @@
   document.getElementById('prevPage').addEventListener('click', () => {
     if (currentPage > 0) {
       currentPage--;
-      fetchSubscriptions(currentPage);
+      fetchSubscriptions(currentPage, '', sortBy, sortDirection);
     }
   });
 
   document.getElementById('nextPage').addEventListener('click', () => {
     currentPage++;
-    fetchSubscriptions(currentPage);
+    fetchSubscriptions(currentPage, '', sortBy, sortDirection);
   });
 
   // Event listener for search input
   document.getElementById('search').addEventListener('input', function (e) {
     const searchText = e.target.value.trim().toLowerCase();
     if (searchText) {
-      fetchSubscriptions(0, searchText); // Trigger search when there's input
+      fetchSubscriptions(0, searchText, sortBy, sortDirection); // Trigger search when there's input
     } else {
-      fetchSubscriptions(currentPage); // Reset to current page if search is cleared
+      fetchSubscriptions(currentPage, '', sortBy, sortDirection); // Reset to current page if search is cleared
     }
   });
 
@@ -165,14 +165,16 @@
       sortBy = 'planName';
       sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
       updateSortArrow('planNameSortArrow', sortDirection); // Update the arrow direction
-      fetchSubscriptions(currentPage, '', sortBy, sortDirection);
+      const searchText = document.getElementById('search').value.trim().toLowerCase();
+      fetchSubscriptions(currentPage,searchText, sortBy, sortDirection);
     });
 
     document.getElementById('sortByCost').addEventListener('click', function () {
       sortBy = 'cost';
       sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
       updateSortArrow('costSortArrow', sortDirection);
-      fetchSubscriptions(currentPage, '', sortBy, sortDirection);
+      const searchText = document.getElementById('search').value.trim().toLowerCase();
+      fetchSubscriptions(currentPage,searchText, sortBy, sortDirection);
     });
 
 

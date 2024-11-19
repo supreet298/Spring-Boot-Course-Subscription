@@ -48,3 +48,23 @@ th .header-content {
 #filterBy {
 	width: 150px; /* Adjust the width as needed */
 }
+
+/* Custom styles to increase the size of the radio buttons */
+.form-check-input {
+    width: 15px; /* Adjust the width of the radio button */
+    height: 15px; /* Adjust the height of the radio button */
+}
+
+.form-check-label {
+    font-size: 18px; /* Optional: Increase label font size */
+}
+
+#loadingSpinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1050; /* Keeps it above other elements */
+    display: none; /* Hidden by default */
+    pointer-events: none; /* Ensures it's non-interactive */
+}

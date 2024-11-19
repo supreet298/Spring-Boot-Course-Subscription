@@ -94,8 +94,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public List<SubscriptionDTO> searchSubscription(String keyword) {
-        List<Subscription> subscriptions = subscriptionRepository.searchSubscription(keyword);
+    public List<SubscriptionDTO> searchSubscription(String keyword, String sortBy, String direction) {
+        Sort sort = Sort.by(Sort.Order.by(sortBy));
+        if ("desc".equalsIgnoreCase(direction)) {
+            sort = sort.descending();
+        } else {
+            sort = sort.ascending();
+        }
+        List<Subscription> subscriptions = subscriptionRepository.searchSubscription(keyword,sort);
         return subscriptions.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

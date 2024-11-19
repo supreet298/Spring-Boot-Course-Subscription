@@ -67,6 +67,7 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         dto.setCost(history.getCost());
         dto.setPaid(history.getPaid());
         dto.setPaidDate(history.getPaidDate());
+        dto.setRecurring(history.getRecurring());
         return dto;
     }
 }

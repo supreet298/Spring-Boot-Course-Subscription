@@ -47,8 +47,9 @@ public class SubscriptionController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<SubscriptionDTO>> searchSubscription(@RequestParam String keyword){
-        List<SubscriptionDTO> subscriptions = subscriptionService.searchSubscription(keyword);
+    public ResponseEntity<List<SubscriptionDTO>> searchSubscription(@RequestParam String keyword,@RequestParam(defaultValue = "planName") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction){
+        List<SubscriptionDTO> subscriptions = subscriptionService.searchSubscription(keyword, sortBy, direction);
         return ResponseEntity.ok(subscriptions);
     }
 
