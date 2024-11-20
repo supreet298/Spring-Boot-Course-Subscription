@@ -96,6 +96,7 @@
                 <button id="nextPage" class="btn btn-success btn-sm ms-2">Next</button>
             </div>
         </div>
+        <div id="toast" class="toast"></div>
     </div>
 </div>
 
@@ -132,6 +133,14 @@
         fetchPurchaseHistory(currentPage, sortBy, sortDirection);
     }
 
+    // Event listener to update endDate min attribute
+    document.getElementById('startDate').addEventListener('change', function() {
+    const startDateValue = this.value;
+    const endDateInput = document.getElementById('endDate');
+    endDateInput.value = ''; // Reset the endDate value
+    endDateInput.min = startDateValue; // Set the minimum endDate value to startDate
+    });
+
     async function fetchPurchaseHistory(page = 0, sortBy = 'planName', direction = 'asc') {
         try {
             let queryParams = `?page=${page}&size=${pageSize}&sortBy=${sortBy}&direction=${direction}`;
@@ -161,6 +170,10 @@
          currentPage = 0; // Reset to the first page when applying the filter
          fetchPurchaseHistory(currentPage, sortBy, sortDirection); // Fetch filtered data
     });
+
+    // Initial setup to ensure endDate is appropriately restricted
+    document.getElementById('startDate').dispatchEvent(new Event('change'));
+
 
     function populatePurchaseHistoryTable(data) {
         const tableBody = document.getElementById('purchaseHistoryTable');
@@ -260,6 +273,7 @@
         fetch(`/api/admin/purchaseSubscription/${uuid}/disable`, { method: 'DELETE' })
             .then(response => {
                 if (response.ok) {
+                    showToast("Disabled Recurring successful!");
                     fetchSubscriptions();
                 } else {
                     response.text().then(text => alert("Failed to off recurring the subscription: " + text));
@@ -276,6 +290,7 @@
         fetch(`/api/admin/purchaseSubscription/${uuid}/pay`, { method: 'PUT' })
             .then(response => {
                 if (response.ok) {
+                    showToast("Subscription payment successful!");
                     fetchSubscriptions();
                 } else {
                     response.text().then(text => alert("Failed to pay the subscription: " + text));
@@ -336,6 +351,18 @@
     // Fetch the latest data for the History tab
     fetchPurchaseHistory(currentPage, sortBy, sortDirection);
 });
+
+    function showToast(message) {
+    const toastElement = document.getElementById('toast');
+    toastElement.textContent = message;
+    toastElement.className = "toast show"; // Add 'show' class to make it visible
+
+    // Remove the toast after 3 seconds
+    setTimeout(() => {
+        toastElement.className = "toast"; // Remove 'show' class to hide it
+    }, 3000);
+}
+
 
     // Fetch data when the page loads
     fetchPurchaseHistory(currentPage);
