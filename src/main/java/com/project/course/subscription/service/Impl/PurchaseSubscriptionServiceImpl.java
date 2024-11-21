@@ -77,7 +77,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         if(purchaseSubscriptionDTO.getPaid())
         {
         String file = "SubscriptionConfirmation.html";
-        emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(),"Sucess", file);
+        emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(),"Success", file);
         }else
         {
         	String file = "SubscriptionConfirmation.html";
@@ -172,12 +172,17 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
     @Override
     public List<PurchaseSubscriptionDTO> getAllPurchaseSubscriptions() {
         List<PurchaseSubscription> purchaseSubscriptions = purchaseSubscriptionRepository.findAll();
-        return purchaseSubscriptions.stream().map(this::convertToDTO).collect(Collectors.toList());
+        return purchaseSubscriptions.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
     public Optional<PurchaseSubscriptionDTO> getPurchaseSubscriptionByUuid(String uuid) {
-        return Optional.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid).filter(PurchaseSubscription::isActive).map(this::convertToDTO).orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid)));
+        return Optional.ofNullable(purchaseSubscriptionRepository.findByUuid(uuid)
+                .filter(PurchaseSubscription::isActive)
+                .map(this::convertToDTO)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Purchase Subscription not found with UUID: " + uuid)));
     }
 
     @Override

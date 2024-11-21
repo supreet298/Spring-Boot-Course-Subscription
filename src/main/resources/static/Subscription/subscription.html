@@ -127,7 +127,6 @@
       fetch(`/api/admin/subscription/${uuid}`, { method: 'DELETE' })
         .then(response => {
           if (response.ok) {
-//            alert("Subscription deleted successfully.");
             fetchSubscriptions(currentPage); // Refresh the table after deletion
           } else {
             alert("Failed to delete the subscription.");

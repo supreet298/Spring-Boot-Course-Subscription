@@ -33,10 +33,12 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         purchaseHistoryRepository.save(purchaseHistory);
     }
 
+    @Override
     public List<PurchaseHistory> findPurchaseHistoryByUserAndSubscription(Long userId, Long subscriptionId) {
         return purchaseHistoryRepository.findPurchaseHistoryByUserAndSubscription(userId, subscriptionId);
     }
 
+    @Override
     public Page<PurchaseHistoryDTO> getPurchaseHistoriesByPaxUserUuid(
             String uuid, int page, int size, String sortBy, String direction,
             LocalDateTime purchaseDate, LocalDateTime expiryDate) {
