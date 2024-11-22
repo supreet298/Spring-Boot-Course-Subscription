@@ -27,7 +27,7 @@ public class PurchaseHistoryController {
     @GetMapping("/{uuid}")
     public ResponseEntity<Page<PurchaseHistoryDTO>> getPurchaseHistories(@PathVariable String uuid,
             @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "planName") String sortBy, @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(defaultValue = "purchaseDate") String sortBy, @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate) {
 
         // Define the DateTimeFormatter for the "dd-MM-yyyy" format

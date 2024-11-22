@@ -24,7 +24,6 @@
 
 #search {
     width: 250px;
-    text-align: center;
     color: black;
 }
 
@@ -78,6 +77,10 @@
 /* Optional: Styling for better hover effect (tooltip positioning and visibility) */
 #subscriptionTable td:nth-child(2):hover {
   cursor: pointer;
+}
+table {
+    table-layout: fixed;
+    width: 100%;
 }
 
 

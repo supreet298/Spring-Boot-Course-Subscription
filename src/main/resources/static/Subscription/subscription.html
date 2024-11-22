@@ -29,7 +29,7 @@
     <tr>
       <th id="sortByPlanName" style="cursor: pointer;"><div class="header-content">Plan Name <span id="planNameSortArrow" class="sort-arrow">▲</span></div></th>
       <th>Description</th>
-      <th id="sortByCost" style="cursor: pointer;"><div class="header-content">Cost<span id="costSortArrow" class="sort-arrow">▲</span></div></th>
+      <th id="sortByCost" style="cursor: pointer;"><div class="header-content">Cost(₹)<span id="costSortArrow" class="sort-arrow">▲</span></div></th>
       <th>Subscription Type</th>
       <th>Action</th> <!-- Action column for buttons -->
     </tr>
@@ -81,22 +81,13 @@
         const subscriptionTableBody = document.getElementById('subscriptionTableBody');
         subscriptionTableBody.innerHTML = ''; // Clear any existing rows
 
-        // Function to format cost in INR
-        function formatToINR(amount) {
-          return new Intl.NumberFormat('en-IN', {
-            style: 'currency',
-            currency: 'INR',
-            maximumFractionDigits: 2
-          }).format(amount);
-        }
-
         // Populate table with subscription data
         subscriptions.forEach(subscription => {
           const row = document.createElement('tr');
           row.innerHTML = `
             <td>${subscription.planName}</td>
             <td title="${subscription.description}">${subscription.description}</td> <!-- Tooltip on hover -->
-            <td>${formatToINR(subscription.cost)}</td> <!-- Format cost as INR -->
+            <td class="text-right">${subscription.cost}</td>
             <td>${subscription.subscriptionType}</td>
             <td>
               <a href="update.html?uuid=${subscription.uuid}" class="btn btn-primary btn-sm">Edit</a>

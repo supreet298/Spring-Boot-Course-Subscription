@@ -23,9 +23,9 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
     @Query("SELECT p FROM PurchaseHistory p WHERE p.expiryDate BETWEEN :start AND :end")
     List<PurchaseHistory> findExpiringPlansBetween(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
-    @Query("SELECT p FROM PurchaseHistory p WHERE p.paxUser.uuid = :uuid AND " +
-            "(:startDate IS NULL OR p.purchaseDate BETWEEN :startDate AND :endDate) AND " +
-            "(:endDate IS NULL OR p.expiryDate <= :endDate)")
+    @Query("SELECT p FROM PurchaseHistory p WHERE p.paxUser.uuid = :uuid " +
+            "AND (:startDate IS NULL OR p.purchaseDate >= :startDate) " +
+            "AND (:endDate IS NULL OR p.purchaseDate <= :endDate)")
     Page<PurchaseHistory> findByPaxUserUuidAndOptionalDates(@Param("uuid") String uuid,
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
     
