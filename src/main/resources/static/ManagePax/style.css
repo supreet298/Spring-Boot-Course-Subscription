@@ -72,3 +72,32 @@ table {
     table-layout: fixed;
     width: 100%;
 }
+
+.text-right {
+    text-align: right !important;
+}
+
+#paginationControls {
+  display: flex;
+  justify-content: center;  /* Center the content */
+  align-items: center;      /* Vertically center the content */
+  width: 100%;              /* Ensure the container takes full width */
+}
+
+#paginationControls {
+  display: flex;
+  justify-content: space-between;  /* Ensure buttons are on the left and right */
+  align-items: center;
+  width: 100%;  /* Ensure it takes the full width */
+  margin-top: 10px; /* Add some space from the table */
+}
+
+#pageInfo {
+  flex-grow: 1;  /* Makes sure the page info takes the remaining space */
+  text-align: center;  /* Center the page info */
+  margin: 0 10px;  /* Add some spacing if needed */
+}
+
+button {
+  margin: 0 10px; /* Space between the buttons */
+}
