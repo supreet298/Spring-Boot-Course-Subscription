@@ -116,7 +116,6 @@ public class PaxUserController {
 		}
 	}
 
-
 	@GetMapping("/head")
 	public Page<PaxHeadDTO> getPaginatedAndSortedHeads(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortBy,

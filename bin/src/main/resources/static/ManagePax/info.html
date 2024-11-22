@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Info</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="/ManagePax/style.css?v=1.0">
+
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row align-items-center mb-5">
+        <div class="col-auto">
+            <a href="managePaxUsers.html" class="btn btn-primary">Back</a>
+        </div>
+        <div class="col text-center">
+            <h2 id="paxUserName" class="mb-0">User Info</h2>
+        </div>
+        <div class="col-auto"></div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-5 mt-3" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button" role="tab" aria-controls="home" aria-selected="true">Home</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="subscription-tab" data-bs-toggle="tab" data-bs-target="#subscription" type="button" role="tab" aria-controls="subscription" aria-selected="false">Subscription</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">History</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="member-tab" data-bs-toggle="tab" data-bs-target="#member" type="button" role="tab" aria-controls="member" aria-selected="false" onclick="redirectToMemberPage()">Member</button>
+        </li>
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content mt-3" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <h4>Home Content</h4>
+            <p>This is the content for the Home tab. You can place any HTML content here.</p>
+        </div>
+
+        <div class="tab-pane fade" id="subscription" role="tabpanel" aria-labelledby="subscription-tab">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4>Subscription</h4>
+                <button id="purchaseButton" class="btn btn-success">Purchase</button>
+            </div>
+            <p>Notes : ∞ Auto-Renewal</p>
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                <tr>
+                    <th>Plan Name</th>
+                    <th>Subscription Type</th>
+                    <th>Paid</th>
+                    <th>Purchase Date</th>
+                    <th>Expiry Date</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody id="subscriptionTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+            <div class="d-flex justify-content-start align-items-center mb-3">
+                <label for="startDate" class="ms-3">From</label>
+                <input type="date" id="startDate" class="form-control ms-2" style="width: 150px;">
+                <label for="endDate" class="ms-3">To</label>
+                <input type="date" id="endDate" class="form-control ms-2" style="width: 150px;">
+                <button id="applyFilter" class="btn btn-primary btn-sm ms-2" onclick="applyFilter()">Apply</button>
+                <button id="clearFilter" class="btn btn-primary btn-sm ms-2" onclick="clearFilter()">Clear</button>
+            </div>
+            <table class="table table-striped table-bordered">
+                <thead class="table-dark">
+                <tr>
+                    <th id="sortByPlanName" style="cursor: pointer;"><div class="header-content">Plan Name <span id="planNameSortArrow" class="sort-arrow">▲</span></div></th>
+                    <th>Subscription Type</th>
+                    <th>Cost</th>
+                    <th>Paid</th>
+                    <th>Recurring</th>
+                    <th>Purchase Date</th>
+                    <th>Expiry Date</th>
+                </tr>
+                </thead>
+                <tbody id="purchaseHistoryTable">
+                </tbody>
+            </table>
+            <div id="paginationInfo" class="d-flex justify-content-between align-items-center mt-3" style="display: none;">
+                <!-- Pagination information will be displayed here -->
+                <button id="prevPage" class="btn btn-success btn-sm" disabled>Previous</button>
+                <span id="pageInfo"></span>
+                <button id="nextPage" class="btn btn-success btn-sm ms-2">Next</button>
+            </div>
+        </div>
+        <div id="toast" class="toast"></div>
+    </div>
+</div>
+
+<script>
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuid = urlParams.get('uuid');
+
+    let currentPage = 0; // Keep track of the current page for purchase history
+    const pageSize = 10; // Set the number of items per page
+    let sortDirection = 'asc';
+    let sortBy = 'planName';
+    let startDate = null;
+    let endDate = null;
+
+    // Apply filter function
+    function applyFilter() {
+        startDate = document.getElementById('startDate').value;
+        endDate = document.getElementById('endDate').value;
+
+        if (startDate) startDate = formatDate(startDate);
+        if (endDate) endDate = formatDate(endDate);
+
+        fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+    }
+
+    // Clear filter function
+    function clearFilter() {
+        document.getElementById('startDate').value = '';
+        document.getElementById('endDate').value = '';
+        startDate = null;
+        endDate = null;
+
+        fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+    }
+
+    // Event listener to update endDate min attribute
+    document.getElementById('startDate').addEventListener('change', function() {
+    const startDateValue = this.value;
+    const endDateInput = document.getElementById('endDate');
+    endDateInput.value = ''; // Reset the endDate value
+    endDateInput.min = startDateValue; // Set the minimum endDate value to startDate
+    });
+
+    async function fetchPurchaseHistory(page = 0, sortBy = 'planName', direction = 'asc') {
+        try {
+            let queryParams = `?page=${page}&size=${pageSize}&sortBy=${sortBy}&direction=${direction}`;
+            if (startDate) queryParams += `&startDate=${startDate}`;
+            if (endDate) queryParams += `&endDate=${endDate}`;
+
+            const response = await fetch(`/api/admin/purchaseHistory/${uuid}${queryParams}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            populatePurchaseHistoryTable(data);
+            updatePaginationButtons(data);
+        } catch (error) {
+            console.error('There was a problem fetching the purchase history:', error);
+        }
+    }
+
+    // Function to format date to yyyy-MM-dd
+    function formatDate(dateString) {
+    // Assuming the date format from the input field is dd-MM-yyyy
+    const [day, month, year] = dateString.split('-');
+    return `${year}-${month}-${day}`; // Format as yyyy-MM-dd
+}
+    // Attach event listener to the Apply Filter button
+    document.getElementById('applyFilter').addEventListener('click', function () {
+         currentPage = 0; // Reset to the first page when applying the filter
+         fetchPurchaseHistory(currentPage, sortBy, sortDirection); // Fetch filtered data
+    });
+
+    // Initial setup to ensure endDate is appropriately restricted
+    document.getElementById('startDate').dispatchEvent(new Event('change'));
+
+
+    function populatePurchaseHistoryTable(data) {
+        const tableBody = document.getElementById('purchaseHistoryTable');
+        tableBody.innerHTML = ''; // Clear previous data
+        data.content.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${item.planName}</td>
+                <td>${item.subscriptionType}</td>
+                <td>${item.cost}</td>
+                <td>${item.paid}</td>
+                <td>${item.recurring}</td>
+                <td>${formatCustomDate(item.purchaseDate)}</td>
+                <td>${formatCustomDate(item.expiryDate)}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function updatePaginationButtons(data) {
+    const prevButton = document.getElementById('prevPage');
+    const nextButton = document.getElementById('nextPage');
+    const pageInfo = document.getElementById('paginationInfo');
+
+    // Check if total elements are more than pageSize (10)
+    if (data.totalElements > pageSize) {
+        prevButton.style.display = 'inline-block';
+        nextButton.style.display = 'inline-block';
+        pageInfo.style.display = 'block';
+
+        // Enable or disable buttons based on data
+        prevButton.disabled = data.first;
+        nextButton.disabled = data.last;
+
+        updatePageInfo(data); // Update the page information
+    } else {
+        // Hide pagination buttons and page info if total elements are 10 or fewer
+        prevButton.style.display = 'none';
+        nextButton.style.display = 'none';
+        pageInfo.style.display = 'none';
+    }
+}
+
+    function updatePageInfo(data) {
+        const pageInfo = document.getElementById('pageInfo');
+        pageInfo.textContent = `Page ${currentPage + 1} of ${data.totalPages}`; // Adjusted for zero-based index
+    }
+
+    document.getElementById('prevPage').addEventListener('click', () => {
+        if (currentPage > 0) {
+            currentPage--;
+            fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+        }
+    });
+
+    document.getElementById('nextPage').addEventListener('click', () => {
+        currentPage++;
+        fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+    });
+
+    async function fetchSubscriptions() {
+        try {
+            const response = await fetch(`/api/admin/purchaseSubscription/active/${uuid}`);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            const data = await response.json();
+            populateSubscriptionTable(data);
+        } catch (error) {
+            console.error('There was a problem fetching the subscriptions:', error);
+        }
+    }
+
+    function populateSubscriptionTable(data) {
+        const tableBody = document.getElementById('subscriptionTableBody');
+        tableBody.innerHTML = ''; // Clear previous data
+        data.forEach(item => {
+            const row = document.createElement('tr');
+            const expiryDate = item.recurring ? '∞' : formatCustomDate(item.expiryDate);
+            row.innerHTML = `
+                <td>${item.subscriptionName}</td>
+                <td>${item.subscriptionType}</td>
+                <td>${item.paid}</td>
+                <td>${formatCustomDate(item.purchaseDate)}</td>
+                <td>${expiryDate}</td>
+                <td>
+                ${item.paid ? '' : `<button class="btn btn-success btn-sm" onclick="paySubscription('${item.uuid}')">Pay</button>`}
+                ${item.recurring ? `<button class="btn btn-danger btn-sm" onclick="disableRecurring('${item.uuid}')">Cancel</button>` : ''}
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+
+    function disableRecurring(uuid) {
+    if (confirm("Are you sure you want to off recurring the subscription?")) {
+        fetch(`/api/admin/purchaseSubscription/${uuid}/disable`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    showToast("Disabled Recurring successful!");
+                    fetchSubscriptions();
+                } else {
+                    response.text().then(text => alert("Failed to off recurring the subscription: " + text));
+                }
+            })
+            .catch(error => {
+                alert("Error: " + error);
+            });
+    }
+}
+
+      function paySubscription(uuid) {
+      if (confirm("Are you ready to pay subscription?")) {
+        fetch(`/api/admin/purchaseSubscription/${uuid}/pay`, { method: 'PUT' })
+            .then(response => {
+                if (response.ok) {
+                    showToast("Subscription payment successful!");
+                    fetchSubscriptions();
+                } else {
+                    response.text().then(text => alert("Failed to pay the subscription: " + text));
+                }
+            })
+            .catch(error => {
+                alert("Error: " + error);
+            });
+    }
+}
+    document.getElementById('purchaseButton').addEventListener('click', () => {
+        window.location.href = `purchase.html?paxUserUuid=${uuid}`;
+    });
+
+    // Toggle sorting direction when clicking the column headers
+    document.getElementById('sortByPlanName').addEventListener('click', function () {
+      sortBy = 'planName';
+      sortDirection = (sortDirection === 'asc') ? 'desc' : 'asc';
+      updateSortArrow('planNameSortArrow', sortDirection); // Update the arrow direction
+      fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+    });
+
+    // Update the sort arrow next to the column header
+    function updateSortArrow(arrowId, direction) {
+      const arrow = document.getElementById(arrowId);
+      arrow.innerHTML = (direction === 'asc') ? '▲' : '▼';
+    }
+
+    function formatCustomDate(dateString) {
+    // Split the date string by "-" to get day, month, and year components
+    const [day, month, year] = dateString.split("-");
+    // Create a new Date object using year, month (0-based index), and day
+    const date = new Date(year, month - 1, day);  // month is zero-based in JavaScript Date
+    if (isNaN(date)) {
+        return "Invalid Date";  // Handle any parsing issues
+    }
+    // Format the date as dd-MM-yyyy
+    const formattedDay = String(date.getDate()).padStart(2, '0');
+    const formattedMonth = String(date.getMonth() + 1).padStart(2, '0');
+    const formattedYear = date.getFullYear();
+    return `${formattedDay}-${formattedMonth}-${formattedYear}`;
+}
+
+
+    document.getElementById('member-tab').addEventListener('click', () => {
+        window.location.href = `managePaxMember.html?uuid=${uuid}`;
+    });
+
+    // Refresh or reload data when the History tab is clicked
+    document.getElementById('history-tab').addEventListener('click', () => {
+    // Reset filters and pagination if needed
+    startDate = null;
+    endDate = null;
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    currentPage = 0; // Reset to the first page
+
+    // Fetch the latest data for the History tab
+    fetchPurchaseHistory(currentPage, sortBy, sortDirection);
+});
+
+    function showToast(message) {
+    const toastElement = document.getElementById('toast');
+    toastElement.textContent = message;
+    toastElement.className = "toast show"; // Add 'show' class to make it visible
+
+    // Remove the toast after 3 seconds
+    setTimeout(() => {
+        toastElement.className = "toast"; // Remove 'show' class to hide it
+    }, 3000);
+}
+
+
+    // Fetch data when the page loads
+    fetchPurchaseHistory(currentPage);
+    fetchSubscriptions();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

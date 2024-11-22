@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -26,6 +28,9 @@ public class EmailServiceImpl implements EmailService {
 
     @Autowired
     private TemplateEngine templateEngine;
+    
+    @Autowired 
+    private PasswordEncoder passwordEncoder;
 
     // Method to send an email
     @Override
@@ -51,6 +56,7 @@ public class EmailServiceImpl implements EmailService {
 
        
     @Override
+    @Async
     public void sendPurchaseConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
 								 LocalDate ExpiryTime, SubscriptionType subscriptionType,String paymentStatus, String htmlfile) {
         try {
@@ -84,7 +90,8 @@ public class EmailServiceImpl implements EmailService {
             throw new RuntimeException("Error while sending email: " + e.getMessage());
         }
     }
-
+    
+    @Async
     @Override
     public void sendExpiryNotification(String to, String clientName, String PlanName, LocalDate setPurchaseDate,
                                        LocalDate setExpiryDate, String htmlfile) {
@@ -118,7 +125,8 @@ public class EmailServiceImpl implements EmailService {
         }
 
     }
-
+    
+    @Async
 	public void sendRenewalEmail(String to, String userName, String planName, LocalDate setPurchaseDate,
 			LocalDate setExpirayDate, SubscriptionType subscriptionType, String htmlfile) {
 		
@@ -154,7 +162,7 @@ public class EmailServiceImpl implements EmailService {
 
 	}
 
-
+	@Async
 	@Override
 	public void sendAutoRenewalCancellationEmail(String to, String userName, String planName,LocalDate setExpirayDate,String htmlfile) {
 		
@@ -185,6 +193,7 @@ public class EmailServiceImpl implements EmailService {
         }
 	}
 	
+	@Async
 	@Override
 	public void sendPlanExpiredEmail(String to, String userName, String planName, String subscriptionType,
 			LocalDate purchaseDate, LocalDate expiryDate, String htmlfile) {
@@ -218,7 +227,7 @@ public class EmailServiceImpl implements EmailService {
         }
 	}
 
-
+	@Async
 	@Override
 	public void sendpaymentConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
 			LocalDate setExpirayDate, SubscriptionType subscriptionType, String paymentStatus, LocalDate paymentDate,
@@ -265,7 +274,7 @@ public class EmailServiceImpl implements EmailService {
 				 response.setHost(emailProperties.getHost());
 				 response.setPort(emailProperties.getPort());
 				 response.setUserName(emailProperties.getUserName());
-				 response.setPassword(emailProperties.getPassword());
+				 response.setPassword(passwordEncoder.encode(emailProperties.getPassword()));
 				 response.setProtocol(emailProperties.getProtocol());
 				 response.setSmtpAuth(emailProperties.isSmtpAuth());
 				 response.setStarttlsEnable(emailProperties.isStarttlsEnable());
@@ -288,11 +297,6 @@ public class EmailServiceImpl implements EmailService {
 		emailRepository.save(setting);
 		return setting;
 	}
-
-
-	
-
-
 
 }
 

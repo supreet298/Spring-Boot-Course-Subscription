@@ -12,14 +12,14 @@
   <div class="d-flex justify-content-between align-items-center mb-3">
     <a href="#" class="btn btn-primary" id="backButton">Back</a>
     <h2 id="paxHeadHeading">Members of <span id="paxHeadName"></span></h2>
-    <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-0">
+    <input type="text" id="search" name="search" placeholder="Search" class="form-control mr-0">
   </div>
   <!-- Total count and Add Member button -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div id="totalElements" class="alert alert-primary text-center d-inline-block p-2" role="alert" style="font-weight: bold;">
       <!-- Total count will be displayed here -->
     </div>
-    <a id="addMemberButton" class="btn btn-success" href="#">Add Member</a>
+    <a id="addMemberButton" class="btn btn-success" href="#">Create</a>
   </div>
   
   <table id="paxMemberTable" class="table table-striped table-bordered">
@@ -48,7 +48,7 @@
   const uuid = urlParams.get('uuid');
   
   let currentPage = 0;
-  const pageSize = 4;
+  const pageSize = 2;
   let paxMembers = []; // Store fetched PaxMember data
   let totalPages = 1; // Total number of pages
   let paxHeadName = ''; // Variable to store PaxHead's name
@@ -113,22 +113,25 @@
       .catch(error => {
         console.error('Error fetching PaxMembers:', error);
         // Handling the case where no members are found
-        if (!window.alertShown && paxHeadName !== 'Unknown PaxHead') {
-          window.alertShown = true;
-          const userConfirmed = window.confirm(`No members found. Do you want to add a member?`);
-          if (userConfirmed) {
-            window.location.href = `createPaxMember.html?uuid=${uuid}`;
-          } else {
-            window.history.back();
-          }
-        }
       });
   }
   // Display PaxMembers in the table
   function displayPaxMembers(paxMembers) {
     const paxMemberTableBody = document.getElementById('paxMemberTableBody');
     paxMemberTableBody.innerHTML = '';
-
+    if (paxMembers.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="5" class="text-center">No members found</td>`; // Adjust colspan based on your table structure
+        paxMemberTableBody.appendChild(row);
+      //Hide pagination if total pages are less than or equal to 1 or the total number of records is less than or equal to the page size
+        if (totalPages <= 1 || paxMembers.length <= pageSize) {
+          paginationControls.style.visibility = 'hidden'; // Hide pagination controls
+          displayPaxMembers(paxMembers); // Display members without pagination
+        } else {
+          paginationControls.style.visibility = 'visible'; // Show pagination controls
+          displayPaxMembers(paxMembers); // Display members with pagination
+        }
+      } else {
     paxMembers.forEach(member => {
       const row = document.createElement('tr');
       row.innerHTML = `
@@ -144,7 +147,7 @@
       paxMemberTableBody.appendChild(row);
     });
   }
-
+  }
   // Function to delete PaxMember
   function deletePaxMember(uuid) {
     if (confirm("Are you sure you want to delete this PaxMember?")) {
@@ -173,10 +176,9 @@
     }
 
     document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
-    document.getElementById('prevPage').disabled = currentPage <= 0;
-    document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
+    document.getElementById('prevPage').hidden = currentPage <= 0;
+    document.getElementById('nextPage').hidden = currentPage >= totalPages - 1;
   }
-
   // Event listeners for pagination buttons
   document.getElementById('prevPage').addEventListener('click', () => {
     if (currentPage > 0) {

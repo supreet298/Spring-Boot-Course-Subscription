@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purchase Subscription</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container mt-5">
+
+  <!-- Back Button -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <button id="backButton" class="btn btn-primary">Back</button>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center">
+    <h2>Purchase Subscription</h2>
+  </div>
+
+  <form id="purchaseSubscriptionForm">
+
+    <!-- Subscription Selection -->
+    <div class="form-group">
+      <label for="subscriptionId">Subscription <span class="text-danger">*</span></label>
+      <select id="subscriptionId" class="form-control" required>
+        <option value="" disabled selected>Select a plan</option>
+      </select>
+    </div>
+
+    <!-- Recurring Radio Buttons (Inline) -->
+    <div class="form-group" style="display:flex">
+      <label>Recurring <span class="text-danger">*</span></label>
+      <div class="ml-3" >
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="recurring" id="recurringYes" value="true" required>
+          <label class="form-check-label" for="recurringYes">Yes</label>
+        </div>
+        <div class="form-check form-check-inline ml-4">
+          <input class="form-check-input" type="radio" name="recurring" id="recurringNo" value="false" required>
+          <label class="form-check-label" for="recurringNo">No</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Type -->
+    <div class="form-group">
+      <label for="notificationType">Notification Type <span class="text-danger">*</span></label>
+      <select class="form-control" id="notificationType" required>
+        <option value="EMAIL">Email</option>
+        <option value="WHATSAPP">WhatsApp</option>
+        <option value="BOTH">Both</option>
+      </select>
+    </div>
+
+    <!-- Paid Radio Buttons (Inline) -->
+    <div class="form-group" style="display:flex">
+      <label>Paid <span class="text-danger">*</span></label>
+      <div class="ml-5">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="paid" id="paidYes" value="true" required>
+          <label class="form-check-label" for="paidYes">Yes</label>
+        </div>
+        <div class="form-check form-check-inline ml-4">
+          <input class="form-check-input" type="radio" name="paid" id="paidNo" value="false" required>
+          <label class="form-check-label" for="paidNo">No</label>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Purchase</button>
+    <div id="toast" class="toast">Purchased successfully!</div>
+  </form>
+</div>
+
+<!-- Spinner -->
+<div id="loadingSpinner" class="spinner-border text-dark" role="status">
+  <span class="visually-hidden"></span>
+</div>
+
+<script>
+  // Function to get URL parameters
+  function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+  }
+
+  // Retrieve the paxUserUuid from the URL
+  const paxUserUuid = getQueryParam('paxUserUuid');
+
+  // Load active purchases to filter out already purchased subscriptions
+  function loadActivePurchases() {
+    return fetch(`/api/admin/purchaseSubscription/active/${paxUserUuid}`)
+      .then(response => response.json())
+      .then(data => {
+        return data.map(purchase => purchase.subscriptionName);
+      })
+      .catch(error => {
+        console.error('Error loading active purchases:', error);
+        return [];
+      });
+  }
+
+  // Load subscription options from the API
+  function loadSubscriptionOptions() {
+    loadActivePurchases().then(purchasedPlans => {
+      fetch('/api/admin/subscription/list')
+        .then(response => response.json())
+        .then(subscriptionData => {
+          const subscriptionSelect = document.getElementById('subscriptionId');
+          const purchasedPlansLower = purchasedPlans.map(plan => plan.toLowerCase());
+
+          subscriptionData.forEach(subscription => {
+            if (!purchasedPlansLower.includes(subscription.planName.toLowerCase())) {
+              const option = document.createElement('option');
+              option.value = subscription.uuid;
+              option.textContent = `${subscription.planName} - ${subscription.cost} Cost - ${subscription.subscriptionType}`;
+              subscriptionSelect.appendChild(option);
+            }
+          });
+
+          if (subscriptionSelect.options.length === 1) {
+            const option = document.createElement('option');
+            option.textContent = "No available subscriptions";
+            subscriptionSelect.appendChild(option);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading subscription options:', error);
+        });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', loadSubscriptionOptions);
+
+  // Get the selected value of a radio button group
+  function getRadioValue(name) {
+    const selectedRadio = document.querySelector(`input[name="${name}"]:checked`);
+    return selectedRadio ? selectedRadio.value === 'true' : null;
+  }
+
+  // Event listener for form submission
+  document.getElementById('purchaseSubscriptionForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Show the spinner
+    const spinner = document.getElementById('loadingSpinner');
+    spinner.style.display = 'block';
+
+    const purchaseData = {
+      paxUserUuid: paxUserUuid,
+      subscriptionUuid: document.getElementById('subscriptionId').value || null,
+      recurring: getRadioValue('recurring'),
+      paid: getRadioValue('paid'),
+      notificationType: document.getElementById('notificationType').value
+    };
+
+    fetch('/api/admin/purchaseSubscription', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(purchaseData)
+    })
+    .then(response => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Failed to create subscription');
+      }
+    })
+    .then(data => {
+      spinner.style.display = 'none';
+      let toast = document.getElementById('toast');
+      toast.className = 'toast show';
+      setTimeout(() => {
+        toast.className = toast.className.replace('show', '');
+        window.location.href = `info.html?uuid=${purchaseData.paxUserUuid}`;
+      }, 3000);
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error purchasing subscription');
+      spinner.style.display = 'none';
+    });
+  });
+
+  // Event listener for "Back" button
+  document.getElementById('backButton').addEventListener('click', function() {
+    window.location.href = `info.html?uuid=${paxUserUuid}`;
+  });
+</script>
+</body>
+</html>

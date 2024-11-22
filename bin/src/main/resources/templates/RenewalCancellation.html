@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Auto-Renewal Cancellation</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 20px;">
+    <div style="max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+        <h2 style="color: #4CAF50;">Auto-Renewal Cancelled</h2>
+        <p>Dear <span th:text="${userName}"></span>,</p>
+
+        <p>We are writing to inform you that the auto-renewal for your <strong th:text="${planName}"></strong> subscription has been successfully cancelled. This means your plan will not automatically renew at the end of your current billing cycle.</p>
+
+        <h4>Plan Details:</h4>
+        <ul>
+            <li><strong>Plan Name:</strong> <span th:text="${planName}"></span></li>
+            <li><strong>Renewal Date:</strong> <span th:text="${setExpirayDate}"></span></li>
+        </ul>
+
+        <p>Please note that you will continue to have access to your plan until the end of the current billing period. If you wish to renew your subscription manually or reactivate auto-renewal, you can do so by contact our support team 24/7.</p>
+
+        <p>If you have any questions or need further assistance, please feel free to contact our support team.</p>
+
+        <p>Thank you for choosing <b>[AssistanZ Networks PVT]</b>.</p>
+
+        <p>Best regards,</p>
+        <p> Contact our Support Team <a href="assistanz@gmail.com">assistanz@gmail.com</a></p>
+    </div>
+</body>
+</html>

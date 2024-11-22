@@ -178,10 +178,10 @@
 
   document.getElementById('backButton').addEventListener('click', function(event) {
 	    event.preventDefault(); // Prevent the default link behavior
-	    const confirmCancel = confirm('Are you sure you want to cancel and go back?');
-		  if (confirmCancel) {
+	   // const confirmCancel = confirm('Are you sure you want to cancel and go back?');
+		//  if (confirmCancel) {
 	    window.history.back();
-		  }// Navigate back to the previous page
+		//}// Navigate back to the previous page
 	  });
   function showErrorMessage(message) {
     const errorMessage = document.getElementById('errorMessage');

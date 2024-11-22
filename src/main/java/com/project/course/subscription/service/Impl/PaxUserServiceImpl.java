@@ -114,13 +114,12 @@ public class PaxUserServiceImpl implements PaxUserService {
 		Pageable pageable = PageRequest.of(page, size, Sort.by(order));
 		Page<PaxUser> allMembers = paxUserRepository.findAllActiveMembersByHeadUuid(uuid, pageable);
 
-		if (!allMembers.isEmpty()) {
-			return allMembers.map(this::convertToUsersDTO);
-		} else {
-			throw new ResourceNotFoundException("No members are found under this head");
-		}
+		return allMembers.map(this::convertToUsersDTO);
+		
 	}
 
+	
+	
 	@Override
 	public PaxUser updatePaxMember(String uuid, PaxUser paxMember) {
 		PaxUser existingMember = paxUserRepository.findByUuidAndTypeAndIsActiveTrue(uuid, Type.MEMBER)

@@ -12,14 +12,14 @@
     <div class="d-flex justify-content-between align-items-center mb-3">
       <a href="../index.html" class="btn btn-primary">Home</a>
       <h2>All PaxHeads</h2>
-       <input type="text" id="search" name="search" placeholder="Search by name, phone, or email" class="form-control mr-0">
+       <input type="text" id="search" name="search" placeholder="Search" class="form-control mr-0">
    </div>
    <!-- Total count and Add Member button -->
   <div class="d-flex justify-content-between align-items-center mb-3">
     <div id="totalElements" class="alert alert-primary text-center d-inline-block p-2" role="alert" style="font-weight: bold;">
       <!-- Total count will be displayed here -->
     </div>
-        <a href="createPaxHead.html" class="btn btn-success">Add Head</a>
+        <a href="createPaxHead.html" class="btn btn-success"> Create </a>
   </div>   
     <table id="paxTable" class="table table-striped table-bordered">
       <thead class="table-dark">
@@ -43,7 +43,7 @@
 
   <script>
     let currentPage = 0;
-    const pageSize = 4;
+    const pageSize = 3;
     let totalPages = 1; // Total number of pages
     let paxHeads = []; // To store fetched PaxHead data
     let sortDirection = 'asc'; // Default sort direction for Name column
@@ -78,7 +78,11 @@
     function displayPaxHeads(paxHeads) {
       const paxTableBody = document.getElementById('paxTableBody');
       paxTableBody.innerHTML = ''; // Clear any existing rows
-
+	if(paxHeads.length===0){
+		const row = document.createElement('tr');
+    row.innerHTML = `<td colspan="4" class="text-center">No PaxHeads found</td>`; // Adjust colspan based on your table structure
+    paxTableBody.appendChild(row);
+    }
       paxHeads.forEach(paxuser => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -87,8 +91,8 @@
           <td>${paxuser.email}</td>
           <td>
             <a href="updateHead.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">Edit</a>
-            <button class="btn btn-danger btn-sm" onclick="deletePaxHead('${paxuser.uuid}')">Delete</button>
             <a href="managePaxMember.html?uuid=${paxuser.uuid}" class="btn btn-primary btn-sm">See Members</a>
+            <button class="btn btn-danger btn-sm" onclick="deletePaxHead('${paxuser.uuid}')">Delete</button>
           </td>
         `;
         paxTableBody.appendChild(row);
@@ -123,8 +127,8 @@
       }
 
       document.getElementById('pageInfo').innerText = `Page ${currentPage + 1} of ${totalPages}`;
-      document.getElementById('prevPage').disabled = currentPage <= 0;
-      document.getElementById('nextPage').disabled = currentPage >= totalPages - 1;
+      document.getElementById('prevPage').hidden = currentPage <= 0;
+      document.getElementById('nextPage').hidden = currentPage >= totalPages - 1;
     }
 
     // Event listeners for pagination buttons

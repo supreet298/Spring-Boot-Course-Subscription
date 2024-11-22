@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Update PaxMember</title>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="/ManagePax/style.css?v=1.0">
+</head>
+<body>
+<div class="container mt-5">
+	<a href="managePaxMember.html" class="btn btn-primary" id="cancelButton">Back</a>
+	<h2>Update PaxMember</h2>
+	<div id="errorMessage" class="alert alert-danger d-none"></div> <!-- Error message container -->
+	<form id="updateMemberForm" class="mt-3">
+	<div class="form-group">
+				<label for="name">Full name <span class="text-danger">*</span></label>
+				<input type="text" id="name" class="form-control" required>
+			</div>
+			<div class="form-group">
+				<label for="email">Email <span class="text-danger">*</span></label>
+				<input type="email" id="email" class="form-control" required>
+			</div>
+			<div class="form-group">
+				<label for="address">Address <span class="text-danger">*</span></label>
+				<textarea id="address" class="form-control" rows="3" required></textarea>
+			</div>
+			<div class="form-group">
+				<div style="display: flex;">
+					<label for="country">Select Country <span
+						class="text-danger">*</span></label> <select id="countries"
+						name="countries" required class="form-control"
+						style="max-width: 155px; margin-left: 15px;">
+						<option value="">Select Country</option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="phone">Phone Number <span class="text-danger">*</span></label>
+				<div style="display: flex;">
+					<select id="countryCode" name="countryCode" required
+						class="form-control" style="max-width: 190px; margin-right: 5px;">
+						<option value="">Select Country code</option>
+					</select> <input type="tel" id="phone" name="phone" required
+						placeholder="Enter phone number" class="form-control"
+						pattern="[0-9]{10}" title="Enter a valid 10-digit phone number">
+				</div>
+			</div>
+			
+		<div class="form-group">
+			<label for="relationType">Relation Type</label>
+			<select id="relationType" class="form-control" required>
+				<option value="FATHER">Father</option>
+				<option value="DAUGHTER">Daughter</option>
+				<option value="SON">Son</option>
+				<option value="WIFE">Wife</option>
+			</select>
+		</div>
+		<div class="form-group mt-3">
+				<button type="submit" class="btn btn-success">Update</button>
+			</div>
+	<div id="toast" class="toast"> Updated successfully!</div>
+	</form>
+	</div>
+<script>
+//Fetch country codes from JSON and populate dropdown
+fetch('data/countryCodes.json')  // Ensure the JSON file path is correct
+    .then(response => response.json())
+    .then(data => {
+        const countrySelect = document.getElementById('countries');
+        const countryCodeSelect = document.getElementById('countryCode');
+        
+        // Populate countries dropdown
+        data.forEach(country => {
+            const countryOption = document.createElement('option');
+            countryOption.value = country.name;
+            countryOption.textContent = `${country.name}`;
+            countrySelect.appendChild(countryOption);
+            
+            // Populate country codes dropdown
+            const codeOption = document.createElement('option');
+            codeOption.value = country.dial_code;
+            codeOption.textContent = `(${country.dial_code} ${country.code})`;
+            countryCodeSelect.appendChild(codeOption);
+        });
+    })
+    .catch(error => console.error('Error loading country codes:', error));
+
+
+// Automatically update country code when a country is selected
+document.getElementById('countries').addEventListener('change', function() {
+    const selectedCountry = this.value;
+    const countryCodeSelect = document.getElementById('countryCode');
+
+    // Find the country object from the list of countries
+    fetch('data/countryCodes.json')  // Ensure the JSON file path is correct
+        .then(response => response.json())
+        .then(data => {
+            // Find country code based on selected country
+            const selectedCountryData = data.find(country => country.name === selectedCountry);
+            
+            if (selectedCountryData) {
+                // Set the correct country code
+                const selectedCountryCode = selectedCountryData.dial_code;
+                countryCodeSelect.value = selectedCountryCode; // Set the country code to the corresponding option
+            }
+        })
+        .catch(error => console.error('Error loading country codes:', error));
+});
+
+    // Get UUID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const uuid = urlParams.get('uuid');
+
+    // Fetch existing member details
+    fetch(`/api/admin/pax/getMember/${uuid}`)
+        .then(response => {
+        if (response.status === 404) {
+            window.location.href = 'managePaxMember.html'; // Redirect to the PaxMember list
+            return;
+        }
+        return response.json();
+        })
+        .then(paxUser => {
+            console.log("Fetched data:", paxUser);
+            if (paxUser) {
+                document.getElementById('name').value = paxUser.name || "";
+                document.getElementById('email').value = paxUser.email || "";
+                document.getElementById('address').value = paxUser.address || "";
+                document.getElementById('countries').value = paxUser.country || "";
+                document.getElementById('relationType').value = paxUser.relation || "FATHER";
+                document.getElementById('countryCode').value = paxUser.countryCode || "";
+
+                // Handle phone and country code
+                const phoneParts = paxUser.phoneNumber ? paxUser.phoneNumber.split(' ') : [];
+                document.getElementById('phone').value = phoneParts.slice(1).join(' ') || paxUser.phoneNumber || "";
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching member details:', error);
+            showErrorMessage(error.message);
+        });
+
+    // Handle form submission
+    document.getElementById('updateMemberForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const updatedMember = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            address: document.getElementById('address').value,
+            country: document.getElementById('countries').value,
+            countryCode: document.getElementById('countryCode').value,
+            phoneNumber: document.getElementById('phone').value,
+            relation: document.getElementById('relationType').value
+        };
+
+        // Make PUT request to update member
+        fetch(`/api/admin/pax/UpdateMember/${uuid}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedMember)
+        })
+        .then(response => {
+            const contentType = response.headers.get("content-type");
+            if (!response.ok) {
+              if (contentType && contentType.includes("application/json")) {
+                return response.json().then(json => { throw new Error(json.message || 'Failed to update Member'); });
+              } else {
+                return response.text().then(text => { throw new Error(text || 'Failed to update Member'); });
+              }
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+            
+            // Show the toast
+            let toast = document.getElementById('toast');
+            toast.className = 'toast show';
+            
+            // Remove the toast after 3 seconds
+            setTimeout(() => {
+                toast.className = toast.className.replace('show', '');
+                window.history.back(); // Redirect after showing the toast
+            }, 3000);
+        })
+        .catch(error => {
+            console.error('Error Updating Member:', error);
+            showErrorMessage(error.message);
+        });
+    });
+
+    document.getElementById('cancelButton').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default link behavior
+        window.history.back(); // Navigate back to the previous page
+    });
+
+    function showErrorMessage(message) {
+        const errorMessage = document.getElementById('errorMessage');
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('d-none');
+    }
+</script>
+</body>
+</html>
