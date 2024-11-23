@@ -291,7 +291,7 @@
 }
 
       function paySubscription(uuid) {
-      if (confirm("Are you sure want to make transaction as paid?")) {
+      if (confirm("Are you sure want to mark transaction as paid?")) {
         fetch(`/api/admin/purchaseSubscription/${uuid}/pay`, { method: 'PUT' })
             .then(response => {
                 if (response.ok) {
@@ -375,6 +375,30 @@
     }, 3000);
 }
 
+     document.addEventListener('DOMContentLoaded', function () {
+    // Function to get the current URL hash (e.g., #subscription)
+    const tab = window.location.hash.replace('#', '');
+
+    if (tab) {
+        // Find the button associated with the tab and activate it
+        const tabButton = document.querySelector(`#${tab}-tab`);
+        const tabContent = document.querySelector(`#${tab}`);
+        if (tabButton && tabContent) {
+            // Deactivate the currently active tab and content
+            const activeTab = document.querySelector('.nav-link.active');
+            const activeContent = document.querySelector('.tab-pane.active.show');
+
+            if (activeTab) activeTab.classList.remove('active');
+            if (activeContent) {
+                activeContent.classList.remove('active', 'show');
+            }
+
+            // Activate the new tab and content
+            tabButton.classList.add('active');
+            tabContent.classList.add('active', 'show');
+        }
+    }
+});
 
     // Fetch data when the page loads
     fetchPurchaseHistory(currentPage);

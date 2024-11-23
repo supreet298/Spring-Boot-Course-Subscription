@@ -58,16 +58,6 @@ th .header-content {
     font-size: 18px; /* Optional: Increase label font size */
 }
 
-#loadingSpinner {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1050; /* Keeps it above other elements */
-    display: none; /* Hidden by default */
-    pointer-events: none; /* Ensures it's non-interactive */
-}
-
 table {
     table-layout: fixed;
     width: 100%;
