@@ -18,11 +18,11 @@ public interface EmailService {
 			LocalDate setExpiryDate,String htmlfile);
 	
 	void sendRenewalEmail(String to, String userName, String planName, LocalDate setPurchaseDate,
-			  LocalDate ExpiryTime, SubscriptionType subscriptionType, String htmlfile);
+			  LocalDate setExpirayDate, SubscriptionType subscriptionType, String htmlfile);
 	
 	void sendAutoRenewalCancellationEmail(String to, String userName, String planName,LocalDate setExpirayDate,String htmlfile);
 	
-	void sendPlanExpiredEmail(String to,String userName,String planName,String subscriptionType,LocalDate purchaseDate,LocalDate expirayDate,String htmlfile);
+	void sendPlanExpiredEmail(String to,String userName,String planName,String subscriptionType,LocalDate purchaseDate,LocalDate expiryDate,String htmlfile);
 
 	EmailSettingResponseDTO getEmailProperties();
 	

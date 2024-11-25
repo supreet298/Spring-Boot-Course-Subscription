@@ -70,8 +70,9 @@
       if (response.status === 404) {
         document.getElementById('paxHeadName').textContent = paxHeadName; // Display fallback name
         alert('PaxHead not found'); // Alert the user that PaxHead is not found
-        window.location.href = 'managePaxUsers.html'; // Redirect to the main page (managePaxUsers.html)
-        return; // Stop further execution
+        window.location.href = '/managePaxUsers.html'; // Redirect to the main page
+        return Promise.reject('Redirecting to /managePaxUsers.html'); // Stop further execution by rejecting the promise
+       // Stop further execution
       }
       return response.json();
     })
