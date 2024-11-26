@@ -51,6 +51,10 @@
   document.getElementById('createSubscriptionForm').addEventListener('submit', function(event) {
       event.preventDefault();
 
+    // Disable the create button
+    const createButton = event.target.querySelector('button[type="submit"]');
+    createButton.disabled = true;
+
       const subscription = {
           planName : document.getElementById('planName').value,
           description : document.getElementById('description').value,
@@ -81,11 +85,12 @@
         setTimeout(() => {
             toast.className = toast.className.replace('show', '');
             window.location.href = 'subscription.html'; // Redirect after showing the toast
-        }, 3000);
+        }, 2000);
       })
       .catch(error => {
           console.error('Error Creating Subscription:', error);
           showErrorMessage(error.message);
+          createButton.disabled = false;
       });
   });
 

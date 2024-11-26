@@ -278,7 +278,7 @@
         fetch(`/api/admin/purchaseSubscription/${uuid}/disable`, { method: 'DELETE' })
             .then(response => {
                 if (response.ok) {
-                    showToast("Canceled unlimited plan successful!");
+                    showToast("Cancelled unlimited plan successful!");
                     fetchSubscriptions();
                 } else {
                     response.text().then(text => alert("Failed to off recurring the subscription: " + text));
@@ -372,7 +372,7 @@
     // Remove the toast after 3 seconds
     setTimeout(() => {
         toastElement.className = "toast"; // Remove 'show' class to hide it
-    }, 3000);
+    }, 2000);
 }
 
      document.addEventListener('DOMContentLoaded', function () {
