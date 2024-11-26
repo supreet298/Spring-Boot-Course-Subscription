@@ -36,6 +36,9 @@ public class PurchaseHistoryDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime paidDate;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDateTime cancelRecurringDate;
+
     private Boolean recurring;
 
     private String notificationType;

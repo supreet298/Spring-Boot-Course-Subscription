@@ -70,6 +70,7 @@ public class PurchaseHistoryServiceImpl implements PurchaseHistoryService {
         dto.setPaid(history.getPaid());
         dto.setPaidDate(history.getPaidDate());
         dto.setRecurring(history.getRecurring());
+        dto.setCancelRecurringDate(history.getCancelRecurringDate());
         return dto;
     }
 }

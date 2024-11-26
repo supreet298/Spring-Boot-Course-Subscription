@@ -74,17 +74,14 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         PurchaseSubscription savedSubscription = purchaseSubscriptionRepository.save(purchaseSubscription);
 
         // Send confirmation email
-        if(purchaseSubscriptionDTO.getPaid())
-        {
         String file = "SubscriptionConfirmation.html";
-        emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(),"Success", file);
-        }else
-        {
-        	String file = "SubscriptionConfirmation.html";
+        if(purchaseSubscriptionDTO.getPaid()) {
+            emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(),"Success", file);
+        }else {
             emailservice.sendPurchaseConfirmEmail(paxUser.getEmail(), paxUser.getName(), subscription.getPlanName(), now.toLocalDate(), purchaseSubscription.getExpiryDate().toLocalDate(), subscription.getSubscriptionType(),"Pending", file);
         }
         // Create purchase history entry
-        createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription,now);
+        createPurchaseHistory(paxUser, subscription, now, purchaseSubscription.getExpiryDate(), 0, purchaseSubscription,now,now);
 
         return convertToDTO(savedSubscription);
 
@@ -98,6 +95,14 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         List<PurchaseSubscription> expiredSubscriptions = purchaseSubscriptionRepository.findExpiredRecurringSubscriptions(LocalDateTime.now());
 
         for (PurchaseSubscription subscription : expiredSubscriptions) {
+
+            Subscription plan = subscription.getSubscription();
+
+            // Check if the plan exists and is not deleted/inactive
+            if (plan == null || !plan.isActive()) {
+                continue; // Skip this subscription
+            }
+
             // Check if the subscription is recurring and paid
             boolean isRecurring = subscription.isRecurring();
             Boolean getPaid = subscription.getPaid();
@@ -120,7 +125,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
                 // Optionally, you can still create a new PurchaseHistory entry for tracking purposes
                 int newRenewalCount = getRenewalCount(subscription.getPaxUser(), subscription.getSubscription());
-                createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(), newExpiryDate, newRenewalCount, subscription,LocalDateTime.now());
+                createPurchaseHistory(subscription.getPaxUser(), subscription.getSubscription(), LocalDateTime.now(), newExpiryDate, newRenewalCount, subscription,LocalDateTime.now(),null);
             }
         }
     }
@@ -143,7 +148,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         };
     }
 
-    private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription,LocalDateTime paidDate) {
+    private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription,LocalDateTime paidDate,LocalDateTime cancelRecurringDate) {
         PurchaseHistory purchaseHistory = new PurchaseHistory();
         purchaseHistory.setPaxUser(paxUser);
         purchaseHistory.setSubscription(subscription);
@@ -160,6 +165,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         purchaseHistory.setPaid(purchaseSubscription.getPaid());
         purchaseHistory.setPaidDate(purchaseSubscription.getPaid() ? paidDate : null);
         purchaseHistory.setRecurring(purchaseSubscription.isRecurring());
+        purchaseHistory.setCancelRecurringDate(!purchaseSubscription.isRecurring() ? cancelRecurringDate : null);
 
         purchaseHistoryService.createPurchaseHistory(purchaseHistory); // Save purchase history
     }
@@ -205,7 +211,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
                     subscription.getExpiryDate(),
                     getRenewalCount(subscription.getPaxUser(), subscription.getSubscription()),
                     subscription,
-                    now
+                    null, // paidDate remains null
+                    now  // cancelRecurringDate is the current time
             );
             String file = "RenewalCancellation.html";
             emailservice.sendAutoRenewalCancellationEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getSubscription().getPlanName(), subscription.getExpiryDate().toLocalDate(), file);
@@ -242,10 +249,11 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
                     subscription.getExpiryDate(),
                     getRenewalCount(subscription.getPaxUser(), subscription.getSubscription()),
                     subscription,
-                    now
+                    now, // paidDate is the current time
+                    null // cancelRecurringDate remains null
             );
             String file1="PaymentConfirmation.html";
-            emailservice.sendpaymentConfirmEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getPlanName(), purchaseDate.toLocalDate(), subscription.getExpiryDate().toLocalDate(),  subscription.getSubscription().getSubscriptionType(), "Sucess", now.toLocalDate(), file1);
+            emailservice.sendpaymentConfirmEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getPlanName(), purchaseDate.toLocalDate(), subscription.getExpiryDate().toLocalDate(),  subscription.getSubscription().getSubscriptionType(), "Success", now.toLocalDate(), file1);
             return true;
         } else {
             throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);

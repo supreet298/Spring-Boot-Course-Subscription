@@ -61,6 +61,9 @@ public class PurchaseHistory {
     @Column(name = "paid_date")
     private LocalDateTime paidDate;
 
+    @Column(name = "cancel_recurring_date")
+    private LocalDateTime cancelRecurringDate;
+
     private Boolean recurring;
     
     private boolean notificationSent=false;
