@@ -27,4 +27,8 @@ public interface EmailService {
 	EmailSettingResponseDTO getEmailProperties();
 	
 	EmailSetting updateEmailProperties(EmailSetting request);
-}
+	
+	 void sentPlanDeletionAlertEmail(String to, String userName, String planName, LocalDate purchaseDate,
+			LocalDate expirayDate,String htmlfile);
+	
+ }

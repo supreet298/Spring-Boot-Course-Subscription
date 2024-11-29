@@ -30,4 +30,5 @@ public interface PurchaseHistoryRepository extends JpaRepository<PurchaseHistory
             @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, Pageable pageable);
     
     List<PurchaseHistory> findAllByExpiryDateBeforeAndNotificationSentFalse(LocalDateTime currentDate);
+    
 }

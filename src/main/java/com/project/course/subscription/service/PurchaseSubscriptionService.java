@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import com.project.course.subscription.dto.PurchaseSubscriptionDTO;
 import com.project.course.subscription.dto.PurchaseSubscriptionResponseDTO;
+import com.project.course.subscription.model.PurchaseSubscription;
+
 import jakarta.validation.Valid;
 
 public interface PurchaseSubscriptionService {
@@ -19,4 +21,6 @@ public interface PurchaseSubscriptionService {
     List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(String paxUserUuid);
 
     boolean paySubscription(String uuid);
+    
+    List<PurchaseSubscription> getAllPaxHeadIdBySubscriptionId(Long id);
 }

@@ -91,7 +91,6 @@ fetch('data/countryCodes.json')  // Ensure the JSON file path is correct
     })
     .catch(error => console.error('Error loading country codes:', error));
 
-
 // Automatically update country code when a country is selected
 document.getElementById('countries').addEventListener('change', function() {
     const selectedCountry = this.value;
@@ -116,6 +115,7 @@ document.getElementById('countries').addEventListener('change', function() {
     // Get UUID from URL
     const urlParams = new URLSearchParams(window.location.search);
     const uuid = urlParams.get('uuid');
+    const uuid2=urlParams.get('uuid2')
 
     // Fetch existing member details
     fetch(`/api/admin/pax/getMember/${uuid}`)
@@ -123,8 +123,9 @@ document.getElementById('countries').addEventListener('change', function() {
         if (response.status === 404) {
             //window.location.href = 'managePaxMember.html'; // Redirect to the PaxMember list
             alert("Pax Member not found")
-          //  window.history.back(); // Navigate back to the previous page
-           window.location.href = 'managePaxUsers.html'; // Redirect to the main page
+           //window.history.back(); // Navigate back to the previous page
+           //window.location.href = 'managePaxUsers.html'; // Redirect to the main page
+           window.location.href=`  managePaxMember.html?uuid=${uuid2}`;
             return;
         }
         return response.json();
@@ -148,7 +149,6 @@ document.getElementById('countries').addEventListener('change', function() {
             console.error('Error fetching member details:', error);
             showErrorMessage(error.message);
         });
-
     // Handle form submission
     document.getElementById('updateMemberForm').addEventListener('submit', function(event) {
         event.preventDefault();

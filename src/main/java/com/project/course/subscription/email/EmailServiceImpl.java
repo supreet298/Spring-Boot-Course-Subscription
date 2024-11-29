@@ -297,6 +297,39 @@ public class EmailServiceImpl implements EmailService {
 		emailRepository.save(setting);
 		return setting;
 	}
+	
+	@Async
+	public void sentPlanDeletionAlertEmail	(String to, String userName, String planName, LocalDate purchaseDate,
+			LocalDate expirayDate,String htmlfile) {
+		try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            // helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject("Plan Removal Notification!");
+
+            // Create the email body with user details and a custom message
+            Context context = new Context();
+            context.setVariable("userName", userName);
+            context.setVariable("planName", planName);
+            context.setVariable("setPurchaseDate", purchaseDate);
+            context.setVariable("ExpiryTime",expirayDate);
+
+            String htmlContent = templateEngine.process(htmlfile, context);
+
+            helper.setText(htmlContent, true); // true to indicate that it is HTML
+
+            mailSender.send(message);
+            System.out.println("Deletion Alert Email Sent Successfully !");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Error while sending email: " + e.getMessage());
+        }
+		
+	
+	}
+	 
 
 }
 

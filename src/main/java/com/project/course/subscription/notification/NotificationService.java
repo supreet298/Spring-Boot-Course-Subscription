@@ -30,8 +30,6 @@ public class NotificationService {
 	
 	@Autowired WhatsappRepository whatsappRepository;
 	
-	// Schedule the job to run every two minutes (for testing purposes)
-
 	//@Scheduled(cron = "0 0 12 * * ?")
 	// @Scheduled(cron = "0 0 8 * * ?") // Runs every day at 8 AM
    	// @Scheduled(cron = "0 */2 * * * ?") // Runs every 2 minutes

@@ -148,6 +148,12 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         };
     }
 
+    public List<PurchaseSubscription> getAllPaxHeadIdBySubscriptionId(Long id)
+    {
+		return purchaseSubscriptionRepository.findAllPaxUserIdsBySubscriptionIdAndRecurring(id, true);
+		
+    }
+    
     private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription,LocalDateTime paidDate,LocalDateTime cancelRecurringDate) {
         PurchaseHistory purchaseHistory = new PurchaseHistory();
         purchaseHistory.setPaxUser(paxUser);
@@ -284,4 +290,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         dto.setExpiryDate(purchaseSubscription.getExpiryDate());
         return dto;
     }
+    
+    //findPaxUserIdsBySubscriptionIdAndRecurring
+    
+
 }

@@ -16,7 +16,6 @@ import org.springframework.web.server.ResponseStatusException;
 import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.PaxMemberPostDTO;
 import com.project.course.subscription.dto.PaxUsersDTO;
-import com.project.course.subscription.exception.ResourceNotFoundException;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.model.PaxUser.Type;
 import com.project.course.subscription.notification.EmailValidator;
