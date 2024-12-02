@@ -140,7 +140,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
     private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
         return switch (subscriptionType) {
-            case MONTHLY -> startDate.plusMinutes(3);
+            case MONTHLY -> startDate.plusMonths(1);
             case QUARTERLY -> startDate.plusMonths(3);
             case HALF_YEARLY -> startDate.plusMonths(6);
             case YEARLY -> startDate.plusYears(1);
@@ -148,6 +148,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         };
     }
 
+    @Override
     public List<PurchaseSubscription> getAllPaxHeadIdBySubscriptionId(Long id){
 		return purchaseSubscriptionRepository.findAllPaxUserIdsBySubscriptionIdAndRecurring(id, true);
     }
@@ -287,9 +288,6 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         dto.setPurchaseDate(purchaseSubscription.getPurchaseDate());
         dto.setExpiryDate(purchaseSubscription.getExpiryDate());
         return dto;
-    }
-    
-    //findPaxUserIdsBySubscriptionIdAndRecurring
-    
+    }    
 
 }

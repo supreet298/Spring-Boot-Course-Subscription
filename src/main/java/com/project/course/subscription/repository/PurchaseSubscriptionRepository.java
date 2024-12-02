@@ -24,10 +24,7 @@ public interface PurchaseSubscriptionRepository extends JpaRepository<PurchaseSu
 
     @Query("SELECT ps FROM PurchaseSubscription ps WHERE ps.paxUser.uuid = :paxUserUuid AND ps.expiryDate > :currentDate")
     List<PurchaseSubscription> findActiveSubscriptionsByPaxUserUuid(@Param("paxUserUuid") String paxUserUuid, @Param("currentDate") LocalDateTime currentDate);
-    
-   // @Query("SELECT ps.paxUser.id FROM PurchaseSubscription ps WHERE ps.subscription.id = :subscriptionId AND ps.recurring = :recurring")
-   // List<Long> findAllPaxUserIdsBySubscriptionIdAndRecurring(@Param("subscriptionId") Long subscriptionId, @Param("recurring") Boolean recurring);
-    
+        
     @Query("SELECT ps FROM PurchaseSubscription ps WHERE ps.subscription.id = :subscriptionId AND ps.recurring = :recurring")
     List<PurchaseSubscription> findAllPaxUserIdsBySubscriptionIdAndRecurring(@Param("subscriptionId") Long subscriptionId, @Param("recurring") Boolean recurring);
 

@@ -17,7 +17,7 @@ public interface EmailService {
 	void sendExpiryNotification(String to,String clientName,String PlanName,LocalDate setPurchaseDate,
 			LocalDate setExpiryDate,String htmlfile);
 	
-	void sendRenewalEmail(String to, String userName, String planNamx, LocalDate setPurchaseDate,
+	void sendRenewalEmail(String to, String userName, String planName, LocalDate setPurchaseDate,
 			  LocalDate setExpiryDate, SubscriptionType subscriptionType, String htmlfile);
 	
 	void sendAutoRenewalCancellationEmail(String to, String userName, String planName,LocalDate setExpiryDate,String htmlfile);
