@@ -128,7 +128,7 @@ public class EmailServiceImpl implements EmailService {
     
     @Async
 	public void sendRenewalEmail(String to, String userName, String planName, LocalDate setPurchaseDate,
-			LocalDate setExpirayDate, SubscriptionType subscriptionType, String htmlfile) {
+			LocalDate setExpiryDate, SubscriptionType subscriptionType, String htmlfile) {
 		
 		try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -142,7 +142,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("userName", userName);
             context.setVariable("planName", planName);
             context.setVariable("setPurchaseDate", setPurchaseDate);
-            context.setVariable("setExpirayDate", setExpirayDate);
+            context.setVariable("setExpiryDate", setExpiryDate);
             context.setVariable("subscriptionType", subscriptionType);
 
             // Process the HTML template with Thymeleaf
@@ -164,7 +164,7 @@ public class EmailServiceImpl implements EmailService {
 
 	@Async
 	@Override
-	public void sendAutoRenewalCancellationEmail(String to, String userName, String planName,LocalDate setExpirayDate,String htmlfile) {
+	public void sendAutoRenewalCancellationEmail(String to, String userName, String planName,LocalDate setExpiryDate,String htmlfile) {
 		
 		try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -177,7 +177,7 @@ public class EmailServiceImpl implements EmailService {
             Context context = new Context();
             context.setVariable("userName", userName);
             context.setVariable("planName", planName);
-            context.setVariable("setExpirayDate", setExpirayDate);
+            context.setVariable("setExpiryDate", setExpiryDate);
             String htmlContent = templateEngine.process(htmlfile, context);
 
             // Set the HTML content in the email body
@@ -197,7 +197,7 @@ public class EmailServiceImpl implements EmailService {
 	@Override
 	public void sendPlanExpiredEmail(String to, String userName, String planName, String subscriptionType,
 			LocalDate purchaseDate, LocalDate expiryDate, String htmlfile) {
-		String Expiredfile="PlanExpired.html";
+		String ExpiredFile="PlanExpired.html";
 		try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -212,7 +212,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("subscriptionType", subscriptionType);
             context.setVariable("purchaseDate", purchaseDate);
             context.setVariable("expiryDate", expiryDate);
-            String htmlContent = templateEngine.process(Expiredfile, context);
+            String htmlContent = templateEngine.process(ExpiredFile, context);
 
             // Set the HTML content in the email body
             helper.setText(htmlContent, true); // true to indicate that it is HTML
@@ -229,8 +229,8 @@ public class EmailServiceImpl implements EmailService {
 
 	@Async
 	@Override
-	public void sendpaymentConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
-			LocalDate setExpirayDate, SubscriptionType subscriptionType, String paymentStatus, LocalDate paymentDate,
+	public void sendPaymentConfirmEmail(String to, String userName, String planName, Object setPurchaseDate,
+			LocalDate setExpiryDate, SubscriptionType subscriptionType, String paymentStatus, LocalDate paymentDate,
 			String htmlfile) {
 		try {
             MimeMessage message = mailSender.createMimeMessage();
@@ -244,7 +244,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("userName", userName);
             context.setVariable("planName", planName);
             context.setVariable("setPurchaseDate", setPurchaseDate);
-            context.setVariable("ExpiryTime", setExpirayDate);
+            context.setVariable("ExpiryTime", setExpiryDate);
             context.setVariable("subscriptionType", subscriptionType);
             context.setVariable("paymentStatus", paymentStatus);
             context.setVariable("paymentDate",paymentDate);
@@ -300,7 +300,7 @@ public class EmailServiceImpl implements EmailService {
 	
 	@Async
 	public void sentPlanDeletionAlertEmail	(String to, String userName, String planName, LocalDate purchaseDate,
-			LocalDate expirayDate,String htmlfile) {
+			LocalDate expiryDate,String htmlfile) {
 		try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -313,7 +313,7 @@ public class EmailServiceImpl implements EmailService {
             context.setVariable("userName", userName);
             context.setVariable("planName", planName);
             context.setVariable("setPurchaseDate", purchaseDate);
-            context.setVariable("ExpiryTime",expirayDate);
+            context.setVariable("ExpiryTime",expiryDate);
 
             String htmlContent = templateEngine.process(htmlfile, context);
 

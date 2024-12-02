@@ -53,21 +53,21 @@
 
     <div class="row">
       <div class="col-md-6 form-group">
-        <label for="from">From <span class="text-danger">*</span></label>
-        <input type="text" id="from" value=id="username" class="form-control" required>
+        <label for="alertDays">Alert Days <span class="text-danger">*</span></label>
+        <input type="text" id="alertDays" class="form-control" required>
       </div>
       <div class="col-md-6 form-group">
         <label for="emailType">Email Type</label>
         <select id="emailType" class="form-control" required>
           <option value="Java Mail Sender">Java Mail Sender</option>
-          <option value="Something">Something</option>
-          <option value="Something Else">Something Else</option>
+          <option value="Something">sender-1</option>
+          <option value="Something Else">Sender-2</option>
         </select>
       </div>
     </div>
 
     <div class="form-group mt-3">
-      <button type="submit" class="btn btn-success">Update</button>
+      <button id="btn" type="submit" class="btn btn-success">Update</button>
     </div>
     <div id="toast" class="toast">Updated successfully!</div>
   </form>
@@ -92,15 +92,12 @@ fetch(`/api/email/getEmailProperties`)
         document.getElementById('Password').value = email.password || '';
         document.getElementById('host').value = email.host || '';
         document.getElementById('port').value = email.port || '';
-        document.getElementById('from').value = email.userName || ''; // Ensure 'from' matches 'username'
         document.getElementById('emailType').value = email.emailType || '';
+        document.getElementById('alertDays').value = email.renewalDayAlert || '';
+
     })
     .catch(error => console.error('Error fetching email details:', error));
 
-// Keep 'from' field in sync with 'username'
-document.getElementById('username').addEventListener('input', function () {
-    document.getElementById('from').value = this.value;
-});
 
 // Form submission logic
 document.getElementById('updateEmailForm').addEventListener('submit', function (event) {
@@ -111,8 +108,8 @@ document.getElementById('updateEmailForm').addEventListener('submit', function (
         password: document.getElementById('Password').value,
         host: document.getElementById('host').value,
         port: document.getElementById('port').value,
-        from: document.getElementById('username').value, // Ensure 'from' matches 'username'
-        emailType: document.getElementById('emailType').value
+        emailType: document.getElementById('emailType').value,
+        renewalDayAlert:document.getElementById('alertDays').value
     };
 
     fetch(`/api/email/updateEmail`, {
@@ -127,6 +124,7 @@ document.getElementById('updateEmailForm').addEventListener('submit', function (
             return response.json();
         })
         .then(data => {
+            document.getElementById("btn").disabled = true;
             let toast = document.getElementById('toast');
             toast.className = 'toast show';
             setTimeout(() => {
@@ -143,10 +141,8 @@ document.getElementById('updateEmailForm').addEventListener('submit', function (
 // Back button logic
 document.getElementById('backButton').addEventListener('click', function (event) {
     event.preventDefault(); // Prevent the default link behavior
-    const confirmCancel = confirm('Are you sure you want to cancel and go back?');
-    if (confirmCancel) {
         window.history.back();
-    } // Navigate back to the previous page
+    // Navigate back to the previous page
 });
 
 // Show error message

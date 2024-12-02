@@ -36,11 +36,6 @@ public class PurchaseSubscriptionController {
         return purchaseSubscriptionService.getPurchaseSubscriptionByUuid(uuid);
     }
     
-    @GetMapping("/getAll/{id}")
-    public List<PurchaseSubscription> getPurchaseSubscriptionByUuid(@PathVariable Long id) {
-        return purchaseSubscriptionService.getAllPaxHeadIdBySubscriptionId(id);
-    }
-
 
     @DeleteMapping("/{uuid}/disable")
     public ResponseEntity<String> disableRecurring(@PathVariable String uuid) {

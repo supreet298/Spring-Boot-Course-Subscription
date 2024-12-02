@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,8 +22,8 @@ import com.project.course.subscription.dto.SubscriptionDTO;
 import com.project.course.subscription.email.EmailService;
 import com.project.course.subscription.model.PurchaseSubscription;
 import com.project.course.subscription.model.Subscription;
-import com.project.course.subscription.repository.PurchaseSubscriptionRepository;
 import com.project.course.subscription.repository.SubscriptionRepository;
+import com.project.course.subscription.service.PurchaseSubscriptionService;
 import com.project.course.subscription.service.SubscriptionService;
 
 @Service
@@ -30,10 +31,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
 	@Autowired
 	private SubscriptionRepository subscriptionRepository;
-
+	
 	@Autowired
-	//private PurchaseSubscriptionService purchaseSubscriptionService;
-	private PurchaseSubscriptionRepository purchaseSubscriptionRepository;
+	@Lazy
+	private PurchaseSubscriptionService purchaseSubscriptionService;
+	
 	@Autowired
 	private EmailService emailservice;
 
@@ -94,18 +96,18 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 	    Subscription subscription = existingSubscription.get();
 	    subscription.setActive(false);
 	    subscriptionRepository.save(subscription);
-	    List<PurchaseSubscription> purchasedSubscriptions = purchaseSubscriptionRepository.findAllPaxUserIdsBySubscriptionIdAndRecurring(existingSubscription.get().getId(), true);
+	    List<PurchaseSubscription> purchasedSubscriptions = purchaseSubscriptionService.getAllPaxHeadIdBySubscriptionId(subscription.getId());
         for (PurchaseSubscription purchasedSubscription : purchasedSubscriptions) {
             String emailTemplate = "PlanDeletionAlert.html";
             System.out.println("purchaseDate"+purchasedSubscription.getPurchaseDate().toLocalDate());
-            System.out.println("ExpirayDate"+ purchasedSubscription.getExpiryDate().toLocalDate());
-            LocalDate datee=purchasedSubscription.getPurchaseDate().toLocalDate();
+            System.out.println("ExpiryDate"+ purchasedSubscription.getExpiryDate().toLocalDate());
+            LocalDate date=purchasedSubscription.getPurchaseDate().toLocalDate();
             try {
                 emailservice.sentPlanDeletionAlertEmail(
                         purchasedSubscription.getPaxUser().getEmail(),  
                         purchasedSubscription.getPaxUser().getName(),   
                         purchasedSubscription.getPlanName(),           
-                        datee, 
+                        date, 
                         purchasedSubscription.getExpiryDate().toLocalDate(), 
                         emailTemplate // Email template
                 );

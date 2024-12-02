@@ -140,7 +140,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
 
     private LocalDateTime calculateExpiryDate(LocalDateTime startDate, Subscription.SubscriptionType subscriptionType) {
         return switch (subscriptionType) {
-            case MONTHLY -> startDate.plusMonths(1);
+            case MONTHLY -> startDate.plusMinutes(3);
             case QUARTERLY -> startDate.plusMonths(3);
             case HALF_YEARLY -> startDate.plusMonths(6);
             case YEARLY -> startDate.plusYears(1);
@@ -148,10 +148,8 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
         };
     }
 
-    public List<PurchaseSubscription> getAllPaxHeadIdBySubscriptionId(Long id)
-    {
+    public List<PurchaseSubscription> getAllPaxHeadIdBySubscriptionId(Long id){
 		return purchaseSubscriptionRepository.findAllPaxUserIdsBySubscriptionIdAndRecurring(id, true);
-		
     }
     
     private void createPurchaseHistory(PaxUser paxUser, Subscription subscription, LocalDateTime purchaseDate, LocalDateTime expiryDate, int renewalCount, PurchaseSubscription purchaseSubscription,LocalDateTime paidDate,LocalDateTime cancelRecurringDate) {
@@ -259,7 +257,7 @@ public class PurchaseSubscriptionServiceImpl implements PurchaseSubscriptionServ
                     null // cancelRecurringDate remains null
             );
             String file1="PaymentConfirmation.html";
-            emailservice.sendpaymentConfirmEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getPlanName(), purchaseDate.toLocalDate(), subscription.getExpiryDate().toLocalDate(),  subscription.getSubscription().getSubscriptionType(), "Success", now.toLocalDate(), file1);
+            emailservice.sendPaymentConfirmEmail(subscription.getPaxUser().getEmail(), subscription.getPaxUser().getName(), subscription.getPlanName(), purchaseDate.toLocalDate(), subscription.getExpiryDate().toLocalDate(),  subscription.getSubscription().getSubscriptionType(), "Success", now.toLocalDate(), file1);
             return true;
         } else {
             throw new ResponseStatusException(NOT_FOUND, "Subscription not found with UUID: " + uuid);
