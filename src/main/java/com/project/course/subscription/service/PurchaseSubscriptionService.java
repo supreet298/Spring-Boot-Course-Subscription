@@ -2,8 +2,13 @@ package com.project.course.subscription.service;
 
 import java.util.List;
 import java.util.Optional;
+
 import com.project.course.subscription.dto.PurchaseSubscriptionDTO;
 import com.project.course.subscription.dto.PurchaseSubscriptionResponseDTO;
+import com.project.course.subscription.model.PurchaseSubscription;
+import com.stripe.exception.StripeException;
+import com.stripe.model.checkout.Session;
+
 import jakarta.validation.Valid;
 
 public interface PurchaseSubscriptionService {
@@ -17,4 +22,14 @@ public interface PurchaseSubscriptionService {
     boolean disableRecurringForSubscription(String uuid);
 
     List<PurchaseSubscriptionResponseDTO> getActiveSubscriptionsByPaxUserUuid(String paxUserUuid);
+
+   // boolean paySubscription(String uuid);
+    
+    List<PurchaseSubscription> getAllPaxHeadIdBySubscriptionId(Long id);
+
+    PurchaseSubscriptionDTO paySubscriptions(String uuid, PurchaseSubscriptionDTO purchaseSubscriptionDTO);
+
+	void updatepurchaseSubscriptionService(Session session) throws StripeException;
+	
+
 }

@@ -1,7 +1,7 @@
 package com.project.course.subscription.controller;
 
 import java.util.List;
-import com.project.course.subscription.dto.PaxHeadResponseDTO;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.PaxMemberPostDTO;
 import com.project.course.subscription.dto.PaxUsersDTO;
 import com.project.course.subscription.model.PaxUser;
 import com.project.course.subscription.service.PaxUserService;
+
 import jakarta.validation.Valid;
 
 @RestController
@@ -74,7 +76,7 @@ public class PaxUserController {
 	@GetMapping("/{uuid}")
 	public ResponseEntity<?> getPaxHeadById(@PathVariable String uuid) {
 		try {
-			PaxUser paxHead = paxUserService.getPaxHeadById(uuid);
+			PaxHeadDTO paxHead = paxUserService.getPaxHeadById(uuid);
 			return new ResponseEntity<>(paxHead, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -84,7 +86,7 @@ public class PaxUserController {
 	@GetMapping("/getMember/{uuid}")
 	public ResponseEntity<?> getPaxMemberById(@PathVariable String uuid) {
 		try {
-			PaxUser paxHead = paxUserService.getPaxMemberById(uuid);
+			PaxUsersDTO paxHead = paxUserService.getPaxMemberById(uuid);
 			return new ResponseEntity<>(paxHead, HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -102,7 +104,7 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/getMemberByHeadId/{uuid}")
-	public ResponseEntity<?> getPaginatedAndSortedMemberss(@PathVariable String uuid,@RequestParam(defaultValue = "0") int page,
+	public ResponseEntity<?> getPaginatedAndSortedMembers(@PathVariable String uuid,@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortBy,
 			@RequestParam(defaultValue = "asc") String direction) {
 		try {
@@ -114,13 +116,6 @@ public class PaxUserController {
 		}
 	}
 
-//	@GetMapping("/head")
-//	public Page<PaxHeadDTO> getPaxHeads(@RequestParam(defaultValue = "0") int page,
-//										@RequestParam(defaultValue = "10") int size) {
-//		Pageable pageable = PageRequest.of(page, size);
-//		return paxUserService.getAllHead(pageable);
-//	}
-
 	@GetMapping("/head")
 	public Page<PaxHeadDTO> getPaginatedAndSortedHeads(@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "name") String sortBy,
@@ -129,15 +124,17 @@ public class PaxUserController {
 	}
 
 	@GetMapping("/searchHead")
-	public ResponseEntity<List<PaxHeadResponseDTO>> searchByHeadItems(@RequestParam String query) {
-		List<PaxHeadResponseDTO> results = paxUserService.searchHead(query);
+	public ResponseEntity<List<PaxHeadDTO>> searchByHeadItems(@RequestParam String query,@RequestParam(defaultValue = "name") String sortBy,
+			@RequestParam(defaultValue = "asc") String direction) {
+		List<PaxHeadDTO> results = paxUserService.searchHead(query,sortBy, direction);
 		return ResponseEntity.ok(results);
 	}
 
 	@GetMapping("/searchMember/{uuid}")
 	public ResponseEntity<List<PaxUsersDTO>> searchByMemberItems(@PathVariable String uuid,
-			@RequestParam String query) {
-		List<PaxUsersDTO> results = paxUserService.searchMemberByHeadUuid(uuid, query);
+			@RequestParam String query,@RequestParam(defaultValue = "name") String sortBy,
+			@RequestParam(defaultValue = "asc") String direction) {
+		List<PaxUsersDTO> results = paxUserService.searchMemberByHeadUuid(uuid, query,sortBy, direction);
 		return ResponseEntity.ok(results);
 	}
 }

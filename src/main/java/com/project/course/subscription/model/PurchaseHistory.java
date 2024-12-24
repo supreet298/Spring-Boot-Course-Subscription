@@ -33,6 +33,9 @@ public class PurchaseHistory {
     
     @Column(name = "plan_name", nullable = false)
     private String planName;
+
+    @Column(name = "subscription_type", nullable = false)
+    private String SubscriptionType;
     
     @Column(name = "renewal_count", nullable = false)
     private int renewalCount;
@@ -48,4 +51,23 @@ public class PurchaseHistory {
     
     @Column(name = "notification_type", nullable = false)
     private  String notificationType;
+
+    @Column(name = "cost", nullable = false)
+    private Double cost;
+
+    @Column(name = "paid", nullable = false)
+    private Boolean paid;
+
+    @Column(name = "paid_date")
+    private LocalDateTime paidDate;
+
+    @Column(name = "cancel_recurring_date")
+    private LocalDateTime cancelRecurringDate;
+
+    private Boolean recurring;
+    
+    private boolean notificationSent=false;
+    
+    private String subscriptionUuid;
+
 }

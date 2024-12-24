@@ -75,15 +75,18 @@
     <div class="container">
         <h1>Congratulations!</h1>
         <p>Dear <span th:text="${userName}"></span>,</p>
-<p>We are pleased to let you know that your subscription plan has been successfully renewed. Below are the details of your updated subscription:</p>
+        <p>We are pleased to inform you that your subscription plan has been successfully purchased by the admin. Here are the details of your subscription:</p>
 
         <h2>Subscription Details:</h2>
         <ul>
             <li><strong>Name:</strong> <span th:text="${userName}"></span></li>
             <li><strong>Plan Name:</strong> <span th:text="${planName}"></span></li>
             <li><strong>Purchase Date:</strong> <span th:text="${setPurchaseDate}"></span></li>
-            <li><strong>Expiry Date:</strong> <span th:text="${setExpiryDate}"></span></li>
+            <li><strong>Expiry Date:</strong> <span th:text="${ExpiryTime}"></span></li>
             <li><strong>Subscription Type:</strong> <span th:text="${subscriptionType}"></span></li>
+            <li><strong>Payment:</strong> <span th:text="${paymentStatus}"></span></li>
+            <li><strong>Payment Date:</strong> <span th:text="${paymentDate}"></span></li>
+            
         </ul>
 
         <p>Thank you for choosing our service! If you have any questions, feel free to reach out to our support team.</p>

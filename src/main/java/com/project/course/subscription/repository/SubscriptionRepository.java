@@ -3,6 +3,7 @@ package com.project.course.subscription.repository;
 import com.project.course.subscription.model.Subscription;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,7 +26,7 @@ public interface SubscriptionRepository extends JpaRepository<Subscription,Long>
             "LOWER(s.description) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "(STR(s.cost) LIKE CONCAT('%', :keyword, '%')) OR " +
             "LOWER(s.subscriptionType) LIKE LOWER(CONCAT('%', :keyword, '%')))")
-    List<Subscription> searchSubscription(@Param("keyword") String keyword);
+    List<Subscription> searchSubscription(@Param("keyword") String keyword, Sort sort);
 
     boolean existsByPlanNameAndIsActiveTrue(String planName);
 }

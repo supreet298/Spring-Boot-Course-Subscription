@@ -30,9 +30,7 @@ public class NotificationService {
 	
 	@Autowired WhatsappRepository whatsappRepository;
 	
-	// Schedule the job to run every two minutes (for testing purposes)
-
-	@Scheduled(cron = "0 0 12 * * ?")
+	//@Scheduled(cron = "0 0 12 * * ?")
 	// @Scheduled(cron = "0 0 8 * * ?") // Runs every day at 8 AM
    	// @Scheduled(cron = "0 */2 * * * ?") // Runs every 2 minutes
 	public void sendNotification() {
@@ -75,5 +73,23 @@ public class NotificationService {
 			System.out.println("MessageSent sent Successfully: " + history.getPaxUser().getCountryCode()+history.getPaxUser().getPhoneNumber().toString());
 		}
 		}
+	
+	// @Scheduled(cron = "0 0 0 * * ?") // Runs daily at midnight
+	 @Scheduled(cron = "0 */5 * * * ?") // 
+	    public void checkAndNotifyExpiredPlans() {
+	        LocalDateTime currentDate = LocalDateTime.now();
+	        List<PurchaseHistory> expiredPlans = purchaseHistoryRepository.findAllByExpiryDateBeforeAndNotificationSentFalse(currentDate);
+	        String ExpiredFile="PlanExpired.html";
+	        
+	        for (PurchaseHistory plan : expiredPlans) {
+	        	if(plan.getPaxUser().isActive())
+	        	{
+	            emailService.sendPlanExpiredEmail(plan.getClientEmail(), plan.getClientName(),plan.getPlanName(), plan.getSubscriptionType(), plan.getPurchaseDate().toLocalDate(), plan.getExpiryDate().toLocalDate(), ExpiredFile); // Implement this method in your email service
+	            plan.setNotificationSent(true);// Mark as notified
+	            purchaseHistoryRepository.save(plan); // Update the record in the database
+				System.out.println("Expiry Email sent Successfully: ");
+	        	}
+	        }
+	    }
 	
 }

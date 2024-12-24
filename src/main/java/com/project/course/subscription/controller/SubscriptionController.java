@@ -1,15 +1,11 @@
 package com.project.course.subscription.controller;
 
-import com.project.course.subscription.dto.CustomPageResponse;
-import com.project.course.subscription.dto.PaxHeadDTO;
 import com.project.course.subscription.dto.SubscriptionDTO;
 import com.project.course.subscription.model.Subscription;
 import com.project.course.subscription.service.SubscriptionService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,24 +35,6 @@ public class SubscriptionController {
         return ResponseEntity.ok(subscriptions);
     }
 
-//    @GetMapping
-//    public ResponseEntity<CustomPageResponse<SubscriptionDTO>> getAllActiveSubscriptions(
-//            @RequestParam(defaultValue = "0") int page,@RequestParam(defaultValue = "10") int size) {
-//        Pageable pageable = PageRequest.of(page, size);
-//        Page<SubscriptionDTO> subscriptionsPage = subscriptionService.getAllActiveSubscriptions(pageable);
-//        // Map the Page to CustomPageResponse
-//        CustomPageResponse<SubscriptionDTO> response = new CustomPageResponse<>(
-//                subscriptionsPage.getContent(),
-//                subscriptionsPage.getNumber(),
-//                subscriptionsPage.getSize(),
-//                subscriptionsPage.getTotalElements(),
-//                subscriptionsPage.getTotalPages(),
-//                subscriptionsPage.isFirst(),
-//                subscriptionsPage.isLast()
-//        );
-//        return ResponseEntity.ok(response);
-//    }
-
     @GetMapping
     public Page<SubscriptionDTO> getPaginatedAndSortedHeads(@RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "planName") String sortBy, @RequestParam(defaultValue = "asc") String direction) {
@@ -69,8 +47,9 @@ public class SubscriptionController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<SubscriptionDTO>> searchSubscription(@RequestParam String keyword){
-        List<SubscriptionDTO> subscriptions = subscriptionService.searchSubscription(keyword);
+    public ResponseEntity<List<SubscriptionDTO>> searchSubscription(@RequestParam String keyword,@RequestParam(defaultValue = "planName") String sortBy,
+        @RequestParam(defaultValue = "asc") String direction){
+        List<SubscriptionDTO> subscriptions = subscriptionService.searchSubscription(keyword, sortBy, direction);
         return ResponseEntity.ok(subscriptions);
     }
 

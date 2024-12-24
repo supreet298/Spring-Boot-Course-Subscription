@@ -14,6 +14,10 @@ public class PaxHeadDTO {
 	
     private String phoneNumber;
     
+    private String country;
+    
+    private String address;
+    
     private String countryCode;
     
     private PaxUser.Type type;

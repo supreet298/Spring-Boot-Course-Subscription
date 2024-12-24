@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscription Confirmation</title>
+    <title>Plan Removal Notification</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
         }
 
         h1 {
-            color: #4CAF50;
+            color: #FF5722;
             margin-bottom: 10px;
         }
 
@@ -64,7 +64,7 @@
         }
 
         .highlight {
-            background-color: #e0ffe0; /* Light green background for highlights */
+            background-color: #ffe0e0; /* Light red background for highlights */
             padding: 5px;
             border-radius: 5px;
         }
@@ -73,24 +73,17 @@
 
 <body>
     <div class="container">
-        <h1>Congratulations!</h1>
+        <h1>Important Notification</h1>
         <p>Dear <span th:text="${userName}"></span>,</p>
-<p>We are pleased to let you know that your subscription plan has been successfully renewed. Below are the details of your updated subscription:</p>
+        <p>We regret to inform you that your current subscription plan,<b> "<span th:text="${planName}"></span>"</b>, has been removed by the admin. We understand this may cause inconvenience, and we are here to assist you in any way possible.</p>
+        <p>Please note that any recurring payments for this plan have been stopped. If you would like to explore alternative plans or need assistance with selecting a new subscription, our support team will be happy to guide you.</p>
+        <p>If you believe this action was taken in error, please contact our support team immediately.</p>
 
-        <h2>Subscription Details:</h2>
-        <ul>
-            <li><strong>Name:</strong> <span th:text="${userName}"></span></li>
-            <li><strong>Plan Name:</strong> <span th:text="${planName}"></span></li>
-            <li><strong>Purchase Date:</strong> <span th:text="${setPurchaseDate}"></span></li>
-            <li><strong>Expiry Date:</strong> <span th:text="${setExpiryDate}"></span></li>
-            <li><strong>Subscription Type:</strong> <span th:text="${subscriptionType}"></span></li>
-        </ul>
-
-        <p>Thank you for choosing our service! If you have any questions, feel free to reach out to our support team.</p>
+        <p>Thank you for being a valued part of our community. We hope to continue serving you with our other available plans and services.</p>
         <p>Best Regards,<br>The [AssistanZ Networks PVT] Team</p>
 
         <div class="footer">
-            <p>This email was sent to you because you purchased a subscription with us. If you did not make this purchase, please contact support.</p>
+            <p>This email was sent to notify you of changes to your subscription plan. If you have any questions or concerns, please contact our support team.</p>
         </div>
     </div>
 </body>

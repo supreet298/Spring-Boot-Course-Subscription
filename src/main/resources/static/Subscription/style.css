@@ -23,48 +23,64 @@
 }
 
 #search {
-	width: 250px;
-	color: black;
+    width: 250px;
+    color: black;
 }
 
 .sort-arrow {
-	font-size: 12px;
-	margin-left: 5px;
+    font-size: 12px;
+    margin-left: 5px;
 }
-
-th {
-	cursor: pointer;
-	white-space: nowrap;
-}
-
-th .header-content {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	width: 100%;
-}
-
+  
+  th {
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  th .header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  
 #filterBy {
-	width: 150px; /* Adjust the width as needed */
+    width: 150px; /* Adjust the width as needed */
 }
 
-/* Custom styles to increase the size of the radio buttons */
-.form-check-input {
-    width: 15px; /* Adjust the width of the radio button */
-    height: 15px; /* Adjust the height of the radio button */
+/* Style the Description column */
+#subscriptionTable td:nth-child(2) {
+  white-space: nowrap; /* Prevent wrapping */
+  overflow: hidden;    /* Hide overflow */
+  text-overflow: ellipsis; /* Add ellipsis when text is too long */
+  max-width: 200px;    /* Set a maximum width for the description column */
+  position: relative;  /* For absolute positioning of the tooltip */
 }
 
-.form-check-label {
-    font-size: 18px; /* Optional: Increase label font size */
+/* Tooltip for showing full description on hover */
+#subscriptionTable td:nth-child(2):hover::after {
+  content: attr(data-description); /* Show full description */
+  position: absolute;
+  top: 0;
+  left: 100%;
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  white-space: normal; /* Allow the description to wrap */
+  max-width: 400px; /* Max width for the tooltip */
+  z-index: 1000;
+  width: auto;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
+/* Optional: Styling for better hover effect (tooltip positioning and visibility) */
+#subscriptionTable td:nth-child(2):hover {
+  cursor: pointer;
+}
 table {
     table-layout: fixed;
     width: 100%;
-}
-
-.text-right {
-    text-align: right !important;
 }
 
 #paginationControls {
@@ -91,3 +107,4 @@ table {
 button {
   margin: 0 10px; /* Space between the buttons */
 }
+

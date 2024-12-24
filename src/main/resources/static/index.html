@@ -8,19 +8,22 @@
 </head>
 <body>
 <div class="container">
-    <h1 class="text-center my-4">Welcome to our website</h1>
+    <h1 class="text-center my-4">Welcome to our Website</h1>
 
     <!-- Button Row -->
     <div class="d-flex justify-content-between">
         <div>
             <!-- Left-aligned buttons -->
             <a class="btn btn-primary me-2" href="Subscription/subscription.html">Subscription</a>
-            <a class="btn btn-primary" href="ManagePax/managePaxUsers.html">PaxUser</a>
+            <a class="btn btn-primary me-2" href="ManagePax/managePaxUsers.html">PaxUser</a>
+	        <a class="btn btn-primary" href="emailSetting.html">Email Configuration </a>
+            
         </div>
 
         <!-- Logout button with JavaScript confirmation -->
         <form action="/logout" method="post" onsubmit="return confirmLogout();">
             <button type="submit" class="btn btn-danger">Logout</button>
+            
         </form>
     </div>
 </div>
