@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class StripeWebhookController {
 
-    private static final String ENDPOINT_SECRET = "abcowhsec_Ed4U4kC3123YVOP9E9MFAnEdR979pceUP3bJ";
+    private static final String ENDPOINT_SECRET = "abcowhsec_xxEd4U4kC3X1XX23YVOP9E9MFAnEdR979pceUP3bJ";
     
     @Autowired
     PurchaseSubscriptionRepository purchaseSubscriptionRepository;
